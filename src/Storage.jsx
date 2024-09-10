@@ -1,5 +1,5 @@
 import React from "react";
-import { useNexusAll } from "../stateManager/store";
+import { useNexusAll } from "./nexusStore";
 
 export default function Storage({ watch }) {
   const states = useNexusAll();

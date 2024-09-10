@@ -1,4 +1,14 @@
-import { actions } from "./nexusConfig";
+const configPath = process.env.NEXUS_CONFIG_PATH || "./nexusConfig";
+let nexusConfig;
+
+try {
+  nexusConfig = await import(configPath); // dynamic import
+} catch (err) {
+  throw new Error("nexusConfig not found, path: " + configPath);
+}
+
+const initialStates = nexusConfig.initialStates;
+const actions = nexusConfig.actions;
 
 function reducer(state, action) {
   const type = action.type;
@@ -23,4 +33,4 @@ function reducer(state, action) {
   return state;
 }
 
-export default reducer;
+export { initialStates, reducer };

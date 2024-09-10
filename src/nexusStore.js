@@ -1,8 +1,7 @@
 import React from "react";
 import context from "./context";
 import Storage from "./Storage";
-import reducer from "./generateData";
-import { initialStates } from "../nexusConfig";
+import { initialStates, reducer } from "./generateData";
 
 const { useNexus, useNexusAll, NexusContextProvider } = context(
   initialStates,
@@ -21,4 +20,3 @@ const NexusProvider = ({ watch, children }) => {
 };
 
 export { useNexus, useNexusAll, NexusProvider };
-export default useNexus;
