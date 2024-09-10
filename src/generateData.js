@@ -1,10 +1,18 @@
 const configPath = process.env.NEXUS_CONFIG_PATH || "./nexusConfig";
-let nexusConfig;
 
+const defaultConfig = {
+  initialStates: {},
+  actions: {},
+};
+
+let nexusConfig;
 try {
-  nexusConfig = await import(configPath); // dynamic import
+  nexusConfig = await import(configPath).then(
+    (module) => module.default || module
+  );
 } catch (err) {
-  throw new Error("nexusConfig not found, path: " + configPath);
+  console.warn("nexusConfig not found");
+  nexusConfig = defaultConfig;
 }
 
 const initialStates = nexusConfig.initialStates;
