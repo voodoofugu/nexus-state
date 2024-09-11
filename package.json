@@ -1,6 +1,6 @@
 {
   "name": "nexus-state",
-  "version": "1.0.0",
+  "version": "1.1.5",
   "author": "Georg Schilin",
   "license": "MIT",
   "description": "Just a global state manager✨",
@@ -10,8 +10,7 @@
   },
   "keywords": [
     "react",
-    "reactjs",
-    "reactive",
+    "state",
     "react-component",
     "state management"
   ],

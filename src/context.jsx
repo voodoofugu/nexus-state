@@ -1,19 +1,25 @@
-import React from "react";
+import React, {
+  useRef,
+  useContext,
+  useCallback,
+  createContext,
+  useSyncExternalStore,
+} from "react";
 
 export default function context(initialStates, reducer) {
   function useStatesContextData() {
-    const store = React.useRef(initialStates);
+    const store = useRef(initialStates);
 
-    const get = React.useCallback(() => store.current, []);
+    const get = useCallback(() => store.current, []);
 
-    const subscribers = React.useRef(new Set());
+    const subscribers = useRef(new Set());
 
-    const set = React.useCallback((value) => {
+    const set = useCallback((value) => {
       store.current = { ...store.current, ...value };
       subscribers.current.forEach((callback) => callback());
     }, []);
 
-    const subscribe = React.useCallback((callback) => {
+    const subscribe = useCallback((callback) => {
       subscribers.current.add(callback);
       return () => subscribers.current.delete(callback);
     }, []);
@@ -25,9 +31,9 @@ export default function context(initialStates, reducer) {
     };
   }
 
-  const StatesContext = React.createContext(null);
+  const StatesContext = createContext(null);
 
-  function ContextStoreProvider({ children }) {
+  function NexusContextProvider({ children }) {
     return (
       <StatesContext.Provider value={useStatesContextData()}>
         {children}
@@ -36,12 +42,12 @@ export default function context(initialStates, reducer) {
   }
 
   function useStatesContext(selector) {
-    const statesContext = React.useContext(StatesContext);
+    const statesContext = useContext(StatesContext);
     if (!statesContext) {
-      throw new Error("Store not found");
+      throw new Error("Context not found");
     }
 
-    const state = React.useSyncExternalStore(
+    const state = useSyncExternalStore(
       statesContext.subscribe,
       () => selector(statesContext.get()),
       () => selector(initialStates)
@@ -59,19 +65,19 @@ export default function context(initialStates, reducer) {
     return [state, set];
   }
 
-  function useStoreContext(fieldName) {
+  function useNexus(fieldName) {
     const [getter, setter] = useStatesContext((fc) => fc[fieldName]);
     return [getter, setter];
   }
 
-  function useAllStoreContext() {
+  function useNexusAll() {
     const [statesContext] = useStatesContext((fc) => fc);
     return statesContext;
   }
 
   return {
-    ContextStoreProvider,
-    useStoreContext,
-    useAllStoreContext,
+    useNexus,
+    useNexusAll,
+    NexusContextProvider,
   };
 }
