@@ -2,22 +2,27 @@ import React from "react";
 import context from "./context";
 import Storage from "./Storage";
 
-let initialStates = {};
-let actions = {};
+let initialStatesLocal = {};
+let actionsLocal = {};
 
-(function () {
-  if (configureNexus) {
-    initialStates = configureNexus.initialStates;
-    actions = configureNexus.actions;
+try {
+  const nexusConfig = require("../../nexusConfig");
+  initialStatesLocal = nexusConfig.initialStates || {};
+  actionsLocal = nexusConfig.actions || {};
+} catch (e) {
+  if (e.code === "MODULE_NOT_FOUND") {
+    console.warn("🕵️‍♂️ nexusConfig not found.");
+  } else {
+    throw e;
   }
-})();
+}
 
 function reducer(state, action) {
   const type = action.type;
   const payload = action.payload;
 
-  if (actions[type]) {
-    const config = actions[type];
+  if (actionsLocal[type]) {
+    const config = actionsLocal[type];
 
     if (config.reducer) {
       return {
@@ -36,7 +41,7 @@ function reducer(state, action) {
 }
 
 const { useNexus, useNexusAll, NexusContextProvider } = context(
-  initialStates,
+  initialStatesLocal,
   reducer
 );
 
@@ -49,4 +54,4 @@ const NexusProvider = ({ watch, children }) => {
   );
 };
 
-export { useNexus, useNexusAll, NexusProvider, configureNexus };
+export { useNexus, useNexusAll, NexusProvider };

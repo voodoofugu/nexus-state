@@ -1,9 +1,4 @@
-import {
-  useNexus,
-  useNexusAll,
-  NexusProvider,
-  configureNexus,
-} from "./nexusStore";
+import { useNexus, useNexusAll, NexusProvider } from "./nexusStore";
 
-export { useNexus, useNexusAll, NexusProvider, configureNexus };
+export { useNexus, useNexusAll, NexusProvider };
 export default useNexus;

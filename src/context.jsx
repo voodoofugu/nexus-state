@@ -44,7 +44,7 @@ export default function context(initialStates, reducer) {
   function useStatesContext(selector) {
     const statesContext = useContext(StatesContext);
     if (!statesContext) {
-      throw new Error("Context not found");
+      console.error(`NexusContextProvider not found 👺`);
     }
 
     const state = useSyncExternalStore(
@@ -66,7 +66,13 @@ export default function context(initialStates, reducer) {
   }
 
   function useNexus(fieldName) {
-    const [getter, setter] = useStatesContext((fc) => fc[fieldName]);
+    const [getter, setter] = useStatesContext((fc) => {
+      if (typeof fc !== "object" || fc === null || !(stateName in fc)) {
+        console.error(`initialState "${stateName}" not found 👺`);
+        return undefined;
+      }
+      return fc[stateName];
+    });
     return [getter, setter];
   }
 
