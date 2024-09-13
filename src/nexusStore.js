@@ -1,19 +1,22 @@
-import React from "react";
 import context from "./context";
-import Storage from "./Storage";
 
 let initialStatesLocal = {};
 let actionsLocal = {};
 
-try {
-  const nexusConfig = require("../../nexusConfig");
-  initialStatesLocal = nexusConfig.initialStates || {};
-  actionsLocal = nexusConfig.actions || {};
-} catch (e) {
-  if (e.code === "MODULE_NOT_FOUND") {
-    console.warn("🕵️‍♂️ nexusConfig not found.");
-  } else {
-    throw e;
+if (typeof process !== "undefined" && process.env.NODE_ENV !== "production") {
+  try {
+    // Используйте путь относительно текущего рабочего каталога
+    const configPath = path.resolve(process.cwd(), "nexusConfig.js");
+    // Путь должен быть внешним и доступным пользователю
+    const nexusConfig = require(configPath);
+    initialStatesLocal = nexusConfig.initialStates || {};
+    actionsLocal = nexusConfig.actions || {};
+  } catch (e) {
+    if (e.code === "MODULE_NOT_FOUND") {
+      console.warn("🕵️‍♂️ nexusConfig not found.");
+    } else {
+      throw e;
+    }
   }
 }
 
@@ -45,13 +48,4 @@ const { useNexus, useNexusAll, NexusContextProvider } = context(
   reducer
 );
 
-const NexusProvider = ({ watch, children }) => {
-  return (
-    <NexusContextProvider>
-      {typeof window !== "undefined" && <Storage watch={watch} />}
-      {children}
-    </NexusContextProvider>
-  );
-};
-
-export { useNexus, useNexusAll, NexusProvider };
+export { useNexus, useNexusAll, NexusContextProvider };
