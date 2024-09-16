@@ -1,7 +1,6 @@
 import React, { useEffect, useMemo } from "react";
-import { useNexusAll } from "./nexusStore";
 
-export default function Storage({ watch }) {
+export default function Storage({ useNexusAll, watch }) {
   const states = useNexusAll();
   const isEmpty = (obj) => Object.keys(obj).length === 0;
 
@@ -25,9 +24,9 @@ export default function Storage({ watch }) {
 
   useEffect(() => {
     !isEmpty(localStates) &&
-      localStorage.setItem("📌", JSON.stringify(localStates));
+      localStorage.setItem("nexusStorage_l", JSON.stringify(localStates));
     !isEmpty(sessionStates) &&
-      sessionStorage.setItem("📌", JSON.stringify(sessionStates));
+      sessionStorage.setItem("nexusStorage_s", JSON.stringify(sessionStates));
 
     if (watch) {
       sessionStorage.setItem("nexusWatch", JSON.stringify(statesForWatch));

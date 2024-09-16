@@ -1,4 +1,5 @@
-import { useNexus, useNexusAll } from "./nexusStore";
-import NexusProvider from "./NexusProvider";
+import nexusContext from "./nexusContext";
+
+const { useNexus, useNexusAll, NexusProvider } = nexusContext();
 
 export { useNexus, useNexusAll, NexusProvider };
