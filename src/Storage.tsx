@@ -1,10 +1,21 @@
-import React, { useEffect, useMemo } from "react";
+import React from "react";
+import { useNexusAll } from "./nexusStore";
 
-export default function Storage({ useNexusAll, watch }) {
+export interface watchType {
+  watch?: boolean;
+}
+
+interface SessionStorProps extends watchType {}
+
+export default function Storage({
+  watch,
+}: SessionStorProps): React.ReactElement | null {
   const states = useNexusAll();
-  const isEmpty = (obj) => Object.keys(obj).length === 0;
+  const isEmpty = (obj: Record<string, any>): boolean => {
+    return Object.keys(obj).length === 0;
+  };
 
-  const { statesForWatch, localStates, sessionStates } = useMemo(() => {
+  const { statesForWatch, localStates, sessionStates } = React.useMemo(() => {
     if (!states) {
       return { statesForWatch: {}, localStates: {}, sessionStates: {} };
     }
@@ -22,14 +33,14 @@ export default function Storage({ useNexusAll, watch }) {
     return { statesForWatch, localStates, sessionStates };
   }, [states]);
 
-  useEffect(() => {
+  React.useEffect(() => {
     !isEmpty(localStates) &&
-      localStorage.setItem("nexusStorage_l", JSON.stringify(localStates));
+      localStorage.setItem("📌", JSON.stringify(localStates));
     !isEmpty(sessionStates) &&
-      sessionStorage.setItem("nexusStorage_s", JSON.stringify(sessionStates));
+      sessionStorage.setItem("📌", JSON.stringify(sessionStates));
 
     if (watch) {
-      sessionStorage.setItem("nexusWatch", JSON.stringify(statesForWatch));
+      sessionStorage.setItem("👁", JSON.stringify(statesForWatch));
     }
   }, [localStates, sessionStates, statesForWatch, watch]);
 
