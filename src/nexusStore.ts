@@ -1,6 +1,5 @@
 import React, { createContext, useContext } from "react";
 import context from "./context";
-import Storage from "./Storage";
 
 interface Config {
   initialStates: Record<string, any>;
@@ -10,6 +9,12 @@ interface Config {
       reducer?: (state: any, action: any) => any;
     }
   >;
+}
+
+interface ProviderProps {
+  initialStates: Config["initialStates"];
+  actions: Config["actions"];
+  children: React.ReactNode;
 }
 
 // Редьюсер, использующий действия из конфигурации
@@ -43,36 +48,6 @@ function createReducer(actions: Config["actions"]) {
 // Создаём контекст, используя динамические начальные состояния и редьюсер
 const NexusContext = createContext<ReturnType<typeof context> | null>(null);
 
-interface ProviderProps {
-  initialStates: Config["initialStates"];
-  actions: Config["actions"];
-  watch?: boolean;
-  children: React.ReactNode;
-}
-
-// NexusProvider принимает конфигурацию состояний и редьюсера
-const NexusProvider: React.FC<ProviderProps> = ({
-  initialStates,
-  actions,
-  watch,
-  children,
-}) => {
-  // Создаём редьюсер на основе переданных действий
-  const reducer = createReducer(actions);
-
-  // Создаём динамический контекст с помощью вашей функции context
-  const nexusContext = context(initialStates, reducer);
-
-  return (
-    <NexusContext.Provider value={nexusContext}>
-      <nexusContext.NexusContextProvider>
-        <Storage watch={watch} />
-        {children}
-      </nexusContext.NexusContextProvider>
-    </NexusContext.Provider>
-  );
-};
-
 // Хуки для работы с состоянием
 const useGetNexus = (stateName: string) => {
   const ctx = useContext(NexusContext);
@@ -96,6 +71,29 @@ const useNexusAll = () => {
     throw new Error("NexusProvider not found");
   }
   return ctx.useNexusAll();
+};
+
+// NexusProvider принимает конфигурацию состояний и редьюсера
+const NexusProvider: React.FC<ProviderProps> = ({
+  initialStates,
+  actions,
+  children,
+}) => {
+  // Создаём редьюсер на основе переданных действий
+  const reducer = createReducer(actions);
+
+  // Создаём динамический контекст с помощью вашей функции context
+  const NexusContextLocal = context(initialStates, reducer);
+
+  return (
+    <NexusContext.Provider value={NexusContextLocal}>
+      {NexusContextLocal ? (
+        <NexusContextLocal.NexusContextProvider>
+          {children}
+        </NexusContextLocal.NexusContextProvider>
+      ) : null}
+    </NexusContext.Provider>
+  );
 };
 
 // Экспортируем хуки и провайдер

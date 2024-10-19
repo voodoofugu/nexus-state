@@ -1,18 +1,21 @@
 {
   "compilerOptions": {
-    "module": "ESNext",
+    "outDir": "./dist/",
+    "noImplicitAny": true,
+    "module": "commonjs",
     "target": "es6",
-    "lib": ["dom", "es2019"],
-    "declaration": true,
-    "outDir": "./dist",
-    "esModuleInterop": true,
-    "skipLibCheck": true,
+    "jsx": "react-jsx",
+    "allowJs": true,
     "moduleResolution": "node",
-    "types": ["react"],
-    "typeRoots": ["./node_modules/@types"],
-    "strict": true,
-    "jsx": "react"
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "baseUrl": "."
   },
-  "include": ["src"],
-  "exclude": ["node_modules", "dist"]
+  "ts-node": {
+    "compilerOptions": {
+      "module": "CommonJS",
+      "typeRoots": ["./node_modules/@types"]
+    }
+  },
+  "include": ["src/**/*"]
 }

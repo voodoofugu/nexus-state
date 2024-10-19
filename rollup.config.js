@@ -9,18 +9,13 @@ export default [
     input: "./src/index.ts",
     output: [
       {
-        file: "dist/cjs/index.js",
-        format: "cjs",
+        file: "dist/index.js",
+        format: "es",
         exports: "named",
+        globals: {
+          react: "React",
+        },
       },
-      // {
-      //   file: "dist/esm/index.js",
-      //   format: "esm",
-      //   exports: "named",
-      //   globals: {
-      //     react: "React",
-      //   },
-      // },
     ],
     plugins: [
       del({ targets: "dist/*" }),

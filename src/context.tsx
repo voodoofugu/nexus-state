@@ -2,7 +2,7 @@ import React from "react";
 
 type Action = {
   type: string;
-  payload?: any;
+  payload?: object;
 };
 
 export default function context<Context>(
@@ -54,7 +54,7 @@ export default function context<Context>(
 
   // Хук для получения состояния по ключу
   // Перегрузка для возвращаемого типа в зависимости от входного параметра
-  function useGetNexus(stateName: string): any;
+  function useGetNexus(stateName: string): object;
   function useGetNexus<SelectorOutput>(
     stateName: string
   ): SelectorOutput | undefined;
