@@ -2,7 +2,7 @@ import React from "react";
 
 export type ActionType = {
   type: string;
-  payload?: unknown;
+  payload?: any;
 };
 
 export default function context<Context extends Record<string, unknown>>(

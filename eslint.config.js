@@ -17,4 +17,9 @@ export default [
     },
     ignores: ["**/*.d.ts", "publish/*", "dist/*"],
   },
+  {
+    rules: {
+      "@typescript-eslint/no-explicit-any": "off",
+    },
+  },
 ];
