@@ -1,13 +1,13 @@
 import React from "react";
 
-type Action = {
+export type ActionType = {
   type: string;
-  payload?: object;
+  payload?: unknown;
 };
 
-export default function context<Context>(
+export default function context<Context extends Record<string, unknown>>(
   initialStates: Context,
-  reducer: (state: Context, action: Action) => Context
+  reducer: (state: Context, action: ActionType) => Context
 ) {
   function useStatesContextData(): {
     get: () => Context;
@@ -53,19 +53,11 @@ export default function context<Context>(
   }
 
   // Хук для получения состояния по ключу
-  // Перегрузка для возвращаемого типа в зависимости от входного параметра
-  function useGetNexus(stateName: string): object;
-  function useGetNexus<SelectorOutput>(
-    stateName: string
-  ): SelectorOutput | undefined;
-
-  function useGetNexus<SelectorOutput>(
-    stateName: string
-  ): SelectorOutput | undefined {
+  function useGetNexus<K extends keyof Context>(stateName: K): Context[K] {
     const statesContext = React.useContext(StatesContext);
     if (!statesContext) {
       console.error(`NexusContextProvider not found 👺`);
-      return undefined;
+      return undefined as Context[K]; // Убедитесь, что возвращаете типизированное значение
     }
 
     const getState = React.useCallback(() => {
@@ -75,31 +67,30 @@ export default function context<Context>(
         state === null ||
         !(stateName in state)
       ) {
-        console.error(`State "${stateName}" not found 👺`);
-        return undefined;
+        console.error(`State "${stateName.toString()}" not found 👺`);
+        return undefined as Context[K];
       }
-      return (state as Record<string, SelectorOutput>)[stateName];
+      return state[stateName];
     }, [stateName, statesContext]);
 
-    // Подписка на изменения состояния по ключу
     return React.useSyncExternalStore(
       statesContext.subscribe,
       getState,
-      () => getState() // Возвращаем текущее значение при инициализации
+      getState
     );
   }
 
   // Хук для обновления состояния по ключу или dispatch action
-  function useSetNexus(): (value: Partial<Context> | Action) => void {
+  function useSetNexus(): (value: Partial<Context> | ActionType) => void {
     const statesContext = React.useContext(StatesContext);
     if (!statesContext) {
       console.error(`NexusContextProvider not found 👺`);
       return () => {}; // Ничего не делаем, если контекст не найден
     }
 
-    return (value: Partial<Context> | Action) => {
+    return (value: Partial<Context> | ActionType) => {
       if ("type" in value) {
-        const newState = reducer(statesContext.get(), value as Action);
+        const newState = reducer(statesContext.get(), value as ActionType);
         statesContext.set(newState);
       } else {
         statesContext.set(value as Partial<Context>);
