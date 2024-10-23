@@ -1,0 +1,36 @@
+{
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Voodoofugu/nexus-state"
+  },
+  "name": "nexus-state",
+  "version": "1.0.0",
+  "description": "Nexus State Manager Repository",
+  "main": "src/index.tsx",
+  "keywords": [],
+  "author": "Georg Schilin",
+  "license": "ISC",
+  "scripts": {
+    "build": "webpack",
+    "lint": "eslint 'src/**/*.{js,ts,tsx}'"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.13.0",
+    "@types/jest": "^29.5.12",
+    "@types/node": "^20.12.6",
+    "@types/react": "^18.2.61",
+    "@types/webpack": "^5.28.5",
+    "esbuild-loader": "^4.2.2",
+    "eslint": "^9.13.0",
+    "eslint-plugin-react": "^7.37.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.6.3",
+    "typescript-eslint": "^8.10.0",
+    "webpack": "^5.90.3",
+    "webpack-cli": "^5.1.4",
+    "webpack-dev-server": "^4.15.1"
+  },
+  "dependencies": {
+    "react": "^18.2.0"
+  }
+}

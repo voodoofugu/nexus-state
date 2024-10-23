@@ -1,0 +1,19 @@
+{
+  "name": "nexus-state",
+  "version": "1.2.5",
+  "author": "Georg Schilin",
+  "license": "MIT",
+  "description": "Just a global state manager✨",
+  "main": "dist/index.js",
+  "type": "commonjs",
+  "keywords": [
+    "react",
+    "state",
+    "react-component",
+    "state management",
+    "global state"
+  ],
+  "peerDependencies": {
+    "react": "^18.3.1"
+  }
+}

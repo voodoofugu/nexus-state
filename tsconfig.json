@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "outDir": "./dist/",
+    "rootDir": "./src",
+    "noImplicitAny": true,
+    "module": "commonjs",
+    "target": "es6",
+    "jsx": "react-jsx",
+    "allowJs": true,
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "baseUrl": ".",
+    "strict": true,
+    "declaration": true,
+    "declarationDir": "./dist/types"
+  },
+  "ts-node": {
+    "compilerOptions": {
+      "module": "CommonJS",
+      "typeRoots": ["./node_modules/@types"]
+    }
+  },
+  "include": ["src/**/*"]
+}
