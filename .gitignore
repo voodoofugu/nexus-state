@@ -1,7 +1,4 @@
-node_modules/
-package-lock.json
-dist/
-.env
-src/styles/css
+dist
+node_modules
 Zone.Identifier
 .DS_Store

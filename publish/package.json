@@ -1,11 +1,11 @@
 {
   "name": "nexus-state",
-  "version": "1.2.5",
+  "version": "1.4.0",
   "author": "Georg Schilin",
   "license": "MIT",
   "description": "Just a global state manager✨",
-  "main": "dist/index.js",
-  "type": "commonjs",
+  "main": "index.js",
+  "types": "index.d.ts",
   "keywords": [
     "react",
     "state",
