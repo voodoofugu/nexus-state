@@ -12,6 +12,7 @@
     "allowSyntheticDefaultImports": true,
     "baseUrl": ".",
     "strict": true,
+    "strictNullChecks": true,
     "declaration": true,
     "emitDeclarationOnly": true
     // "outFile": "./dist/index.d.ts"
