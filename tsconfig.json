@@ -11,10 +11,15 @@
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "baseUrl": ".",
+    "paths": {
+      "@/*": ["*"],
+      "@/nexusConfig": ["./nexusConfig"]
+    },
     "strict": true,
     "strictNullChecks": true,
     "declaration": true,
-    "emitDeclarationOnly": true
+    "emitDeclarationOnly": true,
+    "skipLibCheck": true
     // "outFile": "./dist/index.d.ts"
   },
   "ts-node": {

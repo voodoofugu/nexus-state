@@ -1,6 +1,6 @@
 {
   "name": "nexus-state",
-  "version": "1.4.0",
+  "version": "1.4.2",
   "author": "Georg Schilin",
   "license": "MIT",
   "description": "Just a global state manager✨",

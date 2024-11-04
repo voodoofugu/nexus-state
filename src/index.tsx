@@ -1,9 +1,17 @@
+import React from "react";
 import {
-  useGetNexus,
-  useSetNexus,
-  useNexusAll,
   NexusProvider,
-} from "./nexusStore";
+  useNexus,
+  useSelector,
+  nexusDispatch,
+  createAction,
+} from "./nexus";
 
-export const Nexus = { useGetNexus, useSetNexus, useNexusAll, NexusProvider };
-export { useGetNexus, useSetNexus, useNexusAll, NexusProvider };
+export const Nexus = {
+  NexusProvider,
+  useNexus,
+  useSelector,
+  nexusDispatch,
+  createAction,
+};
+export { NexusProvider, useNexus, useSelector, nexusDispatch, createAction };

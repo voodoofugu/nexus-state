@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "nexus-state": ["./index"],
+      "nexus-state/types": ["./types.d.ts"],
+      "nexus-state/nexus": ["./nexus.d.ts"],
+      "@/nexusConfig": ["./nexusConfig"]
+    }
+  }
+}
