@@ -1,11 +1,11 @@
 {
   "name": "nexus-state",
-  "version": "1.4.2",
-  "author": "Georg Schilin",
+  "version": "1.4.3",
+  "author": "Georg Schilin <schilingeorg@gmail.com>",
   "license": "MIT",
   "description": "Just a global state manager✨",
-  "main": "index.js",
-  "types": "index.d.ts",
+  "main": "nexus.js",
+  "types": "nexus.d.ts",
   "keywords": [
     "react",
     "state",
@@ -15,5 +15,9 @@
   ],
   "peerDependencies": {
     "react": "^18.3.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/voodoofugu/nexus-state.git"
   }
 }

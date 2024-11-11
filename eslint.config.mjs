@@ -10,13 +10,14 @@ export default [
   {
     rules: {
       "@typescript-eslint/no-explicit-any": "off",
+      "@typescript-eslint/no-empty-object-type": "off",
     },
   },
   {
-    "settings": {
-      "react": {
-        "version": "detect" 
-      }
-    }
-  }
+    settings: {
+      react: {
+        version: "detect",
+      },
+    },
+  },
 ];

@@ -3,7 +3,7 @@
     "outDir": "./dist/",
     "rootDir": "./src",
     "noImplicitAny": true,
-    "module": "commonjs",
+    "module": "esnext",
     "target": "es6",
     "jsx": "react-jsx",
     "allowJs": true,
@@ -11,10 +11,6 @@
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "baseUrl": ".",
-    "paths": {
-      "@/*": ["*"],
-      "@/nexusConfig": ["./nexusConfig"]
-    },
     "strict": true,
     "strictNullChecks": true,
     "declaration": true,
