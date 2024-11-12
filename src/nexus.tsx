@@ -121,8 +121,10 @@ const NexusProvider: React.FC<{
   children: React.ReactNode;
 }> = ({ initialStates, actions, children }) => {
   const reducer = createReducer(actions);
+  const immutableInitialStates = structuredClone(initialStates);
+
   const contextValue = {
-    ...createContextValue(initialStates, reducer),
+    ...createContextValue(immutableInitialStates, reducer),
     initialStates, // добавляем initialStates в контекст
   };
 
@@ -179,7 +181,9 @@ function nexusDispatch(action: ActionsCallingT): void {
 function createAction(
   reducer?: (state: StatesT, action: ActionsCallingT) => StatesT
 ) {
-  return { reducer };
+  return {
+    reducer: reducer || ((state: StatesT) => state),
+  };
 }
 
 export { NexusProvider, useNexus, useSelector, nexusDispatch, createAction };

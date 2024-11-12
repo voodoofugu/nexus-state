@@ -16,7 +16,6 @@
     "declaration": true,
     "emitDeclarationOnly": true,
     "skipLibCheck": true
-    // "outFile": "./dist/index.d.ts"
   },
   "ts-node": {
     "compilerOptions": {

@@ -2,17 +2,19 @@ declare global {
   interface StatesT {}
   interface ActionsT {}
 }
-
 export type ActionsCallingT = {
   type: keyof ActionsT extends never ? string : keyof ActionsT;
   payload?: any;
 };
 
 export type ActionsRT = {
-  [key in keyof ActionsT]: {
-    reducer: (state: StatesT, action: ActionsCallingT) => StatesT;
+  [key in keyof ActionsT]?: {
+    reducer: Exclude<
+      (state: StatesT, action: ActionsCallingT) => StatesT,
+      undefined
+    >;
   };
-} & Record<string, never>;
+};
 
 export type NexusContextT = {
   get: <K extends keyof StatesT>(stateName: K) => StatesT[K];

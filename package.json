@@ -2,7 +2,7 @@
   "name": "nexus-state",
   "version": "1.0.0",
   "description": "Nexus State Manager Repository",
-  "main": "src/index.tsx",
+  "main": "src/nexus.tsx",
   "author": "Georg Schilin",
   "license": "MIT",
   "type": "module",
