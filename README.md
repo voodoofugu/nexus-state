@@ -178,10 +178,10 @@ const YourButton= () => {
 # API
 
 - `NexusProvider`: провайдер для оборачивания приложения.
-- `useNexus`: хук для получения `state` по ключу.
+- `useNexus`: хук для получения state по ключу.
 - `useSelector`: хук для выборки вычисленных значений.
-- `nexusDispatch`: функция для вызова `actions`.
-- `createAction`: утилита для создания `actions`.
+- `nexusDispatch`: функция для вызова actions.
+- `createAction`: утилита для создания actions.
 
 ---
 
