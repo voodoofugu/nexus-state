@@ -7,7 +7,7 @@
 Установите библиотеку, выполнив команду:
 
 ```bash
-npm install <nexus-state>
+npm install nexus-state
 ```
 
 # Начало работы
@@ -17,8 +17,8 @@ npm install <nexus-state>
 Создайте файл `nexusConfig.ts`, где определите состояния и экшены:
 
 ```typescript
-Копировать код
-import { PopupState, createAction } from '<название_вашей_библиотеки>';
+"Копировать код";
+import { PopupState, createAction } from "<название_вашей_библиотеки>";
 
 export const initialStates = {
   popupState: {} as PopupState,
@@ -42,9 +42,9 @@ export const actions = {
 Оберните ваше приложение в `NexusProvider`, передавая начальные состояния и экшены:
 
 ```typescript
-Копировать код
-import { NexusProvider } from '<название_вашей_библиотеки>';
-import { initialStates, actions } from './nexusConfig';
+// Копировать код
+import { NexusProvider } from "<название_вашей_библиотеки>";
+import { initialStates, actions } from "./nexusConfig";
 
 const App = () => (
   <NexusProvider initialStates={initialStates} actions={actions}>
