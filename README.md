@@ -1,15 +1,15 @@
 # nexus-state ✨
 
-Лёгкая и гибкая библиотека для управления состоянием в React-приложениях с поддержкой строгой типизации TypeScript. С `nexus-state `удобно строить сложные структуры состояния с минимальными перерендерингами. Для полного раскрытия возможностей автозаполнения типов рекомендуется использовать TypeScript, но `nexus-state` работает и с JavaScript.
+A lightweight and flexible state management library for React applications with TypeScript's strong typing support. With `nexus-state`, you can easily build complex state structures while minimizing re-renders. While the library works with JavaScript, using TypeScript unlocks the full potential of type inference and autocompletion.
 
-Эта библиотека появилась случайно. Я не планировал использовать готовые state-менеджеры и просто обновлял состояния на основе flux-архитектуры. Со временем захотелось выделить управление состояниями в отдельный компонент, что и привело к созданию библиотеки.
+This library came about by chance. I hadn't planned on using a state manager and simply updated states based on a flux-like architecture. Over time, I wanted to isolate state management into a separate component, which led to the creation of this library.
 
-Название "Nexus" пришло ко мне из игры "Demon's Souls", где "Nexus" является убежищем для игрока и отправной точкой. Так и при использовании `nexus-state` я хотел что бы пользователь ощущал связь в любой момент с местом вроде "Nexus" или костром из игры "Dark Souls" откуда можно попасть куда угодно что бы продолжить приключение.
+The name "Nexus" was inspired by the game Demon's Souls, where the "Nexus" serves as a safe haven for the player and a starting point. Similarly, with `nexus-state`, I wanted users to feel connected to a place like the "Nexus" or a bonfire from Dark Souls, where they can start their journey to anywhere.
 🔥🗡️
 
-## Установка
+## Installation
 
-Вы можете установить библиотеку, выполнив команду:
+Install the library using the following command:
 
 ```bash
 npm install nexus-state
@@ -17,11 +17,11 @@ npm install nexus-state
 
 ---
 
-# Начало работы
+# Getting Started
 
-## 1. Определение initialStates, actions и использование createAction
+## 1. Define initialStates, actions, and use createAction
 
-Создайте файл с именем например `nexusConfig`, где определите `initialStates` и `actions`, для определения `actions` есть вспомогательная функция `createAction`:
+Create a file, such as `nexusConfig`, where you define `initialStates` and `actions`. Use the `createAction` helper function for defining `actions`:
 
 ```javascript
 import { createAction } from "nexus-state";
@@ -29,7 +29,7 @@ import { createAction } from "nexus-state";
 export const initialStates = {
   strength: 10,
   secretPower: 5,
-  // другие states...
+  // other states...
 };
 
 export const actions = {
@@ -37,11 +37,11 @@ export const actions = {
     ...state,
     strength: state.strength + action.payload,
   })),
-  // другие actions...
+  // other actions...
 };
 ```
 
-Не забывайте что вы можете выносить код из `actions` в отдельные переменные и ханить где вам удобно:
+You can also move the action logic to separate variables and store them wherever you prefer:
 
 ```javascript
 import { createAction } from "nexus-state";
@@ -53,13 +53,13 @@ const LEVEL_UP = createAction((state, action) => ({
 
 export const actions = {
   LEVEL_UP,
-  // другие actions...
+  // other actions...
 };
 ```
 
-Для `typescript` советую вам расширить глобальные типы `StatesT` и `ActionsT` поставляемые библиотекой и самый короткий способ будет сделать это через `typeof`
+For TypeScript, it’s recommended to extend the global `StatesT` and `ActionsT` interfaces provided by the library. The simplest way is to use `typeof`:
 
-🔮 _Не забудьте правильно настроить `tsconfig`_
+🔮 _Make sure to configure `tsconfig` properly._
 
 ```typescript
 type InitialStatesT = typeof initialStates;
@@ -71,11 +71,11 @@ declare global {
 }
 ```
 
-🔮 _Если вы используете `eslint`он выдаст вам ошибку о том что объект в типах пуст`@typescript-eslint/no-empty-object-type`, но это легко исправить_
+🔮 _If you use `eslint`, you might encounter an error about empty object types (`@typescript-eslint/no-empty-object-type`), but this is easy to fix._
 
-Вот способы по избежанию ошибки `@typescript-eslint/no-empty-object-type`:
+### Ways to address the `no-empty-object-type` error:
 
-### 1. Добавить правило в eslint
+1. Add a rule to eslint:
 
 ```typescript
 rules: {
@@ -83,23 +83,7 @@ rules: {
 }
 ```
 
-### 2. Оставить основной вариант и просто передать дополнительный states и actions
-
-```typescript
-type InitialStatesT = typeof initialStates;
-type InitialActionsT = typeof actions;
-
-declare global {
-  interface StatesT extends InitialStatesT {
-    anyState: string;
-  }
-  interface ActionsT extends InitialActionsT {
-    ANY_ACTION: string;
-  }
-}
-```
-
-### 3. Передать все типы и actions если их немного напрямую
+2. Define all states and actions manually if there are only a few:
 
 ```javascript
 declare global {
@@ -113,13 +97,13 @@ declare global {
 }
 ```
 
-### 4. Просто игнорировать 🙌
+3. Simply ignore the warning. 🙌
 
 ---
 
-## 2. Использование `NexusProvider` в корневом компоненте
+## 2. Wrap your app with `NexusProvider`
 
-Оберните ваше приложение в `NexusProvider`, передавая `initialStates` и `actions`:
+Wrap your application with `NexusProvider`, passing in `initialStates` and `actions`:
 
 ```javascript
 import { NexusProvider } from "nexus-state;
@@ -134,9 +118,9 @@ const App = () => (
 
 ---
 
-## 3. Доступ к состояниям с помощью useNexus
+## 3. Access states with `useNexus`
 
-Для получения значения состояния используйте `useNexus`:
+To access a state value, use the `useNexus` hook:
 
 ```javascript
 import { useNexus } from "nexus-state";
@@ -150,9 +134,9 @@ const YourComponent = () => {
 
 ---
 
-## 4. Использование useSelector для вычисленных значений
+## 4. Use `useSelector` for computed values
 
-Если вам нужно вычислить данные из состояния, используйте `useSelector`:
+If you need to calculate derived data from the state, use the `useSelector` hook:
 
 ```typescript
 import { useSelector } from "nexus-state;
@@ -168,9 +152,9 @@ const YourComponent = () => {
 
 ---
 
-## 5. Вызов actions с помощью nexusDispatch
+## 5. Dispatch actions with `nexusDispatch`
 
-Для изменения состояния воспользуйтесь `nexusDispatch`:
+To update the state, use the `nexusDispatch` function:
 
 ```typescript
 import { nexusDispatch } from "nexus-state;
@@ -187,20 +171,20 @@ const YourButton= () => {
 };
 ```
 
-🔮 _Так же если вы правильно настроили глобальные типы, то в `useNexus`, `useSelector`и`nexusDispatch`в поле`type` будет выведение типов_
+🔮 _If you’ve set up global types properly, `useNexus`, `useSelector`, and `nexusDispatch` will benefit from full type inference, including autocompletion for the type field._
 
 ---
 
 # API
 
-- `NexusProvider`: провайдер для оборачивания приложения.
-- `useNexus`: хук для получения state по ключу.
-- `useSelector`: хук для выборки вычисленных значений.
-- `nexusDispatch`: функция для вызова actions.
-- `createAction`: утилита для создания actions.
+- `NexusProvider`: Provider to wrap your application.
+- `useNexus`: Hook for accessing a state by key.
+- `useSelector`: Hook for computed or derived state values.
+- `nexusDispatch`: Function to dispatch actions.
+- `createAction`: Utility for creating actions.
 
 ---
 
-## Заключение
+## Conclusion
 
-Надеюсь, использование `nexus-state` сделает разработку вашего приложения приятной и продуктивной! ✨
+I hope using `nexus-state` makes your development enjoyable and productive! ✨
