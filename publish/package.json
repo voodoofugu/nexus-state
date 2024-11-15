@@ -1,23 +1,22 @@
 {
   "name": "nexus-state",
-  "version": "1.4.6",
+  "version": "1.4.7",
   "author": "Georg Schilin <schilingeorg@gmail.com>",
   "license": "MIT",
-  "description": "Just a global state manager✨",
+  "description": "Global state manager✨",
   "main": "nexus.js",
   "types": "nexus.d.ts",
   "keywords": [
     "react",
     "state",
-    "react-component",
-    "state management",
-    "global state"
+    "flux",
+    "reducer",
+    "action",
+    "managager",
+    "global",
+    "store"
   ],
   "peerDependencies": {
     "react": "^18.3.1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/voodoofugu/nexus-state.git"
   }
 }
