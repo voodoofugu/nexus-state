@@ -32,12 +32,12 @@ function getContextMethods(initialStates: StatesT): {
   set: (value: Partial<StatesT>) => void;
   subscribe: (callback: () => void) => () => void;
 } {
-  const store = React.useRef(initialStates);
+  let store = initialStates;
   const subscribers = React.useRef(new Set<() => void>());
 
-  const get = React.useCallback(() => store.current, []);
+  const get = React.useCallback(() => store, []);
   const set = React.useCallback((value: Partial<StatesT>) => {
-    store.current = { ...store.current, ...value };
+    store = { ...store, ...value };
     subscribers.current.forEach((callback) => callback());
   }, []);
   const subscribe = React.useCallback((callback: () => void) => {
@@ -159,13 +159,7 @@ const useSelector = <K extends keyof StatesT>(
 ): StatesT[K] => {
   const ctx = contextExist();
 
-  const memoizedSelector = React.useCallback(selector, [selector]);
-
-  return React.useSyncExternalStore(
-    ctx.subscribe,
-    () => memoizedSelector(ctx.getAll()),
-    () => memoizedSelector(ctx.initialStates)
-  );
+  return selector(ctx.getAll());
 };
 
 // functions
@@ -178,7 +172,7 @@ function nexusDispatch(action: ActionsCallingT): void {
   nexusDispatchRef(action);
 }
 
-function createAction(
+function nexusAction(
   reducer?: (state: StatesT, action: ActionsCallingT) => StatesT
 ) {
   return {
@@ -186,4 +180,4 @@ function createAction(
   };
 }
 
-export { NexusProvider, useNexus, useSelector, nexusDispatch, createAction };
+export { NexusProvider, useNexus, useSelector, nexusDispatch, nexusAction };

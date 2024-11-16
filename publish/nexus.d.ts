@@ -36,9 +36,9 @@ declare const useSelector: <K extends keyof StatesT>(
   selector: (state: StatesT) => StatesT[K]
 ) => StatesT[K];
 declare function nexusDispatch(action: ActionsCallingT): void;
-declare function createAction(
+declare function nexusAction(
   reducer?: (state: StatesT, action: ActionsCallingT) => StatesT
 ): {
   reducer: (state: StatesT, action: ActionsCallingT) => StatesT;
 };
-export { NexusProvider, useNexus, useSelector, nexusDispatch, createAction };
+export { NexusProvider, useNexus, useSelector, nexusDispatch, nexusAction };

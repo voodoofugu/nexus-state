@@ -19,12 +19,12 @@ npm install nexus-state
 
 # Getting Started
 
-## 1. Define initialStates, actions, and use createAction
+## 1. Define initialStates, actions, and use nexusAction
 
-Create a file, such as `nexusConfig`, where you define `initialStates` and `actions`. Use the `createAction` helper function for defining `actions`:
+Create a file, such as `nexusConfig`, where you define `initialStates` and `actions`. Use the `nexusAction` helper function for defining `actions`:
 
 ```javascript
-import { createAction } from "nexus-state";
+import { nexusAction } from "nexus-state";
 
 export const initialStates = {
   strength: 10,
@@ -33,7 +33,7 @@ export const initialStates = {
 };
 
 export const actions = {
-  LEVEL_UP: createAction((state, action) => ({
+  LEVEL_UP: nexusAction((state, action) => ({
     ...state,
     strength: state.strength + action.payload,
   })),
@@ -44,9 +44,9 @@ export const actions = {
 You can also move the action logic to separate variables and store them wherever you prefer:
 
 ```javascript
-import { createAction } from "nexus-state";
+import { nexusAction } from "nexus-state";
 
-const LEVEL_UP = createAction((state, action) => ({
+const LEVEL_UP = nexusAction((state, action) => ({
   ...state,
   strength: state.strength + action.payload,
 }));
@@ -181,7 +181,7 @@ const YourButton= () => {
 - `useNexus`: Hook for accessing a state by key.
 - `useSelector`: Hook for computed or derived state values.
 - `nexusDispatch`: Function to dispatch actions.
-- `createAction`: Utility for creating actions.
+- `nexusAction`: Utility for creating actions.
 
 ---
 
