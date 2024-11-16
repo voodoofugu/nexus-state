@@ -73,9 +73,9 @@ declare global {
 
 🔮 _If you use `eslint`, you might encounter an error about empty object types (`@typescript-eslint/no-empty-object-type`), but this is easy to fix._
 
-### Ways to address the `no-empty-object-type` error:
+### Ways to address the no-empty-object-type error:
 
-1. Add a rule to eslint:
+#### 1. Add a rule to eslint:
 
 ```typescript
 rules: {
@@ -83,7 +83,7 @@ rules: {
 }
 ```
 
-2. Define all states and actions manually if there are only a few:
+#### 2. Define all states and actions manually if there are only a few:
 
 ```javascript
 declare global {
@@ -97,11 +97,11 @@ declare global {
 }
 ```
 
-3. Simply ignore the warning. 🙌
+#### 3. Simply ignore the warning. 🙌
 
 ---
 
-## 2. Wrap your app with `NexusProvider`
+## 2. Wrap your app with NexusProvider
 
 Wrap your application with `NexusProvider`, passing in `initialStates` and `actions`:
 
@@ -118,7 +118,7 @@ const App = () => (
 
 ---
 
-## 3. Access states with `useNexus`
+## 3. Access states with useNexus
 
 To access a state value, use the `useNexus` hook:
 
@@ -134,7 +134,7 @@ const YourComponent = () => {
 
 ---
 
-## 4. Use `useSelector` for computed values
+## 4. Use useSelector for computed values
 
 If you need to calculate derived data from the state, use the `useSelector` hook:
 
@@ -152,7 +152,7 @@ const YourComponent = () => {
 
 ---
 
-## 5. Dispatch actions with `nexusDispatch`
+## 5. Dispatch actions with nexusDispatch
 
 To update the state, use the `nexusDispatch` function:
 
