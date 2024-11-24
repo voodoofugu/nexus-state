@@ -37,6 +37,10 @@ export const actions = {
     ...state,
     strength: state.strength + action.payload,
   })),
+  POWER_UP: nexusAction((state, action) => ({
+    ...state,
+    secretPower: state.secretPower + action.payload,
+  })),
   // other actions...
 };
 ```
@@ -132,17 +136,19 @@ const YourComponent = () => {
 };
 ```
 
+🔮 _If you call `useNexus` empty then you will get all your states. This can be useful for debugging._
+
 ---
 
-## 4. Use useSelector for computed values
+## 4. Use useNexusSelect for computed values
 
-If you need to calculate derived data from the state, use the `useSelector` hook:
+If you need to calculate derived data from the state, use the `useNexusSelect` hook:
 
-```typescript
-import { useSelector } from "nexus-state;
+```javascript
+import { useNexusSelect } from "nexus-state;
 
 const YourComponent = () => {
-  const fullPower = useSelector(
+  const fullPower = useNexusSelect(
     (state) => state.strength + state.secretPower
   );
 
@@ -156,7 +162,7 @@ const YourComponent = () => {
 
 To update the state, use the `nexusDispatch` function:
 
-```typescript
+```javascript
 import { nexusDispatch } from "nexus-state;
 
 const levelUp = () => {
@@ -171,17 +177,34 @@ const YourButton= () => {
 };
 ```
 
-🔮 _If you’ve set up global types properly, `useNexus`, `useSelector`, and `nexusDispatch` will benefit from full type inference, including autocompletion for the type field._
+The nexus Dispatch function also supports an array of action objects, allowing you to conveniently dispatch multiple actions at once. Batch processing is built-in to handle these actions efficiently.
+
+```javascript
+const levelUp = () => {
+  nexusDispatch([
+    {
+      type: "LEVEL_UP",
+      payload: 5,
+    },
+    {
+      type: "POWER_UP",
+      payload: 1,
+    },
+  ]);
+};
+```
+
+🔮 _If you’ve set up global types properly, `useNexus`, `useNexusSelect`, and `nexusDispatch` will benefit from full type inference, including autocompletion for the type field._
 
 ---
 
 # API
 
-- `NexusProvider`: Provider to wrap your application.
+- `NexusProvider`: Provider Component to wrap your application.
 - `useNexus`: Hook for accessing a state by key.
-- `useSelector`: Hook for computed or derived state values.
+- `useNexusSelect`: Hook for computed or derived state values.
 - `nexusDispatch`: Function to dispatch actions.
-- `nexusAction`: Utility for creating actions.
+- `nexusAction`: Function for creating actions.
 
 ---
 

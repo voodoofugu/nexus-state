@@ -97,7 +97,7 @@ function createContextValue(
   ): StatesT[K] {
     const state = stateData.get();
     if (select(state) === undefined) {
-      console.error("State in useSelector not found 👺");
+      console.error("State in useNexusSelect not found 👺");
     }
 
     return React.useSyncExternalStore(
@@ -175,7 +175,7 @@ function useNexus(stateName?: keyof StatesT) {
   return stateName ? ctx.get(stateName) : ctx.getAll();
 }
 
-const useSelector = <K extends keyof StatesT>(
+const useNexusSelect = <K extends keyof StatesT>(
   selector: (state: StatesT) => StatesT[K]
 ): StatesT[K] => {
   const ctx = contextExist();
@@ -218,4 +218,4 @@ function nexusAction(
   };
 }
 
-export { NexusProvider, useNexus, useSelector, nexusDispatch, nexusAction };
+export { NexusProvider, useNexus, useNexusSelect, nexusDispatch, nexusAction };

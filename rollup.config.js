@@ -20,7 +20,9 @@ export default {
   plugins: [
     del({ targets: "dist/*" }),
     resolve(),
-    commonjs(),
+    commonjs({
+      ignoreGlobal: true, // Игнорирует преобразование `globalThis` для React
+    }),
     typescript(),
     terser({
       output: {
@@ -28,5 +30,5 @@ export default {
       },
     }),
   ],
-  external: ["react"],
+  external: (id) => /^react/.test(id),
 };

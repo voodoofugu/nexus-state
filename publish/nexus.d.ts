@@ -15,16 +15,6 @@ type ActionsRT = {
     >;
   };
 };
-type NexusContextT = {
-  get: <K extends keyof StatesT>(stateName: K) => StatesT[K];
-  dispatch: ({ type, payload }: ActionsCallingT) => void;
-  getAll: () => StatesT;
-  selector: <K extends keyof StatesT>(
-    selector: (state: StatesT) => StatesT[K]
-  ) => StatesT[K];
-  subscribe: (callback: () => void) => () => void;
-  initialStates: StatesT;
-};
 declare const NexusProvider: React.FC<{
   initialStates: StatesT;
   actions: ActionsRT;
@@ -32,7 +22,7 @@ declare const NexusProvider: React.FC<{
 }>;
 declare function useNexus<K extends keyof StatesT>(stateName: K): StatesT[K];
 declare function useNexus(): StatesT;
-declare const useSelector: <K extends keyof StatesT>(
+declare const useNexusSelect: <K extends keyof StatesT>(
   selector: (state: StatesT) => StatesT[K]
 ) => StatesT[K];
 declare function nexusDispatch(
@@ -51,4 +41,4 @@ declare function nexusAction(
 ): {
   reducer: (state: StatesT, action: ActionsCallingT) => StatesT;
 };
-export { NexusProvider, useNexus, useSelector, nexusDispatch, nexusAction };
+export { NexusProvider, useNexus, useNexusSelect, nexusDispatch, nexusAction };
