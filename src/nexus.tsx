@@ -6,8 +6,6 @@ function createReducer(actions: ActionsRT) {
     state: StatesT,
     action: ActionsCallingT
   ): StatesT {
-    const actionType = action.type as keyof ActionsRT;
-
     // Обработка массива nexusDispatch для батчинга
     if (Array.isArray(action.payload)) {
       return action.payload.reduce(
@@ -30,6 +28,7 @@ function createReducer(actions: ActionsRT) {
     }
 
     // Обычная обработка
+    const actionType = action.type as keyof ActionsRT;
     if (actionType in actions) {
       const config = actions[actionType] as {
         reducer?: (state: StatesT, action: ActionsCallingT) => StatesT;
