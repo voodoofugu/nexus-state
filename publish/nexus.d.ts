@@ -4,7 +4,7 @@ declare global {
   interface ActionsT {}
 }
 type ActionsCallingT = {
-  type: keyof ActionsT extends never ? string : keyof ActionsT;
+  type?: keyof ActionsT extends never ? string : keyof ActionsT;
   payload?: any;
 };
 type ActionsRT = {
@@ -35,7 +35,17 @@ declare function useNexus(): StatesT;
 declare const useSelector: <K extends keyof StatesT>(
   selector: (state: StatesT) => StatesT[K]
 ) => StatesT[K];
-declare function nexusDispatch(action: ActionsCallingT): void;
+declare function nexusDispatch(
+  action:
+    | {
+        type: keyof ActionsT;
+        payload?: any;
+      }
+    | {
+        type: keyof ActionsT;
+        payload?: any;
+      }[]
+): void;
 declare function nexusAction(
   reducer?: (state: StatesT, action: ActionsCallingT) => StatesT
 ): {
