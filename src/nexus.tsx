@@ -8,8 +8,30 @@ function createReducer(actions: ActionsRT) {
   ): StatesT {
     const actionType = action.type as keyof ActionsRT;
 
+    // Обработка массива nexusDispatch для батчинга
+    if (Array.isArray(action.payload)) {
+      return action.payload.reduce(
+        (currentState, singleAction: ActionsCallingT) => {
+          const singleActionType = singleAction.type as keyof ActionsRT;
+
+          if (singleActionType in actions) {
+            const actionConfig = actions[singleActionType] as {
+              reducer?: (state: StatesT, action: ActionsCallingT) => StatesT;
+            };
+            return (
+              actionConfig.reducer?.(currentState, singleAction) ?? currentState
+            );
+          }
+
+          return currentState;
+        },
+        state
+      );
+    }
+
+    // Обычная обработка
     if (actionType in actions) {
-      const config = actions[actionType] as unknown as {
+      const config = actions[actionType] as {
         reducer?: (state: StatesT, action: ActionsCallingT) => StatesT;
       };
 
@@ -163,13 +185,30 @@ const useSelector = <K extends keyof StatesT>(
 };
 
 // functions
-function nexusDispatch(action: ActionsCallingT): void {
+function nexusDispatch(
+  action:
+    | {
+        type: keyof ActionsT;
+        payload?: any;
+      }
+    | {
+        type: keyof ActionsT;
+        payload?: any;
+      }[]
+): void {
   if (!nexusDispatchRef) {
     throw new Error(
       "nexusDispatch is not initialized. Make sure NexusProvider is used 👺"
     );
   }
-  nexusDispatchRef(action);
+
+  if (Array.isArray(action)) {
+    nexusDispatchRef({
+      payload: action,
+    });
+  } else {
+    nexusDispatchRef(action);
+  }
 }
 
 function nexusAction(

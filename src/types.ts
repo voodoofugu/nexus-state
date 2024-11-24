@@ -3,7 +3,7 @@ declare global {
   interface ActionsT {}
 }
 export type ActionsCallingT = {
-  type: keyof ActionsT extends never ? string : keyof ActionsT;
+  type?: keyof ActionsT extends never ? string : keyof ActionsT;
   payload?: any;
 };
 
