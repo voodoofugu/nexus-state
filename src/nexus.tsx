@@ -6,7 +6,7 @@ function createReducer(actions: ActionsRT) {
     state: StatesT,
     action: ActionsCallingT
   ): StatesT {
-    // Обработка массива nexusDispatch для батчинга
+    // Обработка массива nexusDispatch и батчинга
     if (Array.isArray(action.payload)) {
       return action.payload.reduce(
         (currentState, singleAction: ActionsCallingT) => {
@@ -25,23 +25,6 @@ function createReducer(actions: ActionsRT) {
         },
         state
       );
-    }
-
-    // Обычная обработка
-    const actionType = action.type as keyof ActionsRT;
-    if (actionType in actions) {
-      const config = actions[actionType] as {
-        reducer?: (state: StatesT, action: ActionsCallingT) => StatesT;
-      };
-
-      if (config.reducer) {
-        return config.reducer(state, action);
-      } else {
-        return {
-          ...state,
-          ...action.payload,
-        } as StatesT;
-      }
     }
 
     return state;
@@ -201,13 +184,11 @@ function nexusDispatch(
     );
   }
 
-  if (Array.isArray(action)) {
-    nexusDispatchRef({
-      payload: action,
-    });
-  } else {
-    nexusDispatchRef(action);
-  }
+  const actions = Array.isArray(action) ? action : [action];
+
+  nexusDispatchRef({
+    payload: actions,
+  });
 }
 
 function nexusAction(
