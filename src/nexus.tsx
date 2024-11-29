@@ -1,33 +1,59 @@
 import React from "react";
-import { ActionsCallingT, ActionsRT, NexusContextT } from "./types";
+import {
+  UpdateFunction,
+  ActionsCallingT,
+  ActionsRT,
+  NexusContextT,
+} from "./types";
 
 function createReducer(actions: ActionsRT) {
   return function reducerNexus(
     state: StatesT,
     action: ActionsCallingT
   ): StatesT {
-    // Обработка массива nexusDispatch и батчинга
+    // Если payload — массив (батчинг действий)
     if (Array.isArray(action.payload)) {
-      return action.payload.reduce(
-        (currentState, singleAction: ActionsCallingT) => {
-          const singleActionType = singleAction.type as keyof ActionsRT;
+      return action.payload.reduce((state, actionData: ActionsCallingT) => {
+        // Здесь мы должны проверять каждый отдельный action в массиве
+        const { stateKey, payload } = actionData;
 
-          if (singleActionType in actions) {
-            const actionConfig = actions[singleActionType] as {
-              reducer?: (state: StatesT, action: ActionsCallingT) => StatesT;
+        // Если есть stateKey, обновляем его в текущем состоянии
+        if (stateKey) {
+          const currentValue = state[stateKey];
+
+          // Если payload — функция, вызываем её для обновления значения
+          const newValue =
+            typeof payload === "function"
+              ? (payload as UpdateFunction<typeof currentValue>)(currentValue)
+              : payload;
+
+          if (newValue !== currentValue) {
+            return {
+              ...state,
+              [stateKey]: newValue,
             };
-            return (
-              actionConfig.reducer?.(currentState, singleAction) ?? currentState
-            );
           }
+        }
 
-          return currentState;
-        },
-        state
-      );
+        // Если stateKey нет, ищем редьюсер для конкретного действия
+        const singleActionType = actionData.type as keyof ActionsRT;
+        if (singleActionType in actions) {
+          const actionConfig = actions[singleActionType] as {
+            reducer?: (state: StatesT, action: ActionsCallingT) => StatesT;
+          };
+
+          // Выполняем редьюсинг для каждого отдельного действия
+          const newState = actionConfig.reducer?.(state, actionData) ?? state;
+
+          // Возвращаем новое состояние, если оно изменилось
+          return newState !== state ? newState : state;
+        }
+
+        return state;
+      }, state);
     }
 
-    return state;
+    return state; // Если действие не найдено
   };
 }
 
@@ -141,7 +167,8 @@ const NexusProvider: React.FC<{
   );
 };
 
-// Функция проверки существования контекста
+// HOOKS
+// useNexus
 function contextExist(): NexusContextT {
   const ctx = React.useContext(NexusContext);
   if (!ctx) {
@@ -150,7 +177,6 @@ function contextExist(): NexusContextT {
   return ctx;
 }
 
-// Хуки
 function useNexus<K extends keyof StatesT>(stateName: K): StatesT[K];
 function useNexus(): StatesT;
 function useNexus(stateName?: keyof StatesT) {
@@ -158,6 +184,7 @@ function useNexus(stateName?: keyof StatesT) {
   return stateName ? ctx.get(stateName) : ctx.getAll();
 }
 
+// useNexusSelect
 const useNexusSelect = <K extends keyof StatesT>(
   selector: (state: StatesT) => StatesT[K]
 ): StatesT[K] => {
@@ -166,7 +193,8 @@ const useNexusSelect = <K extends keyof StatesT>(
   return selector(ctx.getAll());
 };
 
-// functions
+// FUNCTIONS
+// nexusDispatch
 function nexusDispatch(
   action:
     | {
@@ -191,12 +219,78 @@ function nexusDispatch(
   });
 }
 
-function nexusAction(
-  reducer?: (state: StatesT, action: ActionsCallingT) => StatesT
-) {
-  return {
-    reducer: reducer || ((state: StatesT) => state),
-  };
+// nexusUpdate
+function nexusUpdate<K extends keyof StatesT>(updates: {
+  [key in K]: StatesT[key] | ((prevState: StatesT[key]) => StatesT[key]);
+}) {
+  if (!nexusDispatchRef) {
+    throw new Error(
+      "nexusDispatch is not initialized. Make sure NexusProvider is used 👺"
+    );
+  }
+
+  const actionsArray: ActionsCallingT[] = Object.entries(updates).map(
+    ([stateKey, updateValue]) => {
+      return {
+        stateKey: stateKey as K,
+        payload: updateValue,
+      };
+    }
+  );
+
+  nexusDispatchRef({
+    payload: actionsArray,
+  });
 }
 
-export { NexusProvider, useNexus, useNexusSelect, nexusDispatch, nexusAction };
+// nexusAction
+function nexusAction<K extends keyof StatesT>(
+  stateKey: K
+): { reducer: (state: StatesT, action: ActionsCallingT) => StatesT };
+
+function nexusAction(
+  reducer: (state: StatesT, action: ActionsCallingT) => StatesT
+): { reducer: (state: StatesT, action: ActionsCallingT) => StatesT };
+
+function nexusAction<K extends keyof StatesT>(
+  reducerOrStateKey?: K | ((state: StatesT, action: ActionsCallingT) => StatesT)
+) {
+  if (typeof reducerOrStateKey === "function") {
+    // Если передан редьюсер, возвращаем его
+    return {
+      reducer: (state: StatesT, action: ActionsCallingT): StatesT => {
+        return reducerOrStateKey(state, action);
+      },
+    };
+  } else if (typeof reducerOrStateKey === "string") {
+    // Если передан ключ состояния, создаём редьюсер для этого ключа
+
+    const key = reducerOrStateKey as K;
+    return {
+      reducer: (state: StatesT, action: ActionsCallingT): StatesT => {
+        if (!(reducerOrStateKey in state)) {
+          console.error(
+            `State key "${reducerOrStateKey}" does not exist in StatesT 👺`
+          );
+          return state;
+        }
+        // Обновляем только указанное состояние
+        return {
+          ...state,
+          [key]: action.payload,
+        };
+      },
+    };
+  }
+
+  throw new Error("Reducer or state key must be provided in Nexus 👺");
+}
+
+export {
+  NexusProvider,
+  useNexus,
+  useNexusSelect,
+  nexusDispatch,
+  nexusUpdate,
+  nexusAction,
+};

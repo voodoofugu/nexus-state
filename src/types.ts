@@ -2,9 +2,12 @@ declare global {
   interface StatesT {}
   interface ActionsT {}
 }
+
+export type UpdateFunction<T> = (currentState: T) => T;
 export type ActionsCallingT = {
   type?: keyof ActionsT extends never ? string : keyof ActionsT;
-  payload?: any;
+  stateKey?: keyof StatesT;
+  payload?: any | UpdateFunction<StatesT[keyof StatesT]>;
 };
 
 export type ActionsRT = {
