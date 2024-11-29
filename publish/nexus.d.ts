@@ -9,18 +9,11 @@ declare global {
   interface ActionsT {}
 }
 
-/**
- * Type describing the structure of actions for dispatching.
- */
+type UpdateFunction<T> = (currentState: T) => T;
 type ActionsCallingT = {
-  /**
-   * The action type. If `ActionsT` is empty, string values are allowed.
-   */
   type?: keyof ActionsT extends never ? string : keyof ActionsT;
-  /**
-   * The payload to pass along with the action.
-   */
-  payload?: any;
+  stateKey?: keyof StatesT;
+  payload?: any | UpdateFunction<StatesT[keyof StatesT]>;
 };
 
 /**
@@ -95,16 +88,32 @@ declare function nexusDispatch(
       }[]
 ): void;
 
+declare function nexusUpdate<K extends keyof StatesT>(updates: {
+  [key in K]: StatesT[key] | ((prevState: StatesT[key]) => StatesT[key]);
+}): void;
+
 /**
  * Creates an action object.
  * @param reducer A reducer function to process the state.
  * @returns An action object with the reducer.
  * @see {@link https://www.npmjs.com/package/nexus-state Documentation}
  */
+declare function nexusAction<K extends keyof StatesT>(
+  stateKey: K
+): {
+  reducer: (state: StatesT, action: ActionsCallingT) => StatesT;
+};
 declare function nexusAction(
-  reducer?: (state: StatesT, action: ActionsCallingT) => StatesT
+  reducer: (state: StatesT, action: ActionsCallingT) => StatesT
 ): {
   reducer: (state: StatesT, action: ActionsCallingT) => StatesT;
 };
 
-export { NexusProvider, useNexus, useNexusSelect, nexusDispatch, nexusAction };
+export {
+  NexusProvider,
+  useNexus,
+  useNexusSelect,
+  nexusDispatch,
+  nexusUpdate,
+  nexusAction,
+};
