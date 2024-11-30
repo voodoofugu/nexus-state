@@ -18,21 +18,12 @@ type ActionsCallingT = {
   payload?: any | UpdateFunction<StatesT[keyof StatesT]>;
 };
 
-/**
- * Type describing the actions object and their reducers.
- */
+type ActionFunction = (payload?: any) => void;
+type ActionReducer = (state: StatesT, payload?: any) => StatesT;
 type ActionsRT = {
-  [key in keyof ActionsT]?: {
-    /**
-     * The reducer function to process the state.
-     * @param state Current state.
-     * @param action The action data.
-     * @returns Updated state.
-     */
-    reducer: Exclude<
-      (state: StatesT, action: ActionsCallingT) => StatesT,
-      undefined
-    >;
+  [key: string]: {
+    action?: ActionFunction;
+    reducer?: ActionReducer;
   };
 };
 
