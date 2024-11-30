@@ -152,10 +152,10 @@ const NexusContext = React.createContext<NexusContextT | null>(null);
 let nexusDispatchRef: ((action: ActionsCallingT) => void) | null = null;
 const NexusProvider: React.FC<{
   initialStates: StatesT;
-  actions: ActionsRT;
+  actions?: ActionsRT;
   children: React.ReactNode;
 }> = ({ initialStates, actions, children }) => {
-  const reducer = createReducer(actions);
+  const reducer = createReducer(actions || {});
   const immutableInitialStates = structuredClone(initialStates);
 
   const contextValue = {
@@ -268,4 +268,54 @@ function nexusUpdate<K extends keyof StatesT>(updates: {
   }
 }
 
-export { NexusProvider, useNexus, useNexusSelect, nexusDispatch, nexusUpdate };
+// nexusAction
+function nexusAction<K extends keyof StatesT>(
+  stateKey: K
+): { reducer: (state: StatesT, action: ActionsCallingT) => StatesT };
+
+function nexusAction(
+  reducer: (state: StatesT, action: ActionsCallingT) => StatesT
+): { reducer: (state: StatesT, action: ActionsCallingT) => StatesT };
+
+function nexusAction<K extends keyof StatesT>(
+  reducerOrStateKey?: K | ((state: StatesT, action: ActionsCallingT) => StatesT)
+) {
+  if (typeof reducerOrStateKey === "function") {
+    // Если передан редьюсер, возвращаем его
+    return {
+      reducer: (state: StatesT, action: ActionsCallingT): StatesT => {
+        return reducerOrStateKey(state, action);
+      },
+    };
+  } else if (typeof reducerOrStateKey === "string") {
+    // Если передан ключ состояния, создаём редьюсер для этого ключа
+
+    const key = reducerOrStateKey as K;
+    return {
+      reducer: (state: StatesT, action: ActionsCallingT): StatesT => {
+        if (!(reducerOrStateKey in state)) {
+          console.error(
+            `State key "${reducerOrStateKey}" does not exist in StatesT 👺`
+          );
+          return state;
+        }
+        // Обновляем только указанное состояние
+        return {
+          ...state,
+          [key]: action.payload,
+        };
+      },
+    };
+  }
+
+  throw new Error("Reducer or state key must be provided in Nexus 👺");
+}
+
+export {
+  NexusProvider,
+  useNexus,
+  useNexusSelect,
+  nexusDispatch,
+  nexusUpdate,
+  nexusAction,
+};
