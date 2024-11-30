@@ -5,7 +5,9 @@ import React from "react";
  * Extend this interface in your project to define your states.
  */
 declare global {
-  interface StatesT {}
+  interface StatesT {
+    _NEXUS_?: Partial<StatesT>;
+  }
   interface ActionsT {}
 }
 
