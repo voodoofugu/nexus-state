@@ -220,13 +220,9 @@ function nexusDispatch(
 }
 
 // nexusUpdate
-type UpdatePayload<T> = T | ((prevState: T) => T);
-
-type NexusUpdate<K extends keyof StatesT | "*" = keyof StatesT> = {
-  [key in K]: key extends "*" ? StatesT : UpdatePayload<StatesT>;
-};
-
-function nexusUpdate<K extends keyof StatesT | "*">(updates: NexusUpdate<K>) {
+function nexusUpdate<K extends keyof StatesT>(updates: {
+  [key in K]: StatesT[key] | ((prevState: StatesT[key]) => StatesT[key]);
+}) {
   if (!nexusDispatchRef) {
     throw new Error(
       "nexusDispatch is not initialized. Make sure NexusProvider is used 👺"
@@ -234,11 +230,12 @@ function nexusUpdate<K extends keyof StatesT | "*">(updates: NexusUpdate<K>) {
   }
 
   // Проверка, если обновление всех состояний
-  const isFullUpdate = "*" in updates;
+  const isFullUpdate = "_NEXUS_" in updates;
 
   if (isFullUpdate) {
     // Специальный случай для обновления всех стейтов
-    const newState = updates["*"] as StatesT; // Все состояние
+    const newState = updates["_NEXUS_"] as StatesT;
+
     nexusDispatchRef({
       payload: Object.keys(newState).map((key) => ({
         stateKey: key as keyof StatesT,
@@ -248,9 +245,14 @@ function nexusUpdate<K extends keyof StatesT | "*">(updates: NexusUpdate<K>) {
   } else {
     const actionsArray = Object.entries(updates).map(
       ([stateKey, updateValue]) => {
+        const key = stateKey as K;
+
         return {
-          stateKey: stateKey as K,
-          payload: updateValue,
+          stateKey: key,
+          payload:
+            typeof updateValue === "function"
+              ? (updateValue as (prevState: StatesT[K]) => StatesT[K])
+              : updateValue,
         };
       }
     );

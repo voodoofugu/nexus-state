@@ -1,5 +1,7 @@
 declare global {
-  interface StatesT {}
+  interface StatesT {
+    _NEXUS_?: Partial<StatesT>;
+  }
   interface ActionsT {}
 }
 
