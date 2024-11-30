@@ -48,7 +48,16 @@ function createReducer(actions: ActionsRT) {
 
       // Если у действия есть редьюсер
       if (actionConfig?.reducer) {
-        return actionConfig.reducer(state, payload) ?? state;
+        const singleActionType = action.type as keyof ActionsRT;
+        const actionConfig = actions[singleActionType] as {
+          reducer?: (state: StatesT, action: ActionsCallingT) => StatesT;
+        };
+
+        // Выполняем редьюсинг для каждого отдельного действия
+        const newState = actionConfig.reducer?.(state, action) ?? state;
+
+        // Возвращаем новое состояние, если оно изменилось
+        return newState !== state ? newState : state;
       }
 
       // Если у действия есть функция action
