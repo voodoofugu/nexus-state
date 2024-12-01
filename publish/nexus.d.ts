@@ -18,12 +18,15 @@ type ActionsCallingT = {
   payload?: any | UpdateFunction<StatesT[keyof StatesT]>;
 };
 
-type ActionFunction = (payload?: any) => void;
-type ActionReducer = (state: StatesT, payload?: any) => StatesT;
 type ActionsRT = {
   [key: string]: {
-    action?: ActionFunction;
-    reducer?: ActionReducer;
+    action?: (payload: any) => void;
+    reducer?: (
+      state: StatesT,
+      action: {
+        payload: any;
+      }
+    ) => StatesT;
   };
 };
 
@@ -35,7 +38,7 @@ type ActionsRT = {
  */
 declare const NexusProvider: React.FC<{
   initialStates: StatesT;
-  actions: ActionsRT;
+  actions?: ActionsRT;
   children: React.ReactNode;
 }>;
 
@@ -69,17 +72,30 @@ declare const useNexusSelect: <K extends keyof StatesT>(
  * @param action A single action or an array of actions to process.
  * @see {@link https://www.npmjs.com/package/nexus-state Documentation}
  */
-declare function nexusDispatch(
-  action:
-    | {
-        type: keyof ActionsT;
-        payload?: any;
+type MappedActions = {
+  [K in keyof ActionsT]: ActionsT[K] extends {
+    action: (payload: infer P) => void;
+  }
+    ? {
+        type: K;
+        payload: P;
       }
-    | {
-        type: keyof ActionsT;
-        payload?: any;
-      }[]
-): void;
+    : ActionsT[K] extends {
+        reducer: (
+          state: StatesT,
+          action: {
+            payload: infer P;
+          }
+        ) => StatesT;
+      }
+    ? {
+        type: K;
+        payload: P;
+      }
+    : never;
+};
+type DispatchAction = MappedActions[keyof MappedActions];
+declare function nexusDispatch(action: DispatchAction): void;
 
 declare function nexusUpdate<K extends keyof StatesT>(updates: {
   [key in K]: StatesT[key] | ((prevState: StatesT[key]) => StatesT[key]);
