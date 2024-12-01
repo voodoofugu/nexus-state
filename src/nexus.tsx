@@ -57,13 +57,14 @@ function createReducer(actions: ActionsRT) {
         const newState = actionConfig.reducer?.(state, action) ?? state;
 
         // Возвращаем новое состояние, если оно изменилось
-        return newState !== state ? newState : state;
+        if (newState !== state) {
+          return newState;
+        }
       }
 
       // Если у действия есть функция action
       if (actionConfig?.action) {
         actionConfig.action(payload); // Выполняем побочный эффект
-        return state; // Возвращаем текущее состояние без изменений
       }
     }
 
@@ -209,27 +210,28 @@ const useNexusSelect = <K extends keyof StatesT>(
 
 // FUNCTIONS
 // nexusDispatch
-function nexusDispatch(
-  action:
-    | {
-        type: keyof ActionsT;
-        payload?: any;
+type MappedActions = {
+  [K in keyof ActionsT]: ActionsT[K] extends {
+    action: (payload: infer P) => void;
+  }
+    ? { type: K; payload: P }
+    : ActionsT[K] extends {
+        reducer: (state: StatesT, action: { payload: infer P }) => StatesT;
       }
-    | {
-        type: keyof ActionsT;
-        payload?: any;
-      }[]
-): void {
+    ? { type: K; payload: P }
+    : never;
+};
+type DispatchAction = MappedActions[keyof MappedActions];
+
+function nexusDispatch(action: DispatchAction): void {
   if (!nexusDispatchRef) {
     throw new Error(
       "nexusDispatch is not initialized. Make sure NexusProvider is used 👺"
     );
   }
 
-  const actions = Array.isArray(action) ? action : [action];
-
   nexusDispatchRef({
-    payload: actions,
+    payload: Array.isArray(action) ? action : [action],
   });
 }
 

@@ -12,12 +12,10 @@ export type ActionsCallingT = {
   payload?: any | UpdateFunction<StatesT[keyof StatesT]>;
 };
 
-export type ActionFunction = (payload?: any) => void;
-export type ActionReducer = (state: StatesT, payload?: any) => StatesT;
 export type ActionsRT = {
   [key: string]: {
-    action?: ActionFunction; // Функция для обработки действия
-    reducer?: ActionReducer; // Редуктор для обновления состояния
+    action?: (payload: any) => void; // Функция для обработки действия
+    reducer?: (state: StatesT, action: { payload: any }) => StatesT; // Редуктор для обновления состояния
   };
 };
 
