@@ -6,7 +6,7 @@ import {
   NexusContextT,
 } from "./types";
 
-function createReducer() {
+function createReducer(actions: ActionsRT) {
   return function reducerNexus(
     state: StatesT,
     action: ActionsCallingT,
@@ -23,7 +23,7 @@ function createReducer() {
     }
 
     // Если одиночное действие
-    const { stateKey, payload } = action;
+    const { stateKey, payload, type } = action;
 
     // Обновляем stateKey, если он указан
     if (stateKey) {
@@ -40,6 +40,32 @@ function createReducer() {
           ...state,
           [stateKey]: newValue,
         };
+      }
+    }
+
+    // Обрабатываем действие через actions
+    if (type) {
+      const actionConfig = actions[type];
+
+      // Если у действия есть редьюсер
+      if (actionConfig?.reducer) {
+        const singleActionType = action.type as keyof ActionsRT;
+        const actionConfig = actions[singleActionType] as {
+          reducer?: (state: StatesT, action: ActionsCallingT) => StatesT;
+        };
+
+        // Выполняем редьюсинг для каждого отдельного действия
+        const newState = actionConfig.reducer?.(state, action) ?? state;
+
+        // Возвращаем новое состояние, если оно изменилось
+        if (newState !== state) {
+          return newState;
+        }
+      }
+
+      // Если у действия есть функция action
+      if (actionConfig?.action) {
+        actionConfig.action(payload); // Выполняем побочный эффект
       }
     }
 
@@ -139,8 +165,8 @@ const NexusProvider: React.FC<{
   initialStates: StatesT;
   actions?: ActionsRT;
   children: React.ReactNode;
-}> = ({ initialStates, children }) => {
-  const reducer = createReducer();
+}> = ({ initialStates, actions, children }) => {
+  const reducer = createReducer(actions || {});
   const immutableInitialStates = structuredClone(initialStates);
 
   const contextValue = {

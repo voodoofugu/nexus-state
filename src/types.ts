@@ -7,6 +7,7 @@ declare global {
 
 export type UpdateFunction<T> = (currentState: T) => T;
 export type ActionsCallingT = {
+  type?: keyof ActionsT extends never ? string : keyof ActionsT;
   stateKey?: keyof StatesT;
   payload?: any | UpdateFunction<StatesT[keyof StatesT]>;
 };
@@ -20,7 +21,7 @@ export type ActionsRT = {
 
 export type NexusContextT = {
   get: <K extends keyof StatesT>(stateName: K) => StatesT[K];
-  dispatch: ({ payload }: ActionsCallingT) => void;
+  dispatch: ({ type, payload }: ActionsCallingT) => void;
   getAll: () => StatesT;
   selector: <K extends keyof StatesT>(
     selector: (state: StatesT) => StatesT[K]
