@@ -47,23 +47,23 @@ function createReducer(actions: ActionsRT) {
     if (type) {
       const actionConfig = actions[type];
 
-      // Если у действия есть редьюсер
-      if (actionConfig?.reducer) {
-        const singleActionType = action.type as keyof ActionsRT;
-        const actionConfig = actions[singleActionType] as {
-          reducer?: (state: StatesT, action: ActionsCallingT) => StatesT;
-        };
+      // // Если у действия есть редьюсер
+      // if (actionConfig?.reducer) {
+      //   const singleActionType = action.type as keyof ActionsRT;
+      //   const actionConfig = actions[singleActionType] as {
+      //     reducer?: (state: StatesT, action: ActionsCallingT) => StatesT;
+      //   };
 
-        // Выполняем редьюсинг для каждого отдельного действия
-        const newState = actionConfig.reducer?.(state, action) ?? state;
+      //   // Выполняем редьюсинг для каждого отдельного действия
+      //   const newState = actionConfig.reducer?.(state, action) ?? state;
 
-        // Возвращаем новое состояние, если оно изменилось
-        if (newState !== state) {
-          return newState;
-        }
-      }
+      //   // Возвращаем новое состояние, если оно изменилось
+      //   if (newState !== state) {
+      //     return newState;
+      //   }
+      // }
 
-      // Если у действия есть функция action
+      // Если у действия есть action функция
       if (actionConfig?.action) {
         actionConfig.action(payload); // Выполняем побочный эффект
       }
