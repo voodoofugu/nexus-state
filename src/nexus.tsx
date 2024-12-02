@@ -6,23 +6,24 @@ import {
   NexusContextT,
 } from "./types";
 
-function createReducer(actions: ActionsRT) {
+function createReducer() {
   return function reducerNexus(
     state: StatesT,
-    action: ActionsCallingT
+    action: ActionsCallingT,
+    recursiveCall?: boolean // предотвращаем повторную рекурсию если в payload массив
   ): StatesT {
     // Если payload — массив (батчинг действий)
-    if (Array.isArray(action.payload)) {
+    if (Array.isArray(action.payload) && !recursiveCall) {
       return action.payload.reduce(
         (currentState, actionData: ActionsCallingT) => {
-          return reducerNexus(currentState, actionData); // Рекурсивная обработка каждого действия
+          return reducerNexus(currentState, actionData, true); // Рекурсивная обработка каждого действия
         },
         state
       );
     }
 
     // Если одиночное действие
-    const { stateKey, payload, type } = action;
+    const { stateKey, payload } = action;
 
     // Обновляем stateKey, если он указан
     if (stateKey) {
@@ -34,37 +35,11 @@ function createReducer(actions: ActionsRT) {
           ? (payload as UpdateFunction<typeof currentValue>)(currentValue)
           : payload;
 
-      if (newValue !== currentValue) {
+      if (newValue != currentValue) {
         return {
           ...state,
           [stateKey]: newValue,
         };
-      }
-    }
-
-    // Обрабатываем действие через actions
-    if (type) {
-      const actionConfig = actions[type];
-
-      // Если у действия есть редьюсер
-      if (actionConfig?.reducer) {
-        const singleActionType = action.type as keyof ActionsRT;
-        const actionConfig = actions[singleActionType] as {
-          reducer?: (state: StatesT, action: ActionsCallingT) => StatesT;
-        };
-
-        // Выполняем редьюсинг для каждого отдельного действия
-        const newState = actionConfig.reducer?.(state, action) ?? state;
-
-        // Возвращаем новое состояние, если оно изменилось
-        if (newState !== state) {
-          return newState;
-        }
-      }
-
-      // Если у действия есть функция action
-      if (actionConfig?.action) {
-        actionConfig.action(payload); // Выполняем побочный эффект
       }
     }
 
@@ -164,8 +139,8 @@ const NexusProvider: React.FC<{
   initialStates: StatesT;
   actions?: ActionsRT;
   children: React.ReactNode;
-}> = ({ initialStates, actions, children }) => {
-  const reducer = createReducer(actions || {});
+}> = ({ initialStates, children }) => {
+  const reducer = createReducer();
   const immutableInitialStates = structuredClone(initialStates);
 
   const contextValue = {
@@ -266,6 +241,7 @@ function nexusUpdate<K extends keyof StatesT>(updates: {
         return {
           stateKey: key,
           payload:
+            // использование (prevState)
             typeof updateValue === "function"
               ? (updateValue as (prevState: StatesT[K]) => StatesT[K])
               : updateValue,
@@ -279,54 +255,4 @@ function nexusUpdate<K extends keyof StatesT>(updates: {
   }
 }
 
-// nexusAction
-function nexusAction<K extends keyof StatesT>(
-  stateKey: K
-): { reducer: (state: StatesT, action: ActionsCallingT) => StatesT };
-
-function nexusAction(
-  reducer: (state: StatesT, action: ActionsCallingT) => StatesT
-): { reducer: (state: StatesT, action: ActionsCallingT) => StatesT };
-
-function nexusAction<K extends keyof StatesT>(
-  reducerOrStateKey?: K | ((state: StatesT, action: ActionsCallingT) => StatesT)
-) {
-  if (typeof reducerOrStateKey === "function") {
-    // Если передан редьюсер, возвращаем его
-    return {
-      reducer: (state: StatesT, action: ActionsCallingT): StatesT => {
-        return reducerOrStateKey(state, action);
-      },
-    };
-  } else if (typeof reducerOrStateKey === "string") {
-    // Если передан ключ состояния, создаём редьюсер для этого ключа
-
-    const key = reducerOrStateKey as K;
-    return {
-      reducer: (state: StatesT, action: ActionsCallingT): StatesT => {
-        if (!(reducerOrStateKey in state)) {
-          console.error(
-            `State key "${reducerOrStateKey}" does not exist in StatesT 👺`
-          );
-          return state;
-        }
-        // Обновляем только указанное состояние
-        return {
-          ...state,
-          [key]: action.payload,
-        };
-      },
-    };
-  }
-
-  throw new Error("Reducer or state key must be provided in Nexus 👺");
-}
-
-export {
-  NexusProvider,
-  useNexus,
-  useNexusSelect,
-  nexusDispatch,
-  nexusUpdate,
-  nexusAction,
-};
+export { NexusProvider, useNexus, useNexusSelect, nexusDispatch, nexusUpdate };
