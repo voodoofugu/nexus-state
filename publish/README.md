@@ -17,47 +17,17 @@ npm install nexus-state
 
 ---
 
-# Getting Started
+# Getting Started in five steps
 
-## 1. Define initialStates, actions, and use nexusAction
+## 1. Define initialStates
 
-Create a file, such as `nexusConfig`, where you define `initialStates` and `actions`. Use the `nexusAction` helper function for defining `actions`:
+Create a file, such as `nexusConfig`, where you define `initialStates`:
 
 ```javascript
-import { nexusAction } from "nexus-state";
-
 export const initialStates = {
   strength: 10,
   secretPower: 5,
   // other states...
-};
-
-export const actions = {
-  LEVEL_UP: nexusAction((state, action) => ({
-    ...state,
-    strength: state.strength + action.payload,
-  })),
-  POWER_UP: nexusAction((state, action) => ({
-    ...state,
-    secretPower: state.secretPower + action.payload,
-  })),
-  // other actions...
-};
-```
-
-You can also move the action logic to separate variables and store them wherever you prefer:
-
-```javascript
-import { nexusAction } from "nexus-state";
-
-const LEVEL_UP = nexusAction((state, action) => ({
-  ...state,
-  strength: state.strength + action.payload,
-}));
-
-export const actions = {
-  LEVEL_UP,
-  // other actions...
 };
 ```
 
@@ -67,11 +37,9 @@ For TypeScript, it’s recommended to extend the global `StatesT` and `ActionsT`
 
 ```typescript
 type InitialStatesT = typeof initialStates;
-type InitialActionsT = typeof actions;
 
 declare global {
   interface StatesT extends InitialStatesT {}
-  interface ActionsT extends InitialActionsT {}
 }
 ```
 
@@ -87,16 +55,13 @@ rules: {
 }
 ```
 
-#### 2. Define all states and actions manually if there are only a few:
+#### 2. Define all states manually if there are only a few:
 
 ```javascript
 declare global {
   interface StatesT {
     strength: number;
     secretPower: number;
-  }
-  interface ActionsT {
-    LEVEL_UP: string;
   }
 }
 ```
@@ -107,14 +72,14 @@ declare global {
 
 ## 2. Wrap your app with NexusProvider
 
-Wrap your application with `NexusProvider`, passing in `initialStates` and `actions`:
+Wrap your application with `NexusProvider`, passing in `initialStates`:
 
 ```javascript
 import { NexusProvider } from "nexus-state;
-import { initialStates, actions } from "./nexusConfig";
+import { initialStates } from "./nexusConfig";
 
 const App = () => (
-  <NexusProvider initialStates={initialStates} actions={actions}>
+  <NexusProvider initialStates={initialStates}>
     <YourComponent />
   </NexusProvider>
 );
@@ -145,7 +110,7 @@ const YourComponent = () => {
 If you need to calculate derived data from the state, use the `useNexusSelect` hook:
 
 ```javascript
-import { useNexusSelect } from "nexus-state;
+import { useNexusSelect } from "nexus-state";
 
 const YourComponent = () => {
   const fullPower = useNexusSelect(
@@ -158,21 +123,70 @@ const YourComponent = () => {
 
 ---
 
-## 5. Dispatch actions with nexusDispatch
+## 5. Update states with nexusUpdate
 
-To update the state, use the `nexusDispatch` function:
+To update the state, use the `nexusUpdate` function. You can transmit values directly:
 
 ```javascript
-import { nexusDispatch } from "nexus-state;
+const levelUp = () => {
+  nexusUpdate({
+    strength: 15,
+  });
+};
+```
+
+Or get the previous value and work with it:
+
+```javascript
+const levelUp = () => {
+  nexusUpdate({
+    strength: (prevState) => prevState + 5,
+  });
+};
+```
+
+You can also pass as many values as you want, you are limited only by the number of states you have created:
+
+```javascript
+import { nexusUpdate } from "nexus-state";
 
 const levelUp = () => {
-  nexusDispatch({
+  nexusUpdate({
+    strength: (prevState) => prevState + 5,
+    secretPower: (prevState) => prevState + 1,
+  });
+};
+
+const YourButton = () => {
+  return <button onClick={levelUp}>`🧙‍♂️ Raise the level`</button>;
+};
+```
+
+---
+
+🎉 _Hurray! You already have everything you need to start working with global states. Next are the additional features of nexus-state._
+
+---
+
+## Calling custom functions using the nexusEffect
+
+Since there are many disadvantages of storing functions in states and the practical impossibility of their further use, `nexus-state` provides the possibility of creating a storage center for user functions and further calling them via `nexusEffect`.
+
+### Getting started with `nexusEffect`:
+
+#### 1. Define initialFuncs:
+
+```javascript
+import { nexusEffect } from "nexus-state";
+
+const levelUp = () => {
+  nexusEffect({
     type: "LEVEL_UP",
     payload: 5,
   });
 };
 
-const YourButton= () => {
+const YourButton = () => {
   return <button onClick={levelUp}>`🧙‍♂️ Raise the level`</button>;
 };
 ```
@@ -181,7 +195,7 @@ The nexus Dispatch function also supports an array of action objects, allowing y
 
 ```javascript
 const levelUp = () => {
-  nexusDispatch([
+  nexusEffect([
     {
       type: "LEVEL_UP",
       payload: 5,
@@ -194,7 +208,7 @@ const levelUp = () => {
 };
 ```
 
-🔮 _If you’ve set up global types properly, `useNexus`, `useNexusSelect`, and `nexusDispatch` will benefit from full type inference, including autocompletion for the type field._
+🔮 _If you’ve set up global types properly, `useNexus`, `useNexusSelect`, and `nexusEffect` will benefit from full type inference, including autocompletion for the type field._
 
 ---
 
@@ -203,8 +217,8 @@ const levelUp = () => {
 - `NexusProvider`: Provider Component to wrap your application.
 - `useNexus`: Hook for accessing a state by key.
 - `useNexusSelect`: Hook for computed or derived state values.
-- `nexusDispatch`: Function to dispatch actions.
-- `nexusAction`: Function for creating actions.
+- `nexusUpdate`: Function to update your states.
+- `nexusEffect`: Function to dispatch actions.
 
 ---
 

@@ -88,10 +88,10 @@ type MappedActions = {
     : never;
 };
 type DispatchAction = MappedActions[keyof MappedActions];
-declare function nexusDispatch(action: DispatchAction): void;
+declare function nexusEffect(action: DispatchAction): void;
 
 declare function nexusUpdate<K extends keyof StatesT>(updates: {
   [key in K]: StatesT[key] | ((prevState: StatesT[key]) => StatesT[key]);
 }): void;
 
-export { NexusProvider, useNexus, useNexusSelect, nexusDispatch, nexusUpdate };
+export { NexusProvider, useNexus, useNexusSelect, nexusEffect, nexusUpdate };

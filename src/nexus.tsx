@@ -160,7 +160,7 @@ function createContextValue(
 // Создание контекста
 const NexusContext = React.createContext<NexusContextT | null>(null);
 
-let nexusDispatchRef: ((action: ActionsCallingT) => void) | null = null;
+let nexusEffectRef: ((action: ActionsCallingT) => void) | null = null;
 const NexusProvider: React.FC<{
   initialStates: StatesT;
   actions?: ActionsRT;
@@ -174,7 +174,7 @@ const NexusProvider: React.FC<{
     initialStates, // добавляем initialStates в контекст
   };
 
-  nexusDispatchRef = contextValue.dispatch;
+  nexusEffectRef = contextValue.dispatch;
 
   return (
     <NexusContext.Provider value={contextValue}>
@@ -210,7 +210,7 @@ const useNexusSelect = <K extends keyof StatesT>(
 };
 
 // FUNCTIONS
-// nexusDispatch
+// nexusEffect
 type MappedActions = {
   [K in keyof ActionsT]: ActionsT[K] extends {
     action: (payload: infer P) => void;
@@ -224,14 +224,14 @@ type MappedActions = {
 };
 type DispatchAction = MappedActions[keyof MappedActions];
 
-function nexusDispatch(action: DispatchAction): void {
-  if (!nexusDispatchRef) {
+function nexusEffect(action: DispatchAction): void {
+  if (!nexusEffectRef) {
     throw new Error(
-      "nexusDispatch is not initialized. Make sure NexusProvider is used 👺"
+      "nexusEffect is not initialized. Make sure NexusProvider is used 👺"
     );
   }
 
-  nexusDispatchRef({
+  nexusEffectRef({
     payload: Array.isArray(action) ? action : [action],
   });
 }
@@ -240,9 +240,9 @@ function nexusDispatch(action: DispatchAction): void {
 function nexusUpdate<K extends keyof StatesT>(updates: {
   [key in K]: StatesT[key] | ((prevState: StatesT[key]) => StatesT[key]);
 }) {
-  if (!nexusDispatchRef) {
+  if (!nexusEffectRef) {
     throw new Error(
-      "nexusDispatch is not initialized. Make sure NexusProvider is used 👺"
+      "nexusEffect is not initialized. Make sure NexusProvider is used 👺"
     );
   }
 
@@ -253,7 +253,7 @@ function nexusUpdate<K extends keyof StatesT>(updates: {
     // Специальный случай для обновления всех стейтов
     const newState = updates["_NEXUS_"] as StatesT;
 
-    nexusDispatchRef({
+    nexusEffectRef({
       payload: Object.keys(newState).map((key) => ({
         stateKey: key as keyof StatesT,
         payload: newState[key as keyof StatesT],
@@ -275,10 +275,10 @@ function nexusUpdate<K extends keyof StatesT>(updates: {
       }
     );
 
-    nexusDispatchRef({
+    nexusEffectRef({
       payload: actionsArray,
     });
   }
 }
 
-export { NexusProvider, useNexus, useNexusSelect, nexusDispatch, nexusUpdate };
+export { NexusProvider, useNexus, useNexusSelect, nexusEffect, nexusUpdate };
