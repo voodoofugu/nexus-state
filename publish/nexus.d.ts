@@ -8,10 +8,10 @@ declare global {
   interface StatesT {
     _NEXUS_?: Partial<StatesT>;
   }
-  interface ActionsT {}
+  interface FuncsT {}
 }
 
-type ActionsRT = {
+type FuncsAT = {
   [key: string]: {
     action?: (payload: any) => void;
     reducer?: (
@@ -31,7 +31,7 @@ type ActionsRT = {
  */
 declare const NexusProvider: React.FC<{
   initialStates: StatesT;
-  actions?: ActionsRT;
+  actions?: FuncsAT;
   children: React.ReactNode;
 }>;
 
@@ -66,14 +66,14 @@ declare const useNexusSelect: <K extends keyof StatesT>(
  * @see {@link https://www.npmjs.com/package/nexus-state Documentation}
  */
 type MappedActions = {
-  [K in keyof ActionsT]: ActionsT[K] extends {
+  [K in keyof FuncsT]: FuncsT[K] extends {
     action: (payload: infer P) => void;
   }
     ? {
         type: K;
         payload: P;
       }
-    : ActionsT[K] extends {
+    : FuncsT[K] extends {
         reducer: (
           state: StatesT,
           action: {

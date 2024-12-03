@@ -1,29 +1,21 @@
 import React from "react";
-import {
-  UpdateFunction,
-  ActionsCallingT,
-  ActionsRT,
-  NexusContextT,
-} from "./types";
+import { UpdateFunc, FuncsCallT, FuncsAT, NexusContextT } from "./types";
 
-function createReducer(actions: ActionsRT) {
+function createReducer(initialFuncs: FuncsAT) {
   return function reducerNexus(
     state: StatesT,
-    action: ActionsCallingT,
+    fData: FuncsCallT,
     recursiveCall?: boolean // предотвращаем повторную рекурсию если в payload массив
   ): StatesT {
     // Если payload — массив (батчинг действий)
-    if (Array.isArray(action.payload) && !recursiveCall) {
-      return action.payload.reduce(
-        (currentState, actionData: ActionsCallingT) => {
-          return reducerNexus(currentState, actionData, true); // Рекурсивная обработка каждого действия
-        },
-        state
-      );
+    if (Array.isArray(fData.payload) && !recursiveCall) {
+      return fData.payload.reduce((currentState, funcData: FuncsCallT) => {
+        return reducerNexus(currentState, funcData, true); // Рекурсивная обработка каждого действия
+      }, state);
     }
 
     // Если одиночное действие
-    const { stateKey, payload, type } = action;
+    const { stateKey, payload, type } = fData;
 
     // Обновляем stateKey, если он указан
     if (stateKey) {
@@ -32,7 +24,7 @@ function createReducer(actions: ActionsRT) {
       // Если payload — функция, вызываем её
       const newValue =
         typeof payload === "function"
-          ? (payload as UpdateFunction<typeof currentValue>)(currentValue)
+          ? (payload as UpdateFunc<typeof currentValue>)(currentValue)
           : payload;
 
       if (newValue != currentValue) {
@@ -45,13 +37,13 @@ function createReducer(actions: ActionsRT) {
 
     // Обрабатываем действие через actions
     if (type) {
-      const actionConfig = actions[type];
+      const actionConfig = initialFuncs[type];
 
       // // Если у действия есть редьюсер
       // if (actionConfig?.reducer) {
-      //   const singleActionType = action.type as keyof ActionsRT;
+      //   const singleActionType = action.type as keyof FuncsAT;
       //   const actionConfig = actions[singleActionType] as {
-      //     reducer?: (state: StatesT, action: ActionsCallingT) => StatesT;
+      //     reducer?: (state: StatesT, action: FuncsCallT) => StatesT;
       //   };
 
       //   // Выполняем редьюсинг для каждого отдельного действия
@@ -63,9 +55,9 @@ function createReducer(actions: ActionsRT) {
       //   }
       // }
 
-      // Если у действия есть action функция
-      if (actionConfig?.action) {
-        actionConfig.action(payload); // Выполняем побочный эффект
+      // Если у действия есть fData функция
+      if (actionConfig?.fData) {
+        actionConfig.fData(payload); // Выполняем побочный эффект
       }
     }
 
@@ -101,7 +93,7 @@ function getContextMethods(initialStates: StatesT): {
 // Создание значений контекста
 function createContextValue(
   initialStates: StatesT,
-  reducer: (state: StatesT, action: ActionsCallingT) => StatesT
+  reducer: (state: StatesT, fData: FuncsCallT) => StatesT
 ) {
   const stateData = getContextMethods(initialStates);
 
@@ -132,9 +124,9 @@ function createContextValue(
     );
   }
 
-  function dispatch(action: ActionsCallingT): void {
+  function dispatch(fData: FuncsCallT): void {
     const currentState = stateData.get();
-    const newState = reducer(currentState, action);
+    const newState = reducer(currentState, fData);
     if (currentState !== newState) {
       stateData.set(newState);
     }
@@ -160,13 +152,13 @@ function createContextValue(
 // Создание контекста
 const NexusContext = React.createContext<NexusContextT | null>(null);
 
-let nexusEffectRef: ((action: ActionsCallingT) => void) | null = null;
+let nexusDispatchRef: ((fData: FuncsCallT) => void) | null = null;
 const NexusProvider: React.FC<{
   initialStates: StatesT;
-  actions?: ActionsRT;
+  initialFuncs?: FuncsAT;
   children: React.ReactNode;
-}> = ({ initialStates, actions, children }) => {
-  const reducer = createReducer(actions || {});
+}> = ({ initialStates, initialFuncs, children }) => {
+  const reducer = createReducer(initialFuncs || {});
   const immutableInitialStates = structuredClone(initialStates);
 
   const contextValue = {
@@ -174,7 +166,7 @@ const NexusProvider: React.FC<{
     initialStates, // добавляем initialStates в контекст
   };
 
-  nexusEffectRef = contextValue.dispatch;
+  nexusDispatchRef = contextValue.dispatch;
 
   return (
     <NexusContext.Provider value={contextValue}>
@@ -212,27 +204,27 @@ const useNexusSelect = <K extends keyof StatesT>(
 // FUNCTIONS
 // nexusEffect
 type MappedActions = {
-  [K in keyof ActionsT]: ActionsT[K] extends {
-    action: (payload: infer P) => void;
+  [K in keyof FuncsT]: FuncsT[K] extends {
+    fData: (payload: infer P) => void;
   }
     ? { type: K; payload: P }
-    : ActionsT[K] extends {
-        reducer: (state: StatesT, action: { payload: infer P }) => StatesT;
+    : FuncsT[K] extends {
+        reducer: (state: StatesT, fData: { payload: infer P }) => StatesT;
       }
     ? { type: K; payload: P }
     : never;
 };
 type DispatchAction = MappedActions[keyof MappedActions];
 
-function nexusEffect(action: DispatchAction): void {
-  if (!nexusEffectRef) {
+function nexusEffect(fData: DispatchAction): void {
+  if (!nexusDispatchRef) {
     throw new Error(
       "nexusEffect is not initialized. Make sure NexusProvider is used 👺"
     );
   }
 
-  nexusEffectRef({
-    payload: Array.isArray(action) ? action : [action],
+  nexusDispatchRef({
+    payload: Array.isArray(fData) ? fData : [fData],
   });
 }
 
@@ -240,7 +232,7 @@ function nexusEffect(action: DispatchAction): void {
 function nexusUpdate<K extends keyof StatesT>(updates: {
   [key in K]: StatesT[key] | ((prevState: StatesT[key]) => StatesT[key]);
 }) {
-  if (!nexusEffectRef) {
+  if (!nexusDispatchRef) {
     throw new Error(
       "nexusEffect is not initialized. Make sure NexusProvider is used 👺"
     );
@@ -253,7 +245,7 @@ function nexusUpdate<K extends keyof StatesT>(updates: {
     // Специальный случай для обновления всех стейтов
     const newState = updates["_NEXUS_"] as StatesT;
 
-    nexusEffectRef({
+    nexusDispatchRef({
       payload: Object.keys(newState).map((key) => ({
         stateKey: key as keyof StatesT,
         payload: newState[key as keyof StatesT],
@@ -275,7 +267,7 @@ function nexusUpdate<K extends keyof StatesT>(updates: {
       }
     );
 
-    nexusEffectRef({
+    nexusDispatchRef({
       payload: actionsArray,
     });
   }

@@ -31,7 +31,7 @@ export const initialStates = {
 };
 ```
 
-For TypeScript, it’s recommended to extend the global `StatesT` and `ActionsT` interfaces provided by the library. The simplest way is to use `typeof`:
+For TypeScript, it’s recommended to extend the global `StatesT` and `FuncsT` interfaces provided by the library. The simplest way is to use `typeof`:
 
 🔮 _Make sure to configure `tsconfig` properly._
 
