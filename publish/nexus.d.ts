@@ -2,7 +2,7 @@ import React from "react";
 
 /**
  * Global interface for describing states.
- * Extend this interface in your project to define your states.
+ * Extend this interface in your project to define your states and functions.
  */
 declare global {
   interface StatesT {
@@ -11,27 +11,24 @@ declare global {
   interface FuncsT {}
 }
 
+/**
+ * Type for describing functions in FuncsT.
+ */
 type FuncsAT = {
   [key: string]: {
-    action?: (payload: any) => void;
-    reducer?: (
-      state: StatesT,
-      action: {
-        payload: any;
-      }
-    ) => StatesT;
+    fData: (payload: any) => void;
   };
 };
 
 /**
  * Provider for the Nexus context.
  * @param initialStates Initial states object.
- * @param actions Object containing actions and their reducers.
+ * @param initialFuncs Optional object containing user-defined functions.
  * @param children React children components.
  */
 declare const NexusProvider: React.FC<{
   initialStates: StatesT;
-  actions?: FuncsAT;
+  initialFuncs?: FuncsAT;
   children: React.ReactNode;
 }>;
 
@@ -62,12 +59,12 @@ declare const useNexusSelect: <K extends keyof StatesT>(
 
 /**
  * Function for dispatching actions.
- * @param action A single action or an array of actions to process.
+ * @param fData An object containing the `type` and `payload` of the effect.
  * @see {@link https://www.npmjs.com/package/nexus-state Documentation}
  */
 type MappedActions = {
   [K in keyof FuncsT]: FuncsT[K] extends {
-    action: (payload: infer P) => void;
+    fData: (payload: infer P) => void;
   }
     ? {
         type: K;
@@ -76,7 +73,7 @@ type MappedActions = {
     : FuncsT[K] extends {
         reducer: (
           state: StatesT,
-          action: {
+          fData: {
             payload: infer P;
           }
         ) => StatesT;
@@ -88,8 +85,12 @@ type MappedActions = {
     : never;
 };
 type DispatchAction = MappedActions[keyof MappedActions];
-declare function nexusEffect(action: DispatchAction): void;
+declare function nexusEffect(fData: DispatchAction): void;
 
+/**
+ * Function for updating states.
+ * @param updates An object where keys are state names and values are either new state values or update functions.
+ */
 declare function nexusUpdate<K extends keyof StatesT>(updates: {
   [key in K]: StatesT[key] | ((prevState: StatesT[key]) => StatesT[key]);
 }): void;

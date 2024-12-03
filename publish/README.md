@@ -1,6 +1,6 @@
 # nexus-state ✨
 
-A lightweight and flexible state management library for React applications with TypeScript's strong typing support. With `nexus-state`, you can easily build complex state structures while minimizing re-renders. While the library works with JavaScript, using TypeScript unlocks the full potential of type inference and autocompletion.
+A lightweight and flexible state management library for React applications with TypeScript's strong typing support. With `nexus-state`, you can easily build complex state structures. While the library works with JavaScript, using TypeScript unlocks the full potential of type inference and autocompletion.
 
 This library came about by chance. I hadn't planned on using a state manager and simply updated states based on a flux-like architecture. Over time, I wanted to isolate state management into a separate component, which led to the creation of this library.
 
@@ -31,9 +31,9 @@ export const initialStates = {
 };
 ```
 
-For TypeScript, extend the global `StatesT` interface provided by the library. The simplest way is to use `typeof`:
+### 🛠 Configuring TypeScript for nexus-state
 
-🔮 _Make sure to configure `tsconfig` properly._
+For TypeScript, extend the global `StatesT` interface provided by the library. The simplest way is to use `typeof`:
 
 ```typescript
 type InitialStatesT = typeof initialStates;
@@ -43,30 +43,9 @@ declare global {
 }
 ```
 
-🔮 _If you use `eslint`, you might encounter an error about empty object types (`@typescript-eslint/no-empty-object-type`), but this is easy to fix._
+The `nexus-state` library comes with the default type `_NEXUS_` in `StatesT`. For more information, see the `nexusUpdate` section.
 
-### Ways to address the no-empty-object-type error:
-
-#### 1. Add a rule to eslint:
-
-```typescript
-rules: {
-      "@typescript-eslint/no-empty-object-type": "off",
-}
-```
-
-#### 2. Define all states manually if there are only a few:
-
-```javascript
-declare global {
-  interface StatesT {
-    strength: number;
-    secretPower: number;
-  }
-}
-```
-
-#### 3. Simply ignore the warning. 🙌
+🔮 _Make sure to configure `tsconfig` properly._
 
 ---
 
@@ -75,7 +54,7 @@ declare global {
 Wrap your application with `NexusProvider`, passing in `initialStates`:
 
 ```javascript
-import { NexusProvider } from "nexus-state;
+import { NexusProvider } from "nexus-state";
 import { initialStates } from "./nexusConfig";
 
 const App = () => (
@@ -162,6 +141,15 @@ const YourButton = () => {
 };
 ```
 
+For use in `nexusUpdate`, it supplies one default type `_NEXUS_` to `StatesT`. It is used to update all user states.
+This can help you update all the states at one time they are stored remotely:
+
+```javascript
+nexusUpdate({
+  _NEXUS_: fetchedData,
+});
+```
+
 ---
 
 🎉 _Hurray! You already have everything you need to start working with global states. Next are the additional features of nexus-state._
@@ -224,16 +212,12 @@ import { nexusEffect } from "nexus-state";
 const actionDefiner = () => {
   nexusEffect({
     type: "playerActions",
-    payload: "The player waves his sword!",
+    payload: "The hero waves his sword!",
   });
 };
 
 const YourButton = () => {
-  return (
-    <button onClick={actionDefiner}>
-      `🕵️‍♀️ Find out what the hero is doing`
-    </button>
-  );
+  return <button onClick={actionDefiner}>`🧙‍♂️ What does the hero do?`</button>;
 };
 ```
 
@@ -285,12 +269,44 @@ const powerUpCall = () => {
       type: "strength",
       data: 5,
     },
-  }
+  });
+};
 
 const YourButton = () => {
-  return <button onClick={powerUpCall}>`🧙‍♂️ Increase the desired parameter`</button>;
+  return (
+    <button onClick={powerUpCall}>`🧙‍♂️ Increase the desired parameter`</button>
+  );
 };
 ```
+
+---
+
+# Typical problems
+
+## No-empty-object-type error:
+
+If you use `eslint`, you might encounter an error about empty object types (`@typescript-eslint/no-empty-object-type`), but this is easy to fix:
+
+### 1. Add a rule to eslint:
+
+```typescript
+rules: {
+  "@typescript-eslint/no-empty-object-type": "off",
+}
+```
+
+### 2. Define all states manually if there are only a few:
+
+```javascript
+declare global {
+  interface StatesT {
+    strength: number;
+    secretPower: number;
+  }
+}
+```
+
+### 3. Simply ignore the warning. 🙌
 
 ---
 
