@@ -31,7 +31,7 @@ export const initialStates = {
 };
 ```
 
-For TypeScript, it’s recommended to extend the global `StatesT` and `FuncsT` interfaces provided by the library. The simplest way is to use `typeof`:
+For TypeScript, extend the global `StatesT` interface provided by the library. The simplest way is to use `typeof`:
 
 🔮 _Make sure to configure `tsconfig` properly._
 
@@ -168,47 +168,129 @@ const YourButton = () => {
 
 ---
 
-## Calling custom functions using the nexusEffect
+## Custom functions with nexusEffect
 
 Since there are many disadvantages of storing functions in states and the practical impossibility of their further use, `nexus-state` provides the possibility of creating a storage center for user functions and further calling them via `nexusEffect`.
 
 ### Getting started with `nexusEffect`:
 
-#### 1. Define initialFuncs:
+#### 1. Define initialFuncs in your config:
+
+```javascript
+export const initialFuncs = {
+  playerActions: {
+    fData: (payload) => {
+      console.log("Current player action:", payload);
+    },
+  },
+  // over funcs
+};
+```
+
+For TypeScript, extend the global `FuncsT` interface in the same way as `StatesT`:
+
+```typescript
+type InitialStatesT = typeof initialStates;
+type InitialFuncsT = typeof initialFuncs;
+
+declare global {
+  interface StatesT extends InitialStatesT {}
+  interface FuncsT extends InitialFuncsT {}
+}
+```
+
+🔮 _I wrote about the problems with `eslint` above._
+
+#### 2. Transfer the initialFuncs to the NexusProvider
+
+Wrap your application with `NexusProvider`, passing in `initialStates`:
+
+```javascript
+import { NexusProvider } from "nexus-state;
+import { initialStates, initialFuncs } from "./nexusConfig";
+
+const App = () => (
+  <NexusProvider initialStates={initialStates} initialFuncs={initialFuncs}>
+    <YourComponent />
+  </NexusProvider>
+);
+```
+
+#### 3. Use nexusEffect
 
 ```javascript
 import { nexusEffect } from "nexus-state";
 
-const levelUp = () => {
+const actionDefiner = () => {
   nexusEffect({
-    type: "LEVEL_UP",
-    payload: 5,
+    type: "playerActions",
+    payload: "The player waves his sword!",
   });
 };
 
 const YourButton = () => {
-  return <button onClick={levelUp}>`🧙‍♂️ Raise the level`</button>;
+  return (
+    <button onClick={actionDefiner}>
+      `🕵️‍♀️ Find out what the hero is doing`
+    </button>
+  );
 };
 ```
 
-The nexus Dispatch function also supports an array of action objects, allowing you to conveniently dispatch multiple actions at once. Batch processing is built-in to handle these actions efficiently.
+So you can use `nexusEffect`, but its true power is shown in using it together with `nexusUpdate`, as it is also a simple function.
+This way you can think through complex user logic:
 
 ```javascript
-const levelUp = () => {
-  nexusEffect([
-    {
-      type: "LEVEL_UP",
-      payload: 5,
-    },
-    {
-      type: "POWER_UP",
-      payload: 1,
-    },
-  ]);
+import { nexusUpdate } from "nexus-state";
+
+const powerUp = {
+  fData: ({ type, data }) => {
+    switch (type) {
+      case "strength": {
+        nexusUpdate({
+          strength: (prevState) => prevState + data,
+        });
+        return;
+      }
+
+      case "secretPower": {
+        nexusUpdate({
+          secretPower: (prevState) => prevState + data,
+        });
+        return;
+      }
+
+      default:
+        return;
+    }
+  },
+};
+
+export const initialFuncs = {
+  powerUp,
+  // over funcs
 };
 ```
 
-🔮 _If you’ve set up global types properly, `useNexus`, `useNexusSelect`, and `nexusEffect` will benefit from full type inference, including autocompletion for the type field._
+In this example, we have created a `function` with a `switch` `case` design and the ability to change the desired state.
+Usage example:
+
+```javascript
+import { nexusEffect } from "nexus-state";
+
+const powerUpCall = () => {
+  nexusEffect({
+    type: "powerUp",
+    payload: {
+      type: "strength",
+      data: 5,
+    },
+  }
+
+const YourButton = () => {
+  return <button onClick={powerUpCall}>`🧙‍♂️ Increase the desired parameter`</button>;
+};
+```
 
 ---
 
