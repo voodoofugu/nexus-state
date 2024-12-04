@@ -1,11 +1,22 @@
 # nexus-state ✨
 
-A lightweight and flexible state management library for React applications with TypeScript's strong typing support. With `nexus-state`, you can easily build complex state structures. While the library works with JavaScript, using TypeScript unlocks the full potential of type inference and autocompletion.
+## Table of contents
 
-This library came about by chance. I hadn't planned on using a state manager and simply updated states based on a flux-like architecture. Over time, I wanted to isolate state management into a separate component, which led to the creation of this library.
+- [About](#About)
+- [Installation](#Installation)
+- [InitialStates](#InitialStates)
+- [NexusProvider](#NexusProvider)
+- [useNexus](#useNexus)
+- [useNexusSelect](#useNexusSelect)
+- [nexusUpdate](#nexusUpdate)
+- [nexusEffect](#nexusEffect)
+- [Motivation](#Motivation)
+- [API](#API)
 
-The name "Nexus" was inspired by the game Demon's Souls, where the "Nexus" serves as a safe haven for the player and a starting point. Similarly, with `nexus-state`, I wanted users to feel connected to a place like the "Nexus" or a bonfire from Dark Souls, where they can start their journey to anywhere.
-🔥🗡️
+## About
+
+A lightweight and flexible state management library for `React` applications with `TypeScript` support. With `nexus-state`, you can easily build complex state structures.
+While the library works with JavaScript, using TypeScript unlocks the full potential of type inference and autocompletion.
 
 ## Installation
 
@@ -17,9 +28,7 @@ npm install nexus-state
 
 ---
 
-# Getting Started in five steps
-
-## 1. Define initialStates
+## InitialStates
 
 Create a file, such as `nexusConfig`, where you define `initialStates`:
 
@@ -49,7 +58,7 @@ The `nexus-state` library comes with the default type `_NEXUS_` in `StatesT`. Fo
 
 ---
 
-## 2. Wrap your app with NexusProvider
+## NexusProvider
 
 Wrap your application with `NexusProvider`, passing in `initialStates`:
 
@@ -66,7 +75,7 @@ const App = () => (
 
 ---
 
-## 3. Access states with useNexus
+## useNexus
 
 To access a state value, use the `useNexus` hook:
 
@@ -84,7 +93,7 @@ const YourComponent = () => {
 
 ---
 
-## 4. Use useNexusSelect for computed values
+## useNexusSelect
 
 If you need to calculate derived data from the state, use the `useNexusSelect` hook:
 
@@ -102,7 +111,7 @@ const YourComponent = () => {
 
 ---
 
-## 5. Update states with nexusUpdate
+## nexusUpdate
 
 To update the state, use the `nexusUpdate` function. You can transmit values directly:
 
@@ -156,11 +165,10 @@ nexusUpdate({
 
 ---
 
-## Custom functions with nexusEffect
+## nexusEffect
 
 Since there are many disadvantages of storing functions in states and the practical impossibility of their further use, `nexus-state` provides the possibility of creating a storage center for user functions and further calling them via `nexusEffect`.
-
-### Getting started with `nexusEffect`:
+To get started with the `nexusEffect`, you need to:
 
 #### 1. Define initialFuncs in your config:
 
@@ -186,8 +194,6 @@ declare global {
   interface FuncsT extends InitialFuncsT {}
 }
 ```
-
-🔮 _I wrote about the problems with `eslint` above._
 
 #### 2. Transfer the initialFuncs to the NexusProvider
 
@@ -228,8 +234,8 @@ This way you can think through complex user logic:
 import { nexusUpdate } from "nexus-state";
 
 const powerUp = {
-  fData: ({ type, data }) => {
-    switch (type) {
+  fData: ({ param, data }) => {
+    switch (param) {
       case "strength": {
         nexusUpdate({
           strength: (prevState) => prevState + data,
@@ -266,7 +272,7 @@ const powerUpCall = () => {
   nexusEffect({
     type: "powerUp",
     payload: {
-      type: "strength",
+      param: "strength",
       data: 5,
     },
   });
@@ -281,13 +287,13 @@ const YourButton = () => {
 
 ---
 
-# Typical problems
+## Problems
 
-## No-empty-object-type error:
+### No-empty-object-type error:
 
 If you use `eslint`, you might encounter an error about empty object types (`@typescript-eslint/no-empty-object-type`), but this is easy to fix:
 
-### 1. Add a rule to eslint:
+#### 1. Add a rule to eslint:
 
 ```typescript
 rules: {
@@ -295,7 +301,7 @@ rules: {
 }
 ```
 
-### 2. Define all states manually if there are only a few:
+#### 2. Define all states manually if there are only a few:
 
 ```javascript
 declare global {
@@ -306,20 +312,25 @@ declare global {
 }
 ```
 
-### 3. Simply ignore the warning. 🙌
+#### 3. Simply ignore the warning. 🙌
 
 ---
 
-# API
+## Motivation
+
+This library came about by chance. I hadn't planned on using a state manager and simply updated states based on a flux-like architecture. Over time, I wanted to isolate state management into a separate component, which led to the creation of this library.
+
+The name "Nexus" was inspired by the game Demon's Souls, where the "Nexus" serves as a safe haven for the player and a starting point. Similarly, with `nexus-state`, I wanted users to feel connected to a place like the "Nexus" or a bonfire from Dark Souls, where they can start their journey to anywhere.
+🔥🗡️
+
+I hope using `nexus-state` makes your development enjoyable and productive! ✨
+
+---
+
+## API
 
 - `NexusProvider`: Provider Component to wrap your application.
 - `useNexus`: Hook for accessing a state by key.
 - `useNexusSelect`: Hook for computed or derived state values.
 - `nexusUpdate`: Function to update your states.
 - `nexusEffect`: Function to dispatch actions.
-
----
-
-## Conclusion
-
-I hope using `nexus-state` makes your development enjoyable and productive! ✨
