@@ -1,5 +1,11 @@
 import React from "react";
-import { UpdateFunc, FuncsCallT, FuncsAT, NexusContextT } from "./types";
+import {
+  UpdateFunc,
+  FuncsCallT,
+  FuncsAT,
+  NexusContextT,
+  MappedActions,
+} from "./types";
 
 function createReducer(initialFuncs: FuncsAT) {
   return function reducerNexus(
@@ -202,20 +208,7 @@ const useNexusSelect = <K extends keyof StatesT>(
 
 // FUNCTIONS
 // nexusTrigger
-type MappedActions = {
-  [K in keyof FuncsT]: FuncsT[K] extends {
-    fData: (payload: infer P) => void;
-  }
-    ? { type: K; payload: P }
-    : FuncsT[K] extends {
-        reducer: (state: StatesT, fData: { payload: infer P }) => StatesT;
-      }
-    ? { type: K; payload: P }
-    : never;
-};
-type DispatchAction = MappedActions[keyof MappedActions];
-
-function nexusTrigger(fData: DispatchAction): void {
+function nexusTrigger(fData: MappedActions[keyof MappedActions]): void {
   if (!nexusDispatchRef) {
     throw new Error(
       "nexusTrigger is not initialized. Make sure NexusProvider is used 👺"

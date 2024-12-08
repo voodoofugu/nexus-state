@@ -80,13 +80,12 @@ type MappedActions = {
       }
     : never;
 };
-type DispatchAction = MappedActions[keyof MappedActions];
 /**
  * Function for triggering user-defined functions
  * @param fData An object containing the `type` and `payload` of the effect.
  * @see {@link https://www.npmjs.com/package/nexus-state#nexusTrigger Documentation}
  */
-declare function nexusTrigger(fData: DispatchAction): void;
+declare function nexusTrigger(fData: MappedActions[keyof MappedActions]): void;
 
 /**
  * Function for updating states.

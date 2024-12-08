@@ -28,3 +28,15 @@ export type NexusContextT = {
   subscribe: (callback: () => void) => () => void;
   initialStates: StatesT;
 };
+
+export type MappedActions = {
+  [K in keyof FuncsT]: FuncsT[K] extends {
+    fData: (payload: infer P) => void;
+  }
+    ? { type: K; payload: P }
+    : FuncsT[K] extends {
+        reducer: (state: StatesT, fData: { payload: infer P }) => StatesT;
+      }
+    ? { type: K; payload: P }
+    : never;
+};
