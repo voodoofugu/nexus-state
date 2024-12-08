@@ -39,22 +39,6 @@ function createReducer(initialFuncs: FuncsAT) {
     if (type) {
       const actionConfig = initialFuncs[type];
 
-      // // Если у действия есть редьюсер
-      // if (actionConfig?.reducer) {
-      //   const singleActionType = action.type as keyof FuncsAT;
-      //   const actionConfig = actions[singleActionType] as {
-      //     reducer?: (state: StatesT, action: FuncsCallT) => StatesT;
-      //   };
-
-      //   // Выполняем редьюсинг для каждого отдельного действия
-      //   const newState = actionConfig.reducer?.(state, action) ?? state;
-
-      //   // Возвращаем новое состояние, если оно изменилось
-      //   if (newState !== state) {
-      //     return newState;
-      //   }
-      // }
-
       // Если у действия есть fData функция
       if (actionConfig?.fData) {
         actionConfig.fData(payload); // Выполняем побочный эффект
@@ -72,12 +56,24 @@ function getContextMethods(initialStates: StatesT): {
 } {
   let store = initialStates;
   const subscribers = React.useRef(new Set<() => void>());
+  // добавим таймер на 16мс для оптимизации
+  const timerId = React.useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const get = React.useCallback(() => store, []);
+
   const set = React.useCallback((value: Partial<StatesT>) => {
     store = { ...store, ...value };
-    subscribers.current.forEach((callback) => callback());
+
+    if (timerId.current) {
+      clearTimeout(timerId.current);
+    }
+
+    timerId.current = setTimeout(() => {
+      subscribers.current.forEach((callback) => callback());
+      timerId.current = null;
+    }, 16);
   }, []);
+
   const subscribe = React.useCallback((callback: () => void) => {
     subscribers.current.add(callback);
     return () => subscribers.current.delete(callback);
@@ -98,29 +94,32 @@ function createContextValue(
   const stateData = getContextMethods(initialStates);
 
   function get<K extends keyof StatesT>(stateName: K): StatesT[K] {
-    if (!(stateName in stateData.get())) {
+    if (!(stateName in initialStates)) {
       console.error(`State "${String(stateName)}" in useNexus not found 👺`);
     }
 
     return React.useSyncExternalStore(
       stateData.subscribe,
       () => stateData.get()[stateName] ?? initialStates[stateName],
-      () => initialStates[stateName]
+      () => initialStates[stateName] // для SSR
+    );
+  }
+
+  function getAll(): StatesT {
+    return React.useSyncExternalStore(
+      stateData.subscribe,
+      stateData.get,
+      () => initialStates // для SSR
     );
   }
 
   function selector<K extends keyof StatesT>(
     select: (state: StatesT) => StatesT[K]
   ): StatesT[K] {
-    const state = stateData.get();
-    if (select(state) === undefined) {
-      console.error("State in useNexusSelect not found 👺");
-    }
-
     return React.useSyncExternalStore(
       stateData.subscribe,
       () => select(stateData.get()),
-      () => select(initialStates)
+      () => select(initialStates) // для SSR
     );
   }
 
@@ -132,19 +131,11 @@ function createContextValue(
     }
   }
 
-  function getAll(): StatesT {
-    return React.useSyncExternalStore(
-      stateData.subscribe,
-      stateData.get,
-      () => initialStates
-    );
-  }
-
   return {
     get,
-    dispatch,
     getAll,
     selector,
+    dispatch,
     subscribe: stateData.subscribe,
   };
 }
@@ -158,8 +149,16 @@ const NexusProvider: React.FC<{
   initialFuncs?: FuncsAT;
   children: React.ReactNode;
 }> = ({ initialStates, initialFuncs, children }) => {
-  const reducer = createReducer(initialFuncs || {});
-  const immutableInitialStates = structuredClone(initialStates);
+  const immutableInitialStates = React.useMemo(
+    () => JSON.parse(JSON.stringify(initialStates)),
+    [initialStates]
+  );
+
+  // Создаём reducer
+  const reducer = React.useMemo(
+    () => createReducer(initialFuncs || {}),
+    [initialFuncs]
+  );
 
   const contextValue = {
     ...createContextValue(immutableInitialStates, reducer),
@@ -198,7 +197,7 @@ const useNexusSelect = <K extends keyof StatesT>(
 ): StatesT[K] => {
   const ctx = contextExist();
 
-  return selector(ctx.getAll());
+  return ctx.selector(selector);
 };
 
 // FUNCTIONS
@@ -238,10 +237,7 @@ function nexusUpdate<K extends keyof StatesT>(updates: {
     );
   }
 
-  // Проверка, если обновление всех состояний
-  const isFullUpdate = "_NEXUS_" in updates;
-
-  if (isFullUpdate) {
+  if ("_NEXUS_" in updates) {
     // Специальный случай для обновления всех стейтов
     const newState = updates["_NEXUS_"] as StatesT;
 

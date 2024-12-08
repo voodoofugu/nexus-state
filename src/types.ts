@@ -15,7 +15,6 @@ export type FuncsCallT = {
 export type FuncsAT = {
   [key: string]: {
     fData: (payload: any) => void; // Функция для обработки действия
-    // reducer?: (state: StatesT, action: { payload: any }) => StatesT; // Редуктор для обновления состояния
   };
 };
 
