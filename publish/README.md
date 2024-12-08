@@ -9,7 +9,7 @@
 - [useNexus](#useNexus)
 - [useNexusSelect](#useNexusSelect)
 - [nexusUpdate](#nexusUpdate)
-- [nexusEffect](#nexusEffect)
+- [nexusTrigger](#nexusTrigger)
 - [Motivation](#Motivation)
 - [API](#API)
 
@@ -165,10 +165,10 @@ nexusUpdate({
 
 ---
 
-## nexusEffect
+## nexusTrigger
 
-Since there are many disadvantages of storing functions in states and the practical impossibility of their further use, `nexus-state` provides the possibility of creating a storage center for user functions and further calling them via `nexusEffect`.
-To get started with the `nexusEffect`, you need to:
+Since there are many disadvantages of storing functions in states and the practical impossibility of their further use, `nexus-state` provides the possibility of creating a storage center for user functions and further calling them via `nexusTrigger`.
+To get started with the `nexusTrigger`, you need to:
 
 #### 1. Define initialFuncs in your config:
 
@@ -210,13 +210,13 @@ const App = () => (
 );
 ```
 
-#### 3. Use nexusEffect
+#### 3. Use nexusTrigger
 
 ```javascript
-import { nexusEffect } from "nexus-state";
+import { nexusTrigger } from "nexus-state";
 
 const actionDefiner = () => {
-  nexusEffect({
+  nexusTrigger({
     type: "playerActions",
     payload: "The hero waves his sword!",
   });
@@ -227,7 +227,7 @@ const YourButton = () => {
 };
 ```
 
-So you can use `nexusEffect`, but its true power is shown in using it together with `nexusUpdate`, as it is also a simple function.
+So you can use `nexusTrigger`, but its true power is shown in using it together with `nexusUpdate`, as it is also a simple function.
 This way you can think through complex user logic:
 
 ```javascript
@@ -266,10 +266,10 @@ In this example, we have created a `function` with a `switch` `case` design and 
 Usage example:
 
 ```javascript
-import { nexusEffect } from "nexus-state";
+import { nexusTrigger } from "nexus-state";
 
 const powerUpCall = () => {
-  nexusEffect({
+  nexusTrigger({
     type: "powerUp",
     payload: {
       param: "strength",
@@ -333,4 +333,4 @@ I hope using `nexus-state` makes your development enjoyable and productive! ✨
 - `useNexus`: Hook for accessing a state by key.
 - `useNexusSelect`: Hook for computed or derived state values.
 - `nexusUpdate`: Function to update your states.
-- `nexusEffect`: Function to dispatch actions.
+- `nexusTrigger`: Function to dispatch actions.

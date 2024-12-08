@@ -202,7 +202,7 @@ const useNexusSelect = <K extends keyof StatesT>(
 };
 
 // FUNCTIONS
-// nexusEffect
+// nexusTrigger
 type MappedActions = {
   [K in keyof FuncsT]: FuncsT[K] extends {
     fData: (payload: infer P) => void;
@@ -216,10 +216,10 @@ type MappedActions = {
 };
 type DispatchAction = MappedActions[keyof MappedActions];
 
-function nexusEffect(fData: DispatchAction): void {
+function nexusTrigger(fData: DispatchAction): void {
   if (!nexusDispatchRef) {
     throw new Error(
-      "nexusEffect is not initialized. Make sure NexusProvider is used 👺"
+      "nexusTrigger is not initialized. Make sure NexusProvider is used 👺"
     );
   }
 
@@ -234,7 +234,7 @@ function nexusUpdate<K extends keyof StatesT>(updates: {
 }) {
   if (!nexusDispatchRef) {
     throw new Error(
-      "nexusEffect is not initialized. Make sure NexusProvider is used 👺"
+      "nexusTrigger is not initialized. Make sure NexusProvider is used 👺"
     );
   }
 
@@ -273,4 +273,4 @@ function nexusUpdate<K extends keyof StatesT>(updates: {
   }
 }
 
-export { NexusProvider, useNexus, useNexusSelect, nexusEffect, nexusUpdate };
+export { NexusProvider, useNexus, useNexusSelect, nexusTrigger, nexusUpdate };

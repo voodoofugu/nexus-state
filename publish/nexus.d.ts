@@ -82,11 +82,11 @@ type MappedActions = {
 };
 type DispatchAction = MappedActions[keyof MappedActions];
 /**
- * Function for calling user-defined functions
+ * Function for triggering user-defined functions
  * @param fData An object containing the `type` and `payload` of the effect.
- * @see {@link https://www.npmjs.com/package/nexus-state#nexusEffect Documentation}
+ * @see {@link https://www.npmjs.com/package/nexus-state#nexusTrigger Documentation}
  */
-declare function nexusEffect(fData: DispatchAction): void;
+declare function nexusTrigger(fData: DispatchAction): void;
 
 /**
  * Function for updating states.
@@ -97,4 +97,4 @@ declare function nexusUpdate<K extends keyof StatesT>(updates: {
   [key in K]: StatesT[key] | ((prevState: StatesT[key]) => StatesT[key]);
 }): void;
 
-export { NexusProvider, useNexus, useNexusSelect, nexusEffect, nexusUpdate };
+export { NexusProvider, useNexus, useNexusSelect, nexusTrigger, nexusUpdate };
