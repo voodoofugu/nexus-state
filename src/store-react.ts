@@ -13,11 +13,9 @@ interface CreateReactStoreOptions<
 
 function createReactStore<
   T extends Record<string, unknown>,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  A extends Record<string, (...args: any[]) => any> = Record<
+  A extends Record<string, (...args: any[]) => unknown> = Record<
     string,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (...args: any[]) => any
+    (...args: unknown[]) => unknown
   >
 >(options: CreateReactStoreOptions<T, A>) {
   const { state: store, actions: actionsInstance } = createStore(options);
