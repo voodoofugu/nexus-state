@@ -7,11 +7,7 @@
 - [About](#about)
 - [Installation](#installation)
 - [Configuration](#configuration)
-  - [createStore](#createstore)
-  - [createReactStore](#createreactstore)
 - [API](#api)
-  - [Core API](#core-api)
-  - [React-Specific Hooks](#react-specific-hooks)
 - [License](#license)
 
 <h2></h2>
@@ -34,7 +30,7 @@ npm install nexus-state
 ### Configuration
 
 > **✦ Note:**<br />
-> You can define your store as a separate configuration file (recommended) or directly inside your components.
+> You can define your store as a separate configuration file (recommended) or directly inside your components.<br />
 > Multiple stores are supported.
 
 - #### createStore
@@ -181,7 +177,9 @@ unsubscribe();
       <b>Description:</b> <em><br />
       Registers middleware to intercept state updates. You can modify or cancel the update.<br />
       </em><br />
-      <b>Example:</b>
+      <b>Example:</b><br />
+      <br />
+      <em>Basic Logging:</em>
 
 ```tsx
 state.nexusGate((prev, next) => {
@@ -190,6 +188,41 @@ state.nexusGate((prev, next) => {
   // Optionally, return a modified next state:
   // return { ...next, forced: true };
 });
+```
+
+      <em>Redux DevTools Integration:</em>
+
+```tsx
+// Setup Redux DevTools connection
+const devtools = window.__REDUX_DEVTOOLS_EXTENSION__?.connect({
+  name: "MyStore",
+});
+
+devtools?.init(state.getNexus());
+
+// Register middleware to send state updates to DevTools
+state.nexusGate((_, next) => {
+  devtools?.send?.({ type: "UPDATE" }, next);
+});
+```
+
+      <em>TypeScript Integration (Optional):</em>
+
+```tsx
+interface ReduxDevToolsConnection {
+  send: (action: unknown, state: unknown) => void;
+  init: (state: unknown) => void;
+}
+
+interface ReduxDevToolsExtension {
+  connect(options: { name: string }): ReduxDevToolsConnection;
+}
+
+declare global {
+  interface Window {
+    __REDUX_DEVTOOLS_EXTENSION__?: ReduxDevToolsExtension;
+  }
+}
 ```
 
   </ul></details>
@@ -215,8 +248,8 @@ actions.setUser("Admin");
 
 ##### REACT-SPECIFIC HOOKS
 
-> **✦ Note:**
-> Available only in createReactStore
+> **✦ Note:**<br />
+> Available only in `createReactStore`
 
   <details>
     <summary><b><code>useNexus()</code></b></summary><br />
