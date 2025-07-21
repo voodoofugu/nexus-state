@@ -29,6 +29,10 @@ npm install nexus-state
 
 ### Configuration
 
+> **✦ Note:**<br />
+> You can define your store as a separate configuration file (recommended) or directly inside your components.<br />
+> Multiple stores are supported.
+
 <ul>
 
   <details>
@@ -89,13 +93,7 @@ export { state, actions };
 
   </ul></details>
 
-  <h2></h2>
-
 </ul>
-
-> **✦ Note:**<br />
-> You can define your store as a separate configuration file (recommended) or directly inside your components.<br />
-> Multiple stores are supported.
 
 <h2></h2>
 
@@ -262,6 +260,9 @@ actions.setUser("Admin");
 
 ##### REACT-SPECIFIC HOOKS
 
+> **✦ Note:**<br />
+> Available only in `createReactStore`
+
   <details>
     <summary><b><code>useNexus()</code></b></summary><br />
     <ul>
@@ -307,11 +308,6 @@ const total = state.useNexusSelector(
 ```
 
   </ul></details>
-
-  <h2></h2>
-
-> **✦ Note:**<br />
-> Available only in `createReactStore`
 
   </ul>
 
