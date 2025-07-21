@@ -87,6 +87,8 @@ export { state, actions };
 
 ### API Methods
 
+<ul>
+
   <details>
     <summary><b><code>getNexus()</code></b></summary><br />
     <ul>
@@ -249,6 +251,8 @@ const total = state.useNexusSelector(
 ```
 
   </ul></details>
+
+  </ul>
 
 <h2></h2>
 
