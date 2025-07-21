@@ -1,12 +1,11 @@
-![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/refs/heads/main/src/assets/01-banner-logo.jpg?token=GHSAT0AAAAAADFZRJIDC7XM47QMZITKTUXQ2D6B55A)
+![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/refs/heads/main/src/assets/01-banner-logo.jpg)
 
 <h2></h2>
 
 ### Table of contents
 
 - [About](#About)
-- [Basic Usage](#Basic-Usage)
-- [License](#License)
+- [Store](#Store)
 - [API](#API)
 
 <h2></h2>
@@ -26,7 +25,7 @@ npm install nexus-state
 
 <h2></h2>
 
-### Basic Usage
+### Store
 
 #### Core Store ( _createStore_ )
 
@@ -55,7 +54,7 @@ export { state, actions };
 ##### API Methods
 
   <details>
-    <summary><b><code>getNexus()</code></b>: <em>Returns the current state object.</em></summary><br />
+    <summary><b><code>getNexus()</code></b></summary><br />
     <ul>
       <b>Description:</b> <em><br />
       This method returns the current state object.<br />
@@ -72,7 +71,7 @@ export { state, actions };
   <h2></h2>
 
   <details>
-    <summary><b><code>setNexus()</code></b>: <em>Updates the state object.</em></summary><br />
+    <summary><b><code>setNexus()</code></b></summary><br />
     <ul>
       <b>Description:</b> <em><br />
       This method updates the state object. You can pass a partial object or a function with access to the previous state.<br />
@@ -94,7 +93,7 @@ export { state, actions };
   <h2></h2>
 
   <details>
-    <summary><b><code>nexusReset()</code></b>: <em>Resets the state.</em></summary><br />
+    <summary><b><code>nexusReset()</code></b></summary><br />
     <ul>
       <b>Description:</b> <em><br />
       This method resets the state back to its initial values.<br />
@@ -110,7 +109,7 @@ export { state, actions };
   <h2></h2>
 
   <details>
-    <summary><b><code>nexusSubscribe()</code></b>: <em>Subscribes to changes.</em></summary><br />
+    <summary><b><code>nexusSubscribe()</code></b></summary><br />
     <ul>
       <b>Description:</b> <em><br />
       This method subscribes to changes of specific keys or the entire state.<br />
@@ -131,7 +130,7 @@ export { state, actions };
   <h2></h2>
 
   <details>
-    <summary><b><code>nexusGate()</code></b>: <em>Middleware for subscriptions.</em></summary><br />
+    <summary><b><code>nexusGate()</code></b></summary><br />
     <ul>
       <b>Description:</b> <em><br />
       Registers middleware to intercept state updates. You can modify or cancel the update.<br />
@@ -152,7 +151,7 @@ export { state, actions };
   <h2></h2>
 
   <details>
-    <summary><b><code>actions</code></b>: <em>Optional actions object.</em></summary><br />
+    <summary><b><code>actions</code></b></summary><br />
     <ul>
       <b>Description:</b> <em><br />
       Optional actions object defined during store creation, simplifying state updates.<br />
@@ -191,10 +190,12 @@ const { state, actions } = createReactStore({
 export { state, actions };
 ```
 
+Besides React-specific hooks, the React Store also provides access to the core API methods.
+
 ##### React-Specific Methods
 
   <details>
-    <summary><b><code>useNexus()</code></b>: <em>A React hook for subscribing to state changes.</em></summary><br />
+    <summary><b><code>useNexus()</code></b></summary><br />
     <ul>
       <b>Description:</b> <em><br />
       A React hook for subscribing to the store. Automatically triggers re-renders when subscribed state changes.<br />
@@ -206,17 +207,17 @@ export { state, actions };
       </em><br />
       <b>Example:</b>
 
-      ```tsx
-      const fullState = state.useNexus();
-      const count = state.useNexus("count");
-      ```
+```tsx
+const fullState = state.useNexus();
+const count = state.useNexus("count");
+```
 
   </ul></details>
 
   <h2></h2>
 
   <details>
-    <summary><b><code>useNexusSelector()</code></b>: <em>A React hook for creating derived values from the state.</em></summary><br />
+    <summary><b><code>useNexusSelector()</code></b></summary><br />
     <ul>
       <b>Description:</b> <em><br />
       A React hook for creating derived values from the state.<br />
@@ -238,24 +239,6 @@ export { state, actions };
       ```
 
   </ul></details>
-
-  <h2></h2>
-
-##### Access to Core API
-
-Besides React-specific hooks, the full Core Store API is available:
-
-- `state.getNexus()`
-- `state.setNexus()`
-- `state.nexusReset()`
-- `state.nexusSubscribe()`
-- `state.nexusGate()`
-
-<h2></h2>
-
-### License
-
-MIT
 
 <h2></h2>
 
