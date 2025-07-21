@@ -59,7 +59,7 @@ export { state, actions };
     <ul>
       <b>Description:</b> <em><br />
       This method returns the current state object.<br />
-      <br />
+      </em><br />
       <b>Example:</b>
 
       ```tsx
@@ -76,7 +76,7 @@ export { state, actions };
     <ul>
       <b>Description:</b> <em><br />
       This method updates the state object. You can pass a partial object or a function with access to the previous state.<br />
-      <br />
+      </em><br />
       <b>Example:</b>
 
       ```tsx
@@ -98,7 +98,7 @@ export { state, actions };
     <ul>
       <b>Description:</b> <em><br />
       This method resets the state back to its initial values.<br />
-      <br />
+      </em><br />
       <b>Example:</b>
 
       ```tsx
@@ -114,7 +114,7 @@ export { state, actions };
     <ul>
       <b>Description:</b> <em><br />
       This method subscribes to changes of specific keys or the entire state.<br />
-      <br />
+      </em><br />
       <b>Example:</b>
 
       ```tsx
@@ -135,7 +135,7 @@ export { state, actions };
     <ul>
       <b>Description:</b> <em><br />
       Registers middleware to intercept state updates. You can modify or cancel the update.<br />
-      <br />
+      </em><br />
       <b>Example:</b>
 
       ```tsx
@@ -157,7 +157,7 @@ export { state, actions };
       <b>Description:</b> <em><br />
       Optional actions object defined during store creation, simplifying state updates.<br />
       You can define as many actions as needed.<br />
-      <br />
+      </em><br />
       <b>Example:</b>
 
       ```tsx
@@ -198,11 +198,12 @@ export { state, actions };
     <ul>
       <b>Description:</b> <em><br />
       A React hook for subscribing to the store. Automatically triggers re-renders when subscribed state changes.<br />
+      <br />
       <ul>
         <li><b>Without arguments:</b> returns the entire state object.</li>
         <li><b>With key argument:</b> subscribes to a specific key.</li>
       </ul>
-      <br />
+      </em><br />
       <b>Example:</b>
 
       ```tsx
@@ -219,12 +220,14 @@ export { state, actions };
     <ul>
       <b>Description:</b> <em><br />
       A React hook for creating derived values from the state.<br />
+      <br />
       <ul>
         <li><code>selector</code>: function that returns any derived value from the state.</li>
         <li><code>dependencies</code>: array of state keys to watch for changes.</li>
       </ul>
-      Efficient: updates only when dependencies change.<br />
       <br />
+      Efficient: updates only when dependencies change.<br />
+      </em><br />
       <b>Example:</b>
 
       ```tsx
@@ -248,6 +251,8 @@ Besides React-specific hooks, the full Core Store API is available:
 - `state.nexusSubscribe()`
 - `state.nexusGate()`
 
+<h2></h2>
+
 ### License
 
 MIT
@@ -256,5 +261,5 @@ MIT
 
 ### API
 
-- `NexusProvider`: Provider Component to wrap your application.
-- `useNexus`: Hook for accessing a state by key.
+- `createStore`: Creates a new store instance.
+- `createReactStore`: Creates a new React store instance.
