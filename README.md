@@ -7,6 +7,7 @@
 - [About](#About)
 - [Installation](#Installation)
 - [Configuration](#Configuration)
+- [Methods](#Methods)
 - [API](#API)
 
 <h2></h2>
@@ -85,9 +86,11 @@ export { state, actions };
 
 <h2></h2>
 
-### API Methods
+### Methods
 
 <ul>
+
+##### CORE
 
   <details>
     <summary><b><code>getNexus()</code></b></summary><br />
@@ -204,7 +207,7 @@ actions.setUser("Admin");
 
   <h2></h2>
 
-##### React-Specific Methods
+##### REACT-SPECIFIC
 
   <details>
     <summary><b><code>useNexus()</code></b></summary><br />
