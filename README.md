@@ -198,7 +198,6 @@ state.nexusGate((prev, next) => {
     <ul>
       <b>Description:</b> <em><br />
       Optional actions object defined during store creation, simplifying state updates.<br />
-      You can define as many actions as needed.<br />
       </em><br />
       <b>Example:</b>
 
@@ -213,7 +212,7 @@ actions.setUser("Admin");
 
 ##### REACT-SPECIFIC HOOKS
 
-> **Note:**
+> **✦ Note:**
 > Available only in createReactStore
 
   <details>
