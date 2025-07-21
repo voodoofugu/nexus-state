@@ -207,7 +207,7 @@ state.nexusGate((_, next) => {
 });
 ```
 
-<br /><em>TypeScript Integration (Optional):</em>
+<em>TS for Redux DevTools (Optional):</em>
 
 ```tsx
 interface ReduxDevToolsConnection {
@@ -227,7 +227,7 @@ declare global {
 ```
 
 > **✦ Note:**<br />
-> Use nexusGate for middleware logic like logging or devtools. Unlike React hooks, it runs before UI updates and doesn't trigger re-renders.
+> Use nexusGate for middleware logic. Unlike React hooks, it runs before UI updates and doesn't trigger re-renders.
 
   </ul></details>
 
