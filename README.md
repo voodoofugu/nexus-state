@@ -10,8 +10,8 @@
   - [createStore](#createstore)
   - [createReactStore](#createreactstore)
 - [API](#api)
-  - [CORE API](#core-api)
-  - [REACT-SPECIFIC HOOKS](#react-specific-hooks)
+  - [Core API](#core-api)
+  - [React-Specific Hooks](#react-specific-hooks)
 - [License](#license)
 
 <h2></h2>
@@ -270,4 +270,4 @@ const total = state.useNexusSelector(
 
 ### License
 
-MIT
+[MIT](./publish/LICENSE)
