@@ -30,7 +30,7 @@ npm install nexus-state
 
 <ul>
 
-#### createStore
+- #### createStore
 
 `createStore` is configurable either by creating a separate configuration file (recommended) or directly within your components.
 
@@ -56,7 +56,7 @@ export { state, actions };
 
   <h2></h2>
 
-#### createReactStore
+- #### createReactStore
 
 The `createReactStore` builds on top of the `createStore`, providing React-specific bindings for state management via React hooks. This makes it easy to integrate reactive state directly into your React components while still keeping access to the full core API.
 
@@ -68,6 +68,7 @@ const { state, actions } = createReactStore({
     count: 0,
     user: "Anonymous",
   },
+
   actions: (set) => ({
     increment: () => set((prev) => ({ count: prev.count + 1 })),
   }),
