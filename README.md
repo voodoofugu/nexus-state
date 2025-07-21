@@ -65,7 +65,7 @@ export { state, actions };
 
   <h2></h2>
 
-    <details>
+  <details>
     <summary><b><code>createReactStore</code></b></summary><br />
     <ul>
       <b>Description:</b> <em><br />
