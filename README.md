@@ -4,11 +4,15 @@
 
 ### Table of contents
 
-- [About](#About)
-- [Installation](#Installation)
-- [Configuration](#Configuration)
-- [Methods](#Methods)
-- [API](#API)
+- [About](#about)
+- [Installation](#installation)
+- [Configuration](#configuration)
+  - [createStore](#createstore)
+  - [createReactStore](#createreactstore)
+- [API Reference](#api-reference)
+  - [Core API](#core-api)
+  - [React-Specific Hooks](#react-specific-hooks)
+- [License](#license)
 
 <h2></h2>
 
@@ -33,9 +37,9 @@ npm install nexus-state
 
 <ul>
 
-`createStore` is configurable either by creating a separate configuration file (recommended) or directly within your components.
+Framework-agnostic store. You can define the store as a separate configuration file (recommended) or directly inside your components.
 
-You are not limited to a single store instance — create as many as your project needs.
+Multiple stores are supported.
 
 ```js
 import { createStore } from "nexus-state";
@@ -63,7 +67,7 @@ export { state, actions };
 
 <ul>
 
-The `createReactStore` builds on top of the `createStore`, providing React-specific bindings for state management via React hooks. This makes it easy to integrate reactive state directly into your React components while still keeping access to the full core API.
+Extends `createStore` with React-specific hooks for subscribing to state in components.
 
 ```js
 import { createReactStore } from "nexus-state";
@@ -86,11 +90,11 @@ export { state, actions };
 
 <h2></h2>
 
-### Methods
+### API Reference
 
 <ul>
 
-##### CORE
+##### Core API
 
   <details>
     <summary><b><code>getNexus()</code></b></summary><br />
@@ -160,7 +164,7 @@ sconst unsubscribe = state.nexusSubscribe(["count"], () => {
   console.log("count changed:", state.getNexus().count);
 });
 
-// Later, to unsubscribe:
+// Later:
 unsubscribe();
 ```
 
@@ -208,6 +212,9 @@ actions.setUser("Admin");
   <h2></h2>
 
 ##### REACT-SPECIFIC
+
+> **Note:**
+> Available only in createReactStore
 
   <details>
     <summary><b><code>useNexus()</code></b></summary><br />
@@ -259,7 +266,6 @@ const total = state.useNexusSelector(
 
 <h2></h2>
 
-### API
+### License
 
-- `createStore`: Creates a new store instance.
-- `createReactStore`: Creates a new React store instance.
+MIT
