@@ -1,4 +1,4 @@
-![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/refs/heads/main/src/assets/01-banner-logo.jpg)
+![logo](https://github.com/voodoofugu/nexus-state/blob/main/src/assets/01-banner-logo.jpg?raw=true)
 
 <h2></h2>
 
@@ -33,13 +33,15 @@ npm install nexus-state
 
 ### Configuration
 
+> **✦ Note:**
+> You can define your store as a separate configuration file (recommended) or directly inside your components.
+> Multiple stores are supported.
+
 - #### createStore
 
 <ul>
 
-Framework-agnostic store. You can define the store as a separate configuration file (recommended) or directly inside your components.
-
-Multiple stores are supported.
+Creates a new framework-agnostic store instance.
 
 ```js
 import { createStore } from "nexus-state";
@@ -80,6 +82,7 @@ const { state, actions } = createReactStore({
 
   actions: (set) => ({
     increment: () => set((prev) => ({ count: prev.count + 1 })),
+    setUser: (name) => set({ user: name }),
   }),
 });
 
