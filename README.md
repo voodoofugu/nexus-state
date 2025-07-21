@@ -93,7 +93,7 @@ export { state, actions };
 
   </ul></details>
 
-<ul>
+</ul>
 
 <h2></h2>
 
