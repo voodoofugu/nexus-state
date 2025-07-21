@@ -9,9 +9,9 @@
 - [Configuration](#configuration)
   - [createStore](#createstore)
   - [createReactStore](#createreactstore)
-- [API Reference](#api-reference)
-  - [Core API](#core-api)
-  - [React-Specific Hooks](#react-specific-hooks)
+- [API](#api)
+  - [CORE API](#core-api)
+  - [REACT-SPECIFIC HOOKS](#react-specific-hooks)
 - [License](#license)
 
 <h2></h2>
@@ -90,11 +90,11 @@ export { state, actions };
 
 <h2></h2>
 
-### API Reference
+### API
 
 <ul>
 
-##### Core API
+##### CORE API
 
   <details>
     <summary><b><code>getNexus()</code></b></summary><br />
@@ -211,7 +211,7 @@ actions.setUser("Admin");
 
   <h2></h2>
 
-##### REACT-SPECIFIC
+##### REACT-SPECIFIC HOOKS
 
 > **Note:**
 > Available only in createReactStore
