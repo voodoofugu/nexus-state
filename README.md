@@ -190,7 +190,7 @@ state.nexusGate((prev, next) => {
 });
 ```
 
-      <em>Redux DevTools Integration:</em>
+<em>Redux DevTools Integration:</em>
 
 ```tsx
 // Setup Redux DevTools connection
@@ -206,7 +206,7 @@ state.nexusGate((_, next) => {
 });
 ```
 
-      <em>TypeScript Integration (Optional):</em>
+<em>TypeScript Integration (Optional):</em>
 
 ```tsx
 interface ReduxDevToolsConnection {
