@@ -28,7 +28,7 @@ npm install nexus-state
 
 ### Configuration
 
-<div>
+<ul>
 
 #### createStore
 
@@ -76,7 +76,7 @@ const { state, actions } = createReactStore({
 export { state, actions };
 ```
 
-</div>
+</ul>
 
 <h2></h2>
 
