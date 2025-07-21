@@ -5,7 +5,8 @@
 ### Table of contents
 
 - [About](#About)
-- [Store](#Store)
+- [Installation](#Installation)
+- [Configuration](#Configuration)
 - [API](#API)
 
 <h2></h2>
@@ -25,11 +26,13 @@ npm install nexus-state
 
 <h2></h2>
 
-### Store
+### Configuration
 
-#### Core Store ( _createStore_ )
+- #### createStore
 
-Nexus State Core Store is a minimal, framework-agnostic state management solution. You can use it either by creating a separate configuration file (recommended) or directly within your components.
+<div>
+
+`createStore` is configurable either by creating a separate configuration file (recommended) or directly within your components.
 
 You are not limited to a single store instance — create as many as your project needs.
 
@@ -51,128 +54,15 @@ const { state, actions } = createStore({
 export { state, actions };
 ```
 
-##### API Methods
+</div>
 
-  <details>
-    <summary><b><code>getNexus()</code></b></summary><br />
-    <ul>
-      <b>Description:</b> <em><br />
-      This method returns the current state object.<br />
-      </em><br />
-      <b>Example:</b>
+<h2></h2>
 
-      ```tsx
-      const currentState = state.getNexus();
-      console.log(currentState);
-      ```
+- #### createReactStore
 
-  </ul></details>
+<div>
 
-  <h2></h2>
-
-  <details>
-    <summary><b><code>setNexus()</code></b></summary><br />
-    <ul>
-      <b>Description:</b> <em><br />
-      This method updates the state object. You can pass a partial object or a function with access to the previous state.<br />
-      </em><br />
-      <b>Example:</b>
-
-      ```tsx
-      // Direct update:
-      state.setNexus({ count: 5 });
-
-      // Functional update:
-      state.setNexus((prev) => ({
-        count: prev.count + 1,
-      }));
-      ```
-
-  </ul></details>
-
-  <h2></h2>
-
-  <details>
-    <summary><b><code>nexusReset()</code></b></summary><br />
-    <ul>
-      <b>Description:</b> <em><br />
-      This method resets the state back to its initial values.<br />
-      </em><br />
-      <b>Example:</b>
-
-      ```tsx
-      state.nexusReset();
-      ```
-
-  </ul></details>
-
-  <h2></h2>
-
-  <details>
-    <summary><b><code>nexusSubscribe()</code></b></summary><br />
-    <ul>
-      <b>Description:</b> <em><br />
-      This method subscribes to changes of specific keys or the entire state.<br />
-      </em><br />
-      <b>Example:</b>
-
-      ```tsx
-      sconst unsubscribe = state.nexusSubscribe(["count"], () => {
-        console.log("count changed:", state.getNexus().count);
-      });
-
-      // Later, to unsubscribe:
-      unsubscribe();
-      ```
-
-  </ul></details>
-
-  <h2></h2>
-
-  <details>
-    <summary><b><code>nexusGate()</code></b></summary><br />
-    <ul>
-      <b>Description:</b> <em><br />
-      Registers middleware to intercept state updates. You can modify or cancel the update.<br />
-      </em><br />
-      <b>Example:</b>
-
-      ```tsx
-      state.nexusGate((prev, next) => {
-        console.log("State changing from", prev, "to", next);
-
-        // Optionally, return a modified next state:
-        // return { ...next, forced: true };
-      });
-      ```
-
-  </ul></details>
-
-  <h2></h2>
-
-  <details>
-    <summary><b><code>actions</code></b></summary><br />
-    <ul>
-      <b>Description:</b> <em><br />
-      Optional actions object defined during store creation, simplifying state updates.<br />
-      You can define as many actions as needed.<br />
-      </em><br />
-      <b>Example:</b>
-
-      ```tsx
-      actions.increment();
-      actions.setUser("Admin");
-      ```
-
-  </ul></details>
-
-  <h2></h2>
-
-#### React Store ( _createReactStore_ )
-
-The React Store builds on top of the Core Store, providing React-specific bindings for state management via React hooks. This makes it easy to integrate reactive state directly into your React components while still keeping access to the full core API.
-
-You can structure your store as a configuration file (recommended) or define it inline within components. Like the core version, you're not limited to a single store instance.
+The `createReactStore` builds on top of the `createStore`, providing React-specific bindings for state management via React hooks. This makes it easy to integrate reactive state directly into your React components while still keeping access to the full core API.
 
 ```js
 import { createReactStore } from "nexus-state";
@@ -190,7 +80,126 @@ const { state, actions } = createReactStore({
 export { state, actions };
 ```
 
-Besides React-specific hooks, the React Store also provides access to the core API methods.
+</div>
+
+<h2></h2>
+
+### API Methods
+
+  <details>
+    <summary><b><code>getNexus()</code></b></summary><br />
+    <ul>
+      <b>Description:</b> <em><br />
+      This method returns the current state object.<br />
+      </em><br />
+      <b>Example:</b>
+
+```tsx
+const currentState = state.getNexus();
+console.log(currentState);
+```
+
+  </ul></details>
+
+  <h2></h2>
+
+  <details>
+    <summary><b><code>setNexus()</code></b></summary><br />
+    <ul>
+      <b>Description:</b> <em><br />
+      This method updates the state object. You can pass a partial object or a function with access to the previous state.<br />
+      </em><br />
+      <b>Example:</b>
+
+```tsx
+// Direct update:
+state.setNexus({ count: 5 });
+
+// Functional update:
+state.setNexus((prev) => ({
+  count: prev.count + 1,
+}));
+```
+
+  </ul></details>
+
+  <h2></h2>
+
+  <details>
+    <summary><b><code>nexusReset()</code></b></summary><br />
+    <ul>
+      <b>Description:</b> <em><br />
+      This method resets the state back to its initial values.<br />
+      </em><br />
+      <b>Example:</b>
+
+```tsx
+state.nexusReset();
+```
+
+  </ul></details>
+
+  <h2></h2>
+
+  <details>
+    <summary><b><code>nexusSubscribe()</code></b></summary><br />
+    <ul>
+      <b>Description:</b> <em><br />
+      This method subscribes to changes of specific keys or the entire state.<br />
+      </em><br />
+      <b>Example:</b>
+
+```tsx
+sconst unsubscribe = state.nexusSubscribe(["count"], () => {
+  console.log("count changed:", state.getNexus().count);
+});
+
+// Later, to unsubscribe:
+unsubscribe();
+```
+
+  </ul></details>
+
+  <h2></h2>
+
+  <details>
+    <summary><b><code>nexusGate()</code></b></summary><br />
+    <ul>
+      <b>Description:</b> <em><br />
+      Registers middleware to intercept state updates. You can modify or cancel the update.<br />
+      </em><br />
+      <b>Example:</b>
+
+```tsx
+state.nexusGate((prev, next) => {
+  console.log("State changing from", prev, "to", next);
+
+  // Optionally, return a modified next state:
+  // return { ...next, forced: true };
+});
+```
+
+  </ul></details>
+
+  <h2></h2>
+
+  <details>
+    <summary><b><code>actions</code></b></summary><br />
+    <ul>
+      <b>Description:</b> <em><br />
+      Optional actions object defined during store creation, simplifying state updates.<br />
+      You can define as many actions as needed.<br />
+      </em><br />
+      <b>Example:</b>
+
+```tsx
+actions.increment();
+actions.setUser("Admin");
+```
+
+  </ul></details>
+
+  <h2></h2>
 
 ##### React-Specific Methods
 
@@ -231,12 +240,12 @@ const count = state.useNexus("count");
       </em><br />
       <b>Example:</b>
 
-      ```tsx
-      const total = state.useNexusSelector(
-        (s) => s.count + s.user.length,
-        ["count", "user"]
-      );
-      ```
+```tsx
+const total = state.useNexusSelector(
+  (s) => s.count + s.user.length,
+  ["count", "user"]
+);
+```
 
   </ul></details>
 
