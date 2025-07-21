@@ -176,6 +176,7 @@ unsubscribe();
     <ul>
       <b>Description:</b> <em><br />
       Registers middleware to intercept state updates. You can modify or cancel the update.<br />
+      Useful for adding logging, debugging, or integrating with developer tools.<br />
       </em><br />
       <b>Example:</b><br />
       <br />
@@ -190,7 +191,7 @@ state.nexusGate((prev, next) => {
 });
 ```
 
-<em>Redux DevTools Integration:</em>
+<br /><em>Redux DevTools Integration:</em>
 
 ```tsx
 // Setup Redux DevTools connection
@@ -206,7 +207,7 @@ state.nexusGate((_, next) => {
 });
 ```
 
-<em>TypeScript Integration (Optional):</em>
+<br /><em>TypeScript Integration (Optional):</em>
 
 ```tsx
 interface ReduxDevToolsConnection {
@@ -224,6 +225,9 @@ declare global {
   }
 }
 ```
+
+> **✦ Note:**<br />
+> Use nexusGate for middleware logic like logging or devtools. Unlike React hooks, it runs before UI updates and doesn't trigger re-renders.
 
   </ul></details>
 
