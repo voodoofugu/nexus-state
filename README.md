@@ -34,7 +34,9 @@ npm install nexus-state
 ### Configuration
 
 > **✦ Note:**
+
 > You can define your store as a separate configuration file (recommended) or directly inside your components.
+
 > Multiple stores are supported.
 
 - #### createStore
