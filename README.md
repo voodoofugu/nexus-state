@@ -33,11 +33,15 @@ npm install nexus-state
 > You can define your store as a separate configuration file (recommended) or directly inside your components.<br />
 > Multiple stores are supported.
 
-- #### createStore
-
 <ul>
 
-Creates a new framework-agnostic store instance.
+  <details>
+    <summary><b><code>createStore</code></b></summary><br />
+    <ul>
+      <b>Description:</b> <em><br />
+      Creates a new framework-agnostic store instance.<br />
+      </em><br />
+      <b>Example:</b>
 
 ```js
 import { createStore } from "nexus-state";
@@ -57,15 +61,17 @@ const { state, actions } = createStore({
 export { state, actions };
 ```
 
+  </ul></details>
+
   <h2></h2>
 
-  </ul>
-
-- #### createReactStore
-
-<ul>
-
-Extends `createStore` with React-specific hooks for subscribing to state in components.
+    <details>
+    <summary><b><code>createReactStore</code></b></summary><br />
+    <ul>
+      <b>Description:</b> <em><br />
+      Extends <code>createStore</code> with React-specific hooks for subscribing to state in components.<br />
+      </em><br />
+      <b>Example:</b>
 
 ```js
 import { createReactStore } from "nexus-state";
@@ -85,7 +91,9 @@ const { state, actions } = createReactStore({
 export { state, actions };
 ```
 
-</ul>
+  </ul></details>
+
+<ul>
 
 <h2></h2>
 
