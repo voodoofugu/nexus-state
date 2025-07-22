@@ -29,6 +29,8 @@ npm install nexus-state
 
 ### Configuration
 
+<ul><div>
+
 The library provides two separate builds:
 
 - **ESM (import)** — full version including both `createStore` and `createReactStore`. Recommended for modern bundlers and projects.
@@ -41,7 +43,7 @@ The library provides two separate builds:
 > You can define your store as a separate configuration file (recommended) or directly inside your components.<br>
 > Multiple stores are supported.
 
-<ul><div>
+<br>
 
 <details><summary><b><code>createStore</code></b></summary><br><ul><div>
 <b>Description:</b> <em><br>
