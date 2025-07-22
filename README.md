@@ -59,7 +59,7 @@ export { state, actions };
 
 </details></ul>
 
-<h2></h2>
+<ul><h2></h2></ul>
 
 <ul><details><summary><b><code>createReactStore</code></b></summary><br><ul>
 <b>Description:</b> <em><br>
@@ -106,7 +106,7 @@ console.log(currentState);
 
 </details></ul>
 
-<h2></h2>
+<ul><h2></h2></ul>
 
 <ul><details><summary><b><code>setNexus()</code></b></summary><br><ul>
 <b>Description:</b> <em><br>
@@ -126,7 +126,7 @@ state.setNexus((prev) => ({
 
 </details></ul>
 
-<h2></h2>
+<ul><h2></h2></ul>
 
 <ul><details><summary><b><code>nexusReset()</code></b></summary><br><ul>
 <b>Description:</b> <em><br>
@@ -140,7 +140,7 @@ state.nexusReset();
 
 </details></ul>
 
-<h2></h2>
+<ul><h2></h2></ul>
 
 <ul><details><summary><b><code>nexusSubscribe()</code></b></summary><br><ul>
 <b>Description:</b> <em><br>
@@ -159,7 +159,7 @@ unsubscribe();
 
 </details></ul>
 
-<h2></h2>
+<ul><h2></h2></ul>
 
 <ul><details><summary><b><code>nexusGate()</code></b></summary><br><ul>
 <b>Description:</b> <em><br>
@@ -220,7 +220,7 @@ declare global {
 
 </details></ul>
 
-<h2></h2>
+<ul><h2></h2></ul>
 
 <ul><details><summary><b><code>actions</code></b></summary><br><ul>
 <b>Description:</b> <em><br>
@@ -235,7 +235,7 @@ actions.setUser("Admin");
 
 </details></ul>
 
-<h2></h2>
+<ul><h2></h2></ul>
 
 ##### REACT-SPECIFIC HOOKS
 
@@ -260,7 +260,7 @@ const count = state.useNexus("count");
 
 </details></ul>
 
-<h2></h2>
+<ul><h2></h2></ul>
 
 <ul><details><summary><b><code>useNexusSelector()</code></b></summary><br><ul
 <b>Description:</b> <em><br>
