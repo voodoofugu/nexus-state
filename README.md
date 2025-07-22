@@ -1,4 +1,4 @@
-![logo](https://github.com/voodoofugu/nexus-state/blob/main/src/assets/01-banner-logo.jpg?raw=true)
+![nexus-state logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/01-banner-logo.png)
 
 <h2></h2>
 
@@ -43,23 +43,23 @@ npm install nexus-state
       </em><br />
       <b>Example:</b>
 
-```js
-import { createStore } from "nexus-state";
+    ```js
+    import { createStore } from "nexus-state";
 
-const { state, actions } = createStore({
-  state: {
-    count: 0,
-    user: "Anonymous",
-  },
+    const { state, actions } = createStore({
+      state: {
+        count: 0,
+        user: "Anonymous",
+      },
 
-  actions: (set) => ({
-    increment: () => set((prev) => ({ count: prev.count + 1 })),
-    setUser: (name) => set({ user: name }),
-  }),
-});
+      actions: (set) => ({
+        increment: () => set((prev) => ({ count: prev.count + 1 })),
+        setUser: (name) => set({ user: name }),
+      }),
+    });
 
-export { state, actions };
-```
+    export { state, actions };
+    ```
 
   </ul></details>
 
