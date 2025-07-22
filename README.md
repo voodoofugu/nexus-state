@@ -4,11 +4,15 @@
 
 ### Table of contents
 
-- [About](#about)
-- [Installation](#installation)
-- [Configuration](#configuration)
-- [API](#api)
-- [License](#license)
+<ul><div>
+
+[About](#about)
+[Installation](#installation)
+[Configuration](#configuration)
+[API](#api)
+[License](#license)
+
+</div></ul>
 
 <h2></h2>
 
@@ -101,7 +105,7 @@ export { state, actions };
 
 ### API
 
-**CORE API**
+**CORE API:**
 
 <ul><div>
 
@@ -251,7 +255,7 @@ actions.setUser("Admin");
 
 </div></ul>
 
-**REACT-SPECIFIC HOOKS**
+**REACT-SPECIFIC HOOKS:**
 
 > **✦ Note:**<br>
 > Available only in `createReactStore`
