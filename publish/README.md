@@ -29,11 +29,19 @@ npm install nexus-state
 
 ### Configuration
 
+The library provides two separate builds:
+
+- **ESM (import)** — full version including both `createStore` and `createReactStore`. Recommended for modern bundlers and projects.
+- **CJS (require)** — minimal version exposing only the core `createStore`. The React-specific store (`createReactStore`) is intentionally excluded to keep the CommonJS build clean and framework-agnostic.
+
+<br>
+
 > **✦ Note:**<br>
+> If you're using CommonJS, you won't have access to React bindings by default.<br>
 > You can define your store as a separate configuration file (recommended) or directly inside your components.<br>
 > Multiple stores are supported.
 
-<ul><div>
+<br>
 
 <details><summary><b><code>createStore</code></b></summary><br><ul><div>
 <b>Description:</b> <em><br>
@@ -89,15 +97,13 @@ export { state, actions };
 
 </div></ul></details>
 
-</div></ul>
-
 <h2></h2>
 
 ### API
 
-<ul><div>
-
 ##### CORE API
+
+<ul><div>
 
 <details><summary><b><code>getNexus()</code></b></summary><br><ul><div>
 <b>Description:</b> <em><br>
@@ -243,10 +249,14 @@ actions.setUser("Admin");
 
 <h2></h2>
 
+</div></ul>
+
 ##### REACT-SPECIFIC HOOKS
 
 > **✦ Note:**<br>
 > Available only in `createReactStore`
+
+<ul><div>
 
 <details><summary><b><code>useNexus()</code></b></summary><br><ul><div>
 <b>Description:</b> <em><br>
