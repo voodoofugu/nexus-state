@@ -1,336 +1,321 @@
-# nexus-state ✨
+![logo](https://github.com/voodoofugu/nexus-state/blob/main/src/assets/01-banner-logo.jpg?raw=true)
 
-## Table of contents
+<h2></h2>
 
-- [About](#About)
-- [Installation](#Installation)
-- [InitialStates](#InitialStates)
-- [NexusProvider](#NexusProvider)
-- [useNexus](#useNexus)
-- [useNexusSelect](#useNexusSelect)
-- [nexusUpdate](#nexusUpdate)
-- [nexusTrigger](#nexusTrigger)
-- [Motivation](#Motivation)
-- [API](#API)
+### Table of contents
 
-## About
+- [About](#about)
+- [Installation](#installation)
+- [Configuration](#configuration)
+- [API](#api)
+- [License](#license)
 
-A lightweight and flexible state management library for `React` applications with `TypeScript` support. With `nexus-state`, you can easily build complex state structures.
-While the library works with JavaScript, using TypeScript unlocks the full potential of type inference and autocompletion.
+<h2></h2>
 
-## Installation
+### About
 
-Install the library using the following command:
+Lightweight, framework-agnostic state management with optional actions and React bindings.
+Designed for simplicity and performance.
+
+<h2></h2>
+
+### Installation
 
 ```bash
 npm install nexus-state
 ```
 
----
+<h2></h2>
 
-## InitialStates
+### Configuration
 
-Create a file, such as `nexusConfig`, where you define `initialStates`:
+> **✦ Note:**<br />
+> You can define your store as a separate configuration file (recommended) or directly inside your components.<br />
+> Multiple stores are supported.
 
-```javascript
-export const initialStates = {
-  strength: 10,
-  secretPower: 5,
-  // other states...
-};
+<ul>
+
+  <details>
+    <summary><b><code>createStore</code></b></summary><br />
+    <ul>
+      <b>Description:</b> <em><br />
+      Creates a new framework-agnostic store instance.<br />
+      </em><br />
+      <b>Example:</b>
+
+```js
+import { createStore } from "nexus-state";
+
+const { state, actions } = createStore({
+  state: {
+    count: 0,
+    user: "Anonymous",
+  },
+
+  actions: (set) => ({
+    increment: () => set((prev) => ({ count: prev.count + 1 })),
+    setUser: (name) => set({ user: name }),
+  }),
+});
+
+export { state, actions };
 ```
 
-### 🛠 Configuring TypeScript for nexus-state
+  </ul></details>
 
-For TypeScript, extend the global `StatesT` interface provided by the library. The simplest way is to use `typeof`:
+  <h2></h2>
 
-```typescript
-type InitialStatesT = typeof initialStates;
+  <details>
+    <summary><b><code>createReactStore</code></b></summary><br />
+    <ul>
+      <b>Description:</b> <em><br />
+      Extends <code>createStore</code> with React-specific hooks for subscribing to state in components.<br />
+      </em><br />
+      <b>Example:</b>
 
-declare global {
-  interface StatesT extends InitialStatesT {}
-}
+```js
+import { createReactStore } from "nexus-state";
+
+const { state, actions } = createReactStore({
+  state: {
+    count: 0,
+    user: "Anonymous",
+  },
+
+  actions: (set) => ({
+    increment: () => set((prev) => ({ count: prev.count + 1 })),
+    setUser: (name) => set({ user: name }),
+  }),
+});
+
+export { state, actions };
 ```
 
-The `nexus-state` library comes with the default type `_NEXUS_` in `StatesT`. For more information, see the `nexusUpdate` section.
+  </ul></details>
 
-🔮 _Make sure to configure `tsconfig` properly._
+</ul>
 
----
+<h2></h2>
 
-## NexusProvider
+### API
 
-Wrap your application with `NexusProvider`, passing in `initialStates`:
+<ul>
 
-```javascript
-import { NexusProvider } from "nexus-state";
-import { initialStates } from "./nexusConfig";
+##### CORE API
 
-const App = () => (
-  <NexusProvider initialStates={initialStates}>
-    <YourComponent />
-  </NexusProvider>
-);
+  <details>
+    <summary><b><code>getNexus()</code></b></summary><br />
+    <ul>
+      <b>Description:</b> <em><br />
+      This method returns the current state object.<br />
+      </em><br />
+      <b>Example:</b>
+
+```tsx
+const currentState = state.getNexus();
+console.log(currentState);
 ```
 
----
+  </ul></details>
 
-## useNexus
+  <h2></h2>
 
-To access a state value, use the `useNexus` hook:
+  <details>
+    <summary><b><code>setNexus()</code></b></summary><br />
+    <ul>
+      <b>Description:</b> <em><br />
+      This method updates the state object. You can pass a partial object or a function with access to the previous state.<br />
+      </em><br />
+      <b>Example:</b>
 
-```javascript
-import { useNexus } from "nexus-state";
+```tsx
+// Direct update:
+state.setNexus({ count: 5 });
 
-const YourComponent = () => {
-  const strength = useNexus("strength");
-
-  return <p>`🧙‍♂️ Your strength is ${strength}`</p>;
-};
+// Functional update:
+state.setNexus((prev) => ({
+  count: prev.count + 1,
+}));
 ```
 
-🔮 _If you call `useNexus` empty then you will get all your states. This can be useful for debugging._
+  </ul></details>
 
----
+  <h2></h2>
 
-## useNexusSelect
+  <details>
+    <summary><b><code>nexusReset()</code></b></summary><br />
+    <ul>
+      <b>Description:</b> <em><br />
+      This method resets the state back to its initial values.<br />
+      </em><br />
+      <b>Example:</b>
 
-If you need to calculate derived data from the state, use the `useNexusSelect` hook:
-
-```javascript
-import { useNexusSelect } from "nexus-state";
-
-const YourComponent = () => {
-  const fullPower = useNexusSelect(
-    (state) => state.strength + state.secretPower
-  );
-
-  return <p>`🧙‍♂️ Your full power is ${fullPower}`</p>;
-};
+```tsx
+state.nexusReset();
 ```
 
----
+  </ul></details>
 
-## nexusUpdate
+  <h2></h2>
 
-To update the state, use the `nexusUpdate` function. You can transmit values directly:
+  <details>
+    <summary><b><code>nexusSubscribe()</code></b></summary><br />
+    <ul>
+      <b>Description:</b> <em><br />
+      This method subscribes to changes of specific keys or the entire state.<br />
+      </em><br />
+      <b>Example:</b>
 
-```javascript
-const levelUp = () => {
-  nexusUpdate({
-    strength: 15,
-  });
-};
+```tsx
+sconst unsubscribe = state.nexusSubscribe(["count"], () => {
+  console.log("count changed:", state.getNexus().count);
+});
+
+// Later:
+unsubscribe();
 ```
 
-Or get the previous value and work with it:
+  </ul></details>
 
-```javascript
-const levelUp = () => {
-  nexusUpdate({
-    strength: (prevState) => prevState + 5,
-  });
-};
-```
+  <h2></h2>
 
-You can also pass as many values as you want, you are limited only by the number of states you have created:
+  <details>
+    <summary><b><code>nexusGate()</code></b></summary><br />
+    <ul>
+      <b>Description:</b> <em><br />
+      Registers middleware to intercept state updates. You can modify or cancel the update.<br />
+      Useful for adding logging, debugging, or integrating with developer tools.<br />
+      </em><br />
+      <b>Example:</b><br />
+      <br />
+      <em>Basic Logging:</em>
 
-```javascript
-import { nexusUpdate } from "nexus-state";
+```tsx
+state.nexusGate((prev, next) => {
+  console.log("State changing from", prev, "to", next);
 
-const levelUp = () => {
-  nexusUpdate({
-    strength: (prevState) => prevState + 5,
-    secretPower: (prevState) => prevState + 1,
-  });
-};
-
-const YourButton = () => {
-  return <button onClick={levelUp}>`🧙‍♂️ Raise the level`</button>;
-};
-```
-
-For use in `nexusUpdate`, it supplies one default type `_NEXUS_` to `StatesT`. It is used to update all user states.
-This can help you update all the states at one time they are stored remotely:
-
-```javascript
-nexusUpdate({
-  _NEXUS_: fetchedData,
+  // Optionally, return a modified next state:
+  // return { ...next, forced: true };
 });
 ```
 
----
+<br /><em>Redux DevTools Integration:</em>
 
-🎉 _Hurray! You already have everything you need to start working with global states. Next are the additional features of nexus-state._
+```tsx
+// Setup Redux DevTools connection
+const devtools = window.__REDUX_DEVTOOLS_EXTENSION__?.connect({
+  name: "MyStore",
+});
 
----
+devtools?.init(state.getNexus());
 
-## nexusTrigger
-
-Since there are many disadvantages of storing functions in states and the practical impossibility of their further use, `nexus-state` provides the possibility of creating a storage center for user functions and further calling them via `nexusTrigger`.
-To get started with the `nexusTrigger`, you need to:
-
-#### 1. Define initialFuncs in your config:
-
-```javascript
-export const initialFuncs = {
-  playerActions: {
-    fData: (payload) => {
-      console.log("Current player action:", payload);
-    },
-  },
-  // over funcs
-};
+// Register middleware to send state updates to DevTools
+state.nexusGate((_, next) => {
+  devtools?.send?.({ type: "UPDATE" }, next);
+});
 ```
 
-For TypeScript, extend the global `FuncsT` interface in the same way as `StatesT`:
+<em>TS for Redux DevTools (Optional):</em>
 
-```typescript
-type InitialStatesT = typeof initialStates;
-type InitialFuncsT = typeof initialFuncs;
+```tsx
+interface ReduxDevToolsConnection {
+  send: (action: unknown, state: unknown) => void;
+  init: (state: unknown) => void;
+}
+
+interface ReduxDevToolsExtension {
+  connect(options: { name: string }): ReduxDevToolsConnection;
+}
 
 declare global {
-  interface StatesT extends InitialStatesT {}
-  interface FuncsT extends InitialFuncsT {}
-}
-```
-
-#### 2. Transfer the initialFuncs to the NexusProvider
-
-Wrap your application with `NexusProvider`, passing in `initialStates`:
-
-```javascript
-import { NexusProvider } from "nexus-state;
-import { initialStates, initialFuncs } from "./nexusConfig";
-
-const App = () => (
-  <NexusProvider initialStates={initialStates} initialFuncs={initialFuncs}>
-    <YourComponent />
-  </NexusProvider>
-);
-```
-
-#### 3. Use nexusTrigger
-
-```javascript
-import { nexusTrigger } from "nexus-state";
-
-const actionDefiner = () => {
-  nexusTrigger({
-    type: "playerActions",
-    payload: "The hero waves his sword!",
-  });
-};
-
-const YourButton = () => {
-  return <button onClick={actionDefiner}>`🧙‍♂️ What does the hero do?`</button>;
-};
-```
-
-So you can use `nexusTrigger`, but its true power is shown in using it together with `nexusUpdate`, as it is also a simple function.
-This way you can think through complex user logic:
-
-```javascript
-import { nexusUpdate } from "nexus-state";
-
-const powerUp = {
-  fData: ({ param, data }) => {
-    switch (param) {
-      case "strength": {
-        nexusUpdate({
-          strength: (prevState) => prevState + data,
-        });
-        return;
-      }
-
-      case "secretPower": {
-        nexusUpdate({
-          secretPower: (prevState) => prevState + data,
-        });
-        return;
-      }
-
-      default:
-        return;
-    }
-  },
-};
-
-export const initialFuncs = {
-  powerUp,
-  // over funcs
-};
-```
-
-In this example, we have created a `function` with a `switch` `case` design and the ability to change the desired state.
-Usage example:
-
-```javascript
-import { nexusTrigger } from "nexus-state";
-
-const powerUpCall = () => {
-  nexusTrigger({
-    type: "powerUp",
-    payload: {
-      param: "strength",
-      data: 5,
-    },
-  });
-};
-
-const YourButton = () => {
-  return (
-    <button onClick={powerUpCall}>`🧙‍♂️ Increase the desired parameter`</button>
-  );
-};
-```
-
----
-
-## Problems
-
-### No-empty-object-type error:
-
-If you use `eslint`, you might encounter an error about empty object types (`@typescript-eslint/no-empty-object-type`), but this is easy to fix:
-
-#### 1. Add a rule to eslint:
-
-```typescript
-rules: {
-  "@typescript-eslint/no-empty-object-type": "off",
-}
-```
-
-#### 2. Define all states manually if there are only a few:
-
-```javascript
-declare global {
-  interface StatesT {
-    strength: number;
-    secretPower: number;
+  interface Window {
+    __REDUX_DEVTOOLS_EXTENSION__?: ReduxDevToolsExtension;
   }
 }
 ```
 
-#### 3. Simply ignore the warning. 🙌
+> **✦ Note:**<br />
+> Use nexusGate for middleware logic. Unlike React hooks, it runs before UI updates and doesn't trigger re-renders.
 
----
+  </ul></details>
 
-## Motivation
+  <h2></h2>
 
-This library came about by chance. I hadn't planned on using a state manager and simply updated states based on a flux-like architecture. Over time, I wanted to isolate state management into a separate component, which led to the creation of this library.
+  <details>
+    <summary><b><code>actions</code></b></summary><br />
+    <ul>
+      <b>Description:</b> <em><br />
+      Optional actions object defined during store creation, simplifying state updates.<br />
+      </em><br />
+      <b>Example:</b>
 
-The name "Nexus" was inspired by the game Demon's Souls, where the "Nexus" serves as a safe haven for the player and a starting point. Similarly, with `nexus-state`, I wanted users to feel connected to a place like the "Nexus" or a bonfire from Dark Souls, where they can start their journey to anywhere.
-🔥🗡️
+```tsx
+actions.increment();
+actions.setUser("Admin");
+```
 
-I hope using `nexus-state` makes your development enjoyable and productive! ✨
+  </ul></details>
 
----
+  <h2></h2>
 
-## API
+##### REACT-SPECIFIC HOOKS
 
-- `NexusProvider`: Provider Component to wrap your application.
-- `useNexus`: Hook for accessing a state by key.
-- `useNexusSelect`: Hook for computed or derived state values.
-- `nexusUpdate`: Function to update your states.
-- `nexusTrigger`: Function to dispatch actions.
+> **✦ Note:**<br />
+> Available only in `createReactStore`
+
+  <details>
+    <summary><b><code>useNexus()</code></b></summary><br />
+    <ul>
+      <b>Description:</b> <em><br />
+      A React hook for subscribing to the store. Automatically triggers re-renders when subscribed state changes.<br />
+      <br />
+      <ul>
+        <li><b>Without arguments:</b> returns the entire state object.</li>
+        <li><b>With key argument:</b> subscribes to a specific key.</li>
+      </ul>
+      </em><br />
+      <b>Example:</b>
+
+```tsx
+const fullState = state.useNexus();
+const count = state.useNexus("count");
+```
+
+  </ul></details>
+
+  <h2></h2>
+
+  <details>
+    <summary><b><code>useNexusSelector()</code></b></summary><br />
+    <ul>
+      <b>Description:</b> <em><br />
+      A React hook for creating derived values from the state.<br />
+      <br />
+      <ul>
+        <li><code>selector</code>: function that returns any derived value from the state.</li>
+        <li><code>dependencies</code>: array of state keys to watch for changes.</li>
+      </ul>
+      <br />
+      Efficient: updates only when dependencies change.<br />
+      </em><br />
+      <b>Example:</b>
+
+```tsx
+const total = state.useNexusSelector(
+  (s) => s.count + s.user.length,
+  ["count", "user"]
+);
+```
+
+> **✦ Note:**<br />
+> Memoize your selector with `useCallback` if it’s recreated often due to frequent re-renders — this prevents unnecessary re-subscriptions.
+
+  </ul></details>
+
+  </ul>
+
+<h2></h2>
+
+### License
+
+[MIT](./publish/LICENSE)
