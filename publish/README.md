@@ -1,4 +1,4 @@
-![logo](https://github.com/voodoofugu/nexus-state/blob/main/src/assets/01-banner-logo.jpg?raw=true)
+![nexus-state logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/01-banner-logo.png)
 
 <h2></h2>
 
@@ -29,19 +29,17 @@ npm install nexus-state
 
 ### Configuration
 
-> **✦ Note:**<br />
-> You can define your store as a separate configuration file (recommended) or directly inside your components.<br />
+> **✦ Note:**<br>
+> You can define your store as a separate configuration file (recommended) or directly inside your components.<br>
 > Multiple stores are supported.
 
 <ul>
 
-  <details>
-    <summary><b><code>createStore</code></b></summary><br />
-    <ul>
-      <b>Description:</b> <em><br />
-      Creates a new framework-agnostic store instance.<br />
-      </em><br />
-      <b>Example:</b>
+<details><summary><b><code>createStore</code></b></summary><br><ul>
+<b>Description:</b> <em><br>
+Creates a new framework-agnostic store instance.<br>
+</em><br>
+<b>Example:</b>
 
 ```js
 import { createStore } from "nexus-state";
@@ -61,17 +59,15 @@ const { state, actions } = createStore({
 export { state, actions };
 ```
 
-  </ul></details>
+</ul></details>
 
-  <h2></h2>
+<h2></h2>
 
-  <details>
-    <summary><b><code>createReactStore</code></b></summary><br />
-    <ul>
-      <b>Description:</b> <em><br />
-      Extends <code>createStore</code> with React-specific hooks for subscribing to state in components.<br />
-      </em><br />
-      <b>Example:</b>
+<details><summary><b><code>createReactStore</code></b></summary><br><ul>
+<b>Description:</b> <em><br>
+Extends <code>createStore</code> with React-specific hooks for subscribing to state in components.<br>
+</em><br>
+<b>Example:</b>
 
 ```js
 import { createReactStore } from "nexus-state";
@@ -91,7 +87,7 @@ const { state, actions } = createReactStore({
 export { state, actions };
 ```
 
-  </ul></details>
+</ul></details>
 
 </ul>
 
@@ -103,30 +99,26 @@ export { state, actions };
 
 ##### CORE API
 
-  <details>
-    <summary><b><code>getNexus()</code></b></summary><br />
-    <ul>
-      <b>Description:</b> <em><br />
-      This method returns the current state object.<br />
-      </em><br />
-      <b>Example:</b>
+<details><summary><b><code>getNexus()</code></b></summary><br><ul>
+<b>Description:</b> <em><br>
+This method returns the current state object.<br>
+</em><br>
+<b>Example:</b>
 
 ```tsx
 const currentState = state.getNexus();
 console.log(currentState);
 ```
 
-  </ul></details>
+</ul></details>
 
-  <h2></h2>
+<h2></h2>
 
-  <details>
-    <summary><b><code>setNexus()</code></b></summary><br />
-    <ul>
-      <b>Description:</b> <em><br />
-      This method updates the state object. You can pass a partial object or a function with access to the previous state.<br />
-      </em><br />
-      <b>Example:</b>
+<details><summary><b><code>setNexus()</code></b></summary><br><ul>
+<b>Description:</b> <em><br>
+This method updates the state object. You can pass a partial object or a function with access to the previous state.<br>
+</em><br>
+<b>Example:</b>
 
 ```tsx
 // Direct update:
@@ -138,33 +130,29 @@ state.setNexus((prev) => ({
 }));
 ```
 
-  </ul></details>
+</ul></details>
 
-  <h2></h2>
+<h2></h2>
 
-  <details>
-    <summary><b><code>nexusReset()</code></b></summary><br />
-    <ul>
-      <b>Description:</b> <em><br />
-      This method resets the state back to its initial values.<br />
-      </em><br />
-      <b>Example:</b>
+<details><summary><b><code>nexusReset()</code></b></summary><br><ul>
+<b>Description:</b> <em><br>
+This method resets the state back to its initial values.<br>
+</em><br>
+<b>Example:</b>
 
 ```tsx
 state.nexusReset();
 ```
 
-  </ul></details>
+</ul></details>
 
-  <h2></h2>
+<h2></h2>
 
-  <details>
-    <summary><b><code>nexusSubscribe()</code></b></summary><br />
-    <ul>
-      <b>Description:</b> <em><br />
-      This method subscribes to changes of specific keys or the entire state.<br />
-      </em><br />
-      <b>Example:</b>
+<details><summary><b><code>nexusSubscribe()</code></b></summary><br><ul>
+<b>Description:</b> <em><br>
+This method subscribes to changes of specific keys or the entire state.<br>
+</em><br>
+<b>Example:</b>
 
 ```tsx
 sconst unsubscribe = state.nexusSubscribe(["count"], () => {
@@ -175,20 +163,16 @@ sconst unsubscribe = state.nexusSubscribe(["count"], () => {
 unsubscribe();
 ```
 
-  </ul></details>
+</ul></details>
 
-  <h2></h2>
+<h2></h2>
 
-  <details>
-    <summary><b><code>nexusGate()</code></b></summary><br />
-    <ul>
-      <b>Description:</b> <em><br />
-      Registers middleware to intercept state updates. You can modify or cancel the update.<br />
-      Useful for adding logging, debugging, or integrating with developer tools.<br />
-      </em><br />
-      <b>Example:</b><br />
-      <br />
-      <em>Basic Logging:</em>
+<details><summary><b><code>nexusGate()</code></b></summary><br><ul>
+<b>Description:</b> <em><br>
+Registers middleware to intercept state updates. You can modify or cancel the update.<br>
+Useful for adding logging, debugging, or integrating with developer tools.<br>
+</em><br>
+<b>Example:</b><br>
 
 ```tsx
 state.nexusGate((prev, next) => {
@@ -199,7 +183,7 @@ state.nexusGate((prev, next) => {
 });
 ```
 
-<br /><em>Redux DevTools Integration:</em>
+<details><summary><b>Redux DevTools Integration</b></summary><br>
 
 ```tsx
 // Setup Redux DevTools connection
@@ -215,9 +199,8 @@ state.nexusGate((_, next) => {
 });
 ```
 
-<em>TS for Redux DevTools (Optional):</em>
-
 ```tsx
+// TS for Redux DevTools
 interface ReduxDevToolsConnection {
   send: (action: unknown, state: unknown) => void;
   init: (state: unknown) => void;
@@ -234,20 +217,22 @@ declare global {
 }
 ```
 
-> **✦ Note:**<br />
+</details>
+
+<br>
+
+> **✦ Note:**<br>
 > Use nexusGate for middleware logic. Unlike React hooks, it runs before UI updates and doesn't trigger re-renders.
 
-  </ul></details>
+</ul></details>
 
-  <h2></h2>
+<h2></h2>
 
-  <details>
-    <summary><b><code>actions</code></b></summary><br />
-    <ul>
-      <b>Description:</b> <em><br />
-      Optional actions object defined during store creation, simplifying state updates.<br />
-      </em><br />
-      <b>Example:</b>
+<details><summary><b><code>actions</code></b></summary><br><ul>
+<b>Description:</b> <em><br>
+Optional actions object defined during store creation, simplifying state updates.<br>
+</em><br>
+<b>Example:</b>
 
 ```tsx
 actions.increment();
@@ -260,45 +245,41 @@ actions.setUser("Admin");
 
 ##### REACT-SPECIFIC HOOKS
 
-> **✦ Note:**<br />
+> **✦ Note:**<br>
 > Available only in `createReactStore`
 
-  <details>
-    <summary><b><code>useNexus()</code></b></summary><br />
-    <ul>
-      <b>Description:</b> <em><br />
-      A React hook for subscribing to the store. Automatically triggers re-renders when subscribed state changes.<br />
-      <br />
-      <ul>
-        <li><b>Without arguments:</b> returns the entire state object.</li>
-        <li><b>With key argument:</b> subscribes to a specific key.</li>
-      </ul>
-      </em><br />
-      <b>Example:</b>
+<details><summary><b><code>useNexus()</code></b></summary><br><ul>
+<b>Description:</b> <em><br>
+A React hook for subscribing to the store. Automatically triggers re-renders when subscribed state changes.<br>
+<br>
+<ul>
+  <li><b>Without arguments:</b> returns the entire state object.</li>
+  <li><b>With key argument:</b> subscribes to a specific key.</li>
+</ul>
+</em><br>
+<b>Example:</b>
 
 ```tsx
 const fullState = state.useNexus();
 const count = state.useNexus("count");
 ```
 
-  </ul></details>
+</ul></details>
 
-  <h2></h2>
+<h2></h2>
 
-  <details>
-    <summary><b><code>useNexusSelector()</code></b></summary><br />
-    <ul>
-      <b>Description:</b> <em><br />
-      A React hook for creating derived values from the state.<br />
-      <br />
-      <ul>
-        <li><code>selector</code>: function that returns any derived value from the state.</li>
-        <li><code>dependencies</code>: array of state keys to watch for changes.</li>
-      </ul>
-      <br />
-      Efficient: updates only when dependencies change.<br />
-      </em><br />
-      <b>Example:</b>
+<details><summary><b><code>useNexusSelector()</code></b></summary><br><ul
+<b>Description:</b> <em><br>
+A React hook for creating derived values from the state.<br>
+<br>
+<ul>
+  <li><code>selector</code>: function that returns any derived value from the state.</li>
+  <li><code>dependencies</code>: array of state keys to watch for changes.</li>
+</ul>
+<br>
+Efficient: updates only when dependencies change.<br>
+</em><br>
+<b>Example:</b>
 
 ```tsx
 const total = state.useNexusSelector(
@@ -307,12 +288,14 @@ const total = state.useNexusSelector(
 );
 ```
 
-> **✦ Note:**<br />
+<br>
+
+> **✦ Note:**<br>
 > Memoize your selector with `useCallback` if it’s recreated often due to frequent re-renders — this prevents unnecessary re-subscriptions.
 
-  </ul></details>
+</ul></details>
 
-  </ul>
+</ul>
 
 <h2></h2>
 
