@@ -183,7 +183,9 @@ state.nexusGate((prev, next) => {
 });
 ```
 
-<ul><details><summary><b>Redux DevTools Integration</b></summary><br>
+<ul>
+
+<details><summary><b>Redux DevTools Integration</b></summary><br>
 
 ```tsx
 // Setup Redux DevTools connection
@@ -217,7 +219,9 @@ declare global {
 }
 ```
 
-</ul></details>
+</details>
+
+</ul>
 
 <br>
 
