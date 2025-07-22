@@ -6,10 +6,10 @@
 
 <ul><div>
 
-[About](#about)
-[Installation](#installation)
-[Configuration](#configuration)
-[API](#api)
+[About](#about)<br>
+[Installation](#installation)<br>
+[Configuration](#configuration)<br>
+[API](#api)<br>
 [License](#license)
 
 </div></ul>
