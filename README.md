@@ -307,6 +307,9 @@ const total = state.useNexusSelector(
 );
 ```
 
+> **✦ Note:**<br />
+> Memoize your selector with `useCallback` if it’s recreated often due to frequent re-renders — this prevents unnecessary re-subscriptions.
+
   </ul></details>
 
   </ul>

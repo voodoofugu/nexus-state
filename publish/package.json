@@ -19,6 +19,9 @@
     "global state",
     "state store"
   ],
+  "peerDependencies": {
+    "react": ">=16.8 <20"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/voodoofugu/nexus-state.git"
