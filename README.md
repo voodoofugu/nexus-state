@@ -29,8 +29,6 @@ npm install nexus-state
 
 ### Configuration
 
-<ul><div>
-
 The library provides two separate builds:
 
 - **ESM (import)** — full version including both `createStore` and `createReactStore`. Recommended for modern bundlers and projects.
@@ -99,15 +97,13 @@ export { state, actions };
 
 </div></ul></details>
 
-</div></ul>
-
 <h2></h2>
 
 ### API
 
-<ul><div>
-
 ##### CORE API
+
+<ul><div>
 
 <details><summary><b><code>getNexus()</code></b></summary><br><ul><div>
 <b>Description:</b> <em><br>
@@ -251,9 +247,13 @@ actions.setUser("Admin");
 
 </div></ul></details>
 
+</div></ul>
+
 <h2></h2>
 
 ##### REACT-SPECIFIC HOOKS
+
+<ul><div>
 
 > **✦ Note:**<br>
 > Available only in `createReactStore`
