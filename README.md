@@ -35,43 +35,39 @@ npm install nexus-state
 
 <ul>
 
-  <details>
-    <summary><b><code>createStore</code></b></summary><br />
-    <ul>
-      <b>Description:</b> <em><br />
-      Creates a new framework-agnostic store instance.<br />
-      </em><br />
-      <b>Example:</b>
+<details><summary><b><code>createStore</code></b></summary><br /><ul>
+<b>Description:</b> <em><br />
+Creates a new framework-agnostic store instance.<br />
+</em><br />
+<b>Example:</b>
 
-    ```js
-    import { createStore } from "nexus-state";
+```js
+import { createStore } from "nexus-state";
 
-    const { state, actions } = createStore({
-      state: {
-        count: 0,
-        user: "Anonymous",
-      },
+const { state, actions } = createStore({
+  state: {
+    count: 0,
+    user: "Anonymous",
+  },
 
-      actions: (set) => ({
-        increment: () => set((prev) => ({ count: prev.count + 1 })),
-        setUser: (name) => set({ user: name }),
-      }),
-    });
+  actions: (set) => ({
+    increment: () => set((prev) => ({ count: prev.count + 1 })),
+    setUser: (name) => set({ user: name }),
+  }),
+});
 
-    export { state, actions };
-    ```
+export { state, actions };
+```
 
-  </ul></details>
+</ul></details>
 
-  <h2></h2>
+<h2></h2>
 
-  <details>
-    <summary><b><code>createReactStore</code></b></summary><br />
-    <ul>
-      <b>Description:</b> <em><br />
-      Extends <code>createStore</code> with React-specific hooks for subscribing to state in components.<br />
-      </em><br />
-      <b>Example:</b>
+<details><summary><b><code>createReactStore</code></b></summary><br /><ul>
+<b>Description:</b> <em><br />
+Extends <code>createStore</code> with React-specific hooks for subscribing to state in components.<br />
+</em><br />
+<b>Example:</b>
 
 ```js
 import { createReactStore } from "nexus-state";
@@ -91,7 +87,7 @@ const { state, actions } = createReactStore({
 export { state, actions };
 ```
 
-  </ul></details>
+</ul></details>
 
 </ul>
 
