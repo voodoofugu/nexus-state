@@ -247,16 +247,16 @@ actions.setUser("Admin");
 
 </div></ul></details>
 
-</div></ul>
-
 <h2></h2>
+
+</div></ul>
 
 ##### REACT-SPECIFIC HOOKS
 
-<ul><div>
-
 > **✦ Note:**<br>
 > Available only in `createReactStore`
+
+<ul><div>
 
 <details><summary><b><code>useNexus()</code></b></summary><br><ul><div>
 <b>Description:</b> <em><br>
