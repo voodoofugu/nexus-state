@@ -221,12 +221,12 @@ declare global {
 
 </details>
 
-</ul>
-
 <br>
 
 > **✦ Note:**<br>
 > Use nexusGate for middleware logic. Unlike React hooks, it runs before UI updates and doesn't trigger re-renders.
+
+</ul>
 
 </details>
 
