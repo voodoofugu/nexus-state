@@ -172,7 +172,7 @@ unsubscribe();
 Registers middleware to intercept state updates. You can modify or cancel the update.<br>
 Useful for adding logging, debugging, or integrating with developer tools.<br>
 </em><br>
-<b>Example:</b><br></ul>
+<b>Example:</b><br>
 
 ```tsx
 state.nexusGate((prev, next) => {
