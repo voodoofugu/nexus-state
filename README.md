@@ -173,8 +173,6 @@ Registers middleware to intercept state updates. You can modify or cancel the up
 Useful for adding logging, debugging, or integrating with developer tools.<br />
 </em><br />
 <b>Example:</b><br />
-<br />
-<em>Basic Logging:</em>
 
 ```tsx
 state.nexusGate((prev, next) => {
@@ -185,7 +183,7 @@ state.nexusGate((prev, next) => {
 });
 ```
 
-<details><summary><b><code>Redux DevTools Integration()</code></b></summary><br />
+<details><summary><b>Redux DevTools Integration</b></summary><br />
 
 ```tsx
 // Setup Redux DevTools connection
