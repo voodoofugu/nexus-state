@@ -35,7 +35,7 @@ npm install nexus-state
 
 <ul><div>
 
-<details><summary><b><code>createStore</code></b></summary><br><ul>
+<details><summary><b><code>createStore</code></b></summary><br><ul><div>
 <b>Description:</b> <em><br>
 Creates a new framework-agnostic store instance.<br>
 </em><br>
@@ -59,15 +59,15 @@ const { state, actions } = createStore({
 export { state, actions };
 ```
 
-</details>
+</div></ul></details>
 
 <h2></h2>
 
-<details><summary><b><code>createReactStore</code></b></summary><br><ul>
+<details><summary><b><code>createReactStore</code></b></summary><br><ul><div>
 <b>Description:</b> <em><br>
 Extends <code>createStore</code> with React-specific hooks for subscribing to state in components.<br>
 </em><br>
-<b>Example:</b></ul>
+<b>Example:</b>
 
 ```js
 import { createReactStore } from "nexus-state";
@@ -87,9 +87,9 @@ const { state, actions } = createReactStore({
 export { state, actions };
 ```
 
-</details>
+</div></ul></details>
 
-</ul></div>
+</div></ul>
 
 <h2></h2>
 
@@ -99,7 +99,7 @@ export { state, actions };
 
 ##### CORE API
 
-<details><summary><b><code>getNexus()</code></b></summary><br><ul>
+<details><summary><b><code>getNexus()</code></b></summary><br><ul><div>
 <b>Description:</b> <em><br>
 This method returns the current state object.<br>
 </em><br>
@@ -110,11 +110,11 @@ const currentState = state.getNexus();
 console.log(currentState);
 ```
 
-</details>
+</div></ul></details>
 
 <h2></h2>
 
-<details><summary><b><code>setNexus()</code></b></summary><br><ul>
+<details><summary><b><code>setNexus()</code></b></summary><br><ul><div>
 <b>Description:</b> <em><br>
 This method updates the state object. You can pass a partial object or a function with access to the previous state.<br>
 </em><br>
@@ -130,11 +130,11 @@ state.setNexus((prev) => ({
 }));
 ```
 
-</details>
+</div></ul></details>
 
 <h2></h2>
 
-<details><summary><b><code>nexusReset()</code></b></summary><br><ul>
+<details><summary><b><code>nexusReset()</code></b></summary><br><ul><div>
 <b>Description:</b> <em><br>
 This method resets the state back to its initial values.<br>
 </em><br>
@@ -144,11 +144,11 @@ This method resets the state back to its initial values.<br>
 state.nexusReset();
 ```
 
-</details>
+</div></ul></details>
 
 <h2></h2>
 
-<details><summary><b><code>nexusSubscribe()</code></b></summary><br><ul>
+<details><summary><b><code>nexusSubscribe()</code></b></summary><br><ul><div>
 <b>Description:</b> <em><br>
 This method subscribes to changes of specific keys or the entire state.<br>
 </em><br>
@@ -163,11 +163,11 @@ sconst unsubscribe = state.nexusSubscribe(["count"], () => {
 unsubscribe();
 ```
 
-</details>
+</div></ul></details>
 
 <h2></h2>
 
-<details><summary><b><code>nexusGate()</code></b></summary><br><ul>
+<details><summary><b><code>nexusGate()</code></b></summary><br><ul><div>
 <b>Description:</b> <em><br>
 Registers middleware to intercept state updates. You can modify or cancel the update.<br>
 Useful for adding logging, debugging, or integrating with developer tools.<br>
@@ -224,11 +224,11 @@ declare global {
 > **✦ Note:**<br>
 > Use nexusGate for middleware logic. Unlike React hooks, it runs before UI updates and doesn't trigger re-renders.
 
-</details>
+</div></ul></details>
 
 <h2></h2>
 
-<details><summary><b><code>actions</code></b></summary><br><ul>
+<details><summary><b><code>actions</code></b></summary><br><ul><div>
 <b>Description:</b> <em><br>
 Optional actions object defined during store creation, simplifying state updates.<br>
 </em><br>
@@ -239,7 +239,7 @@ actions.increment();
 actions.setUser("Admin");
 ```
 
-</details>
+</div></ul></details>
 
 <h2></h2>
 
@@ -248,7 +248,7 @@ actions.setUser("Admin");
 > **✦ Note:**<br>
 > Available only in `createReactStore`
 
-<details><summary><b><code>useNexus()</code></b></summary><br><ul>
+<details><summary><b><code>useNexus()</code></b></summary><br><ul><div>
 <b>Description:</b> <em><br>
 A React hook for subscribing to the store. Automatically triggers re-renders when subscribed state changes.<br>
 <br>
@@ -264,11 +264,11 @@ const fullState = state.useNexus();
 const count = state.useNexus("count");
 ```
 
-</details>
+</div></ul></details>
 
 <h2></h2>
 
-<details><summary><b><code>useNexusSelector()</code></b></summary><br><ul
+<details><summary><b><code>useNexusSelector()</code></b></summary><br><ul><div>
 <b>Description:</b> <em><br>
 A React hook for creating derived values from the state.<br>
 <br>
@@ -293,9 +293,9 @@ const total = state.useNexusSelector(
 > **✦ Note:**<br>
 > Memoize your selector with `useCallback` if it’s recreated often due to frequent re-renders — this prevents unnecessary re-subscriptions.
 
-</details>
+</div></ul></details>
 
-</ul></div>
+</div></ul>
 
 <h2></h2>
 
