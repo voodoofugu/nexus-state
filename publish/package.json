@@ -1,6 +1,6 @@
 {
   "name": "nexus-state",
-  "version": "2.0.8",
+  "version": "2.0.9",
   "author": "Georg Schilin",
   "license": "MIT",
   "description": "Global state manager",
