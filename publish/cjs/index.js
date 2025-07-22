@@ -1,1 +1,1 @@
-"use strict";const{createStore:e}=require("./shared");module.exports={createStore:e,default:{createStore:e}};
+"use strict";const{createStore,createReactStore}=require("../shared/index.js");module.exports={createStore,createReactStore};
