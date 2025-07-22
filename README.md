@@ -39,7 +39,7 @@ npm install nexus-state
 <b>Description:</b> <em><br>
 Creates a new framework-agnostic store instance.<br>
 </em><br>
-<b>Example:</b></ul>
+<b>Example:</b>
 
 ```js
 import { createStore } from "nexus-state";
@@ -103,7 +103,7 @@ export { state, actions };
 <b>Description:</b> <em><br>
 This method returns the current state object.<br>
 </em><br>
-<b>Example:</b></ul>
+<b>Example:</b>
 
 ```tsx
 const currentState = state.getNexus();
@@ -118,7 +118,7 @@ console.log(currentState);
 <b>Description:</b> <em><br>
 This method updates the state object. You can pass a partial object or a function with access to the previous state.<br>
 </em><br>
-<b>Example:</b></ul>
+<b>Example:</b>
 
 ```tsx
 // Direct update:
@@ -138,7 +138,7 @@ state.setNexus((prev) => ({
 <b>Description:</b> <em><br>
 This method resets the state back to its initial values.<br>
 </em><br>
-<b>Example:</b></ul>
+<b>Example:</b>
 
 ```tsx
 state.nexusReset();
@@ -152,7 +152,7 @@ state.nexusReset();
 <b>Description:</b> <em><br>
 This method subscribes to changes of specific keys or the entire state.<br>
 </em><br>
-<b>Example:</b></ul>
+<b>Example:</b>
 
 ```tsx
 sconst unsubscribe = state.nexusSubscribe(["count"], () => {
@@ -232,7 +232,7 @@ declare global {
 <b>Description:</b> <em><br>
 Optional actions object defined during store creation, simplifying state updates.<br>
 </em><br>
-<b>Example:</b></ul>
+<b>Example:</b>
 
 ```tsx
 actions.increment();
@@ -257,7 +257,7 @@ A React hook for subscribing to the store. Automatically triggers re-renders whe
   <li><b>With key argument:</b> subscribes to a specific key.</li>
 </ul>
 </em><br>
-<b>Example:</b></ul>
+<b>Example:</b>
 
 ```tsx
 const fullState = state.useNexus();
@@ -279,7 +279,7 @@ A React hook for creating derived values from the state.<br>
 <br>
 Efficient: updates only when dependencies change.<br>
 </em><br>
-<b>Example:</b></ul>
+<b>Example:</b>
 
 ```tsx
 const total = state.useNexusSelector(
