@@ -2,7 +2,7 @@
 
 <h2></h2>
 
-### Table of contents
+## Table of contents
 
 - [About](#about)
 - [Installation](#installation)
@@ -12,14 +12,22 @@
 
 <h2></h2>
 
-### About
+## About
 
 Lightweight, framework-agnostic state management with optional actions and React bindings.
 Designed for simplicity and performance.
 
+The library provides two separate builds:
+
+- **ESM (ECMAScript Modules)** — full version including both createStore and createReactStore. Recommended for modern bundlers and projects.
+- **CJS (CommonJS)** — minimal version exposing only the core createStore. The React-specific store (createReactStore) is intentionally excluded to keep the CommonJS build clean and framework-agnostic.
+
+> **✦ Note:**<br>
+> If you're using CommonJS, you won't have access to React bindings by default.
+
 <h2></h2>
 
-### Installation
+## Installation
 
 ```bash
 npm install nexus-state
@@ -27,7 +35,7 @@ npm install nexus-state
 
 <h2></h2>
 
-### Configuration
+## Configuration
 
 > **✦ Note:**<br>
 > You can define your store as a separate configuration file (recommended) or directly inside your components.<br>
@@ -93,11 +101,11 @@ export { state, actions };
 
 <h2></h2>
 
-### API
+## API
 
 <ul><div>
 
-##### CORE API
+#### CORE API
 
 <details><summary><b><code>getNexus()</code></b></summary><br><ul><div>
 <b>Description:</b> <em><br>
@@ -243,7 +251,7 @@ actions.setUser("Admin");
 
 <h2></h2>
 
-##### REACT-SPECIFIC HOOKS
+#### REACT-SPECIFIC HOOKS
 
 > **✦ Note:**<br>
 > Available only in `createReactStore`
@@ -299,6 +307,6 @@ const total = state.useNexusSelector(
 
 <h2></h2>
 
-### License
+## License
 
 [MIT](./publish/LICENSE)

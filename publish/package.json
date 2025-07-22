@@ -1,14 +1,15 @@
 {
   "name": "nexus-state",
-  "version": "2.0.6",
+  "version": "2.0.7",
   "author": "Georg Schilin",
   "license": "MIT",
   "description": "Global state manager",
   "main": "./cjs/index.js",
   "exports": {
     ".": {
-      "require": "./dist/entry.cjs.js",
-      "import": "./dist/entry.esm.js"
+      "import": "./esm/index.js",
+      "require": "./cjs/index.js",
+      "types": "./types/index.d.ts"
     }
   },
   "types": "./types/index.d.ts",
