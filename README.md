@@ -4,15 +4,11 @@
 
 ### Table of contents
 
-<ul><div>
-
-[About](#about)<br>
-[Installation](#installation)<br>
-[Configuration](#configuration)<br>
-[API](#api)<br>
-[License](#license)
-
-</div></ul>
+- [About](#about)
+- [Installation](#installation)
+- [Configuration](#configuration)
+- [API](#api)
+- [License](#license)
 
 <h2></h2>
 
