@@ -29,6 +29,7 @@ npm install nexus-state
 
 ### Configuration
 
+> **✦ Note:**<br>
 > You can define your store as a separate configuration file (recommended) or directly inside your components.<br>
 > Multiple stores are supported.
 
@@ -220,6 +221,7 @@ declare global {
 
 <br>
 
+> **✦ Note:**<br>
 > Use nexusGate for middleware logic. Unlike React hooks, it runs before UI updates and doesn't trigger re-renders.
 
 </ul></details>
@@ -243,6 +245,7 @@ actions.setUser("Admin");
 
 ##### REACT-SPECIFIC HOOKS
 
+> **✦ Note:**<br>
 > Available only in `createReactStore`
 
 <details><summary><b><code>useNexus()</code></b></summary><br><ul>
@@ -287,6 +290,7 @@ const total = state.useNexusSelector(
 
 <br>
 
+> **✦ Note:**<br>
 > Memoize your selector with `useCallback` if it’s recreated often due to frequent re-renders — this prevents unnecessary re-subscriptions.
 
 </ul></details>
