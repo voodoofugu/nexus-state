@@ -1,9 +1,9 @@
 type Middleware<T> = (prevState: T, nextState: T) => T | void;
-
 type SetState<T> = (partial: Partial<T> | ((prev: T) => Partial<T>)) => void;
 
 interface Store<T> {
   getNexus(): T;
+  getNexus<K extends keyof T>(key: K): T[K];
   setNexus: SetState<T>;
   nexusReset(): void;
   nexusSubscribe(keys: (keyof T)[] | "*", listener: () => void): () => void;
@@ -26,28 +26,29 @@ function createStore<
   const notify = (keys: (keyof T)[] | "*") => {
     if (keys === "*") {
       listeners.forEach((set) => set.forEach((cb) => cb()));
-      return;
+    } else {
+      keys.forEach((key) => listeners.get(key)?.forEach((cb) => cb()));
+      listeners.get("*")?.forEach((cb) => cb());
     }
-    keys.forEach((key) => listeners.get(key)?.forEach((cb) => cb()));
-    listeners.get("*")?.forEach((cb) => cb());
   };
 
   function getNexus(): T;
   function getNexus<K extends keyof T>(key: K): T[K];
   function getNexus<K extends keyof T>(key?: K): T | T[K] {
-    return key ? state[key] : state;
+    return key !== undefined ? state[key] : state;
   }
 
   const setNexus: SetState<T> = (partial) => {
     const prevState = { ...state };
     const nextPartial =
       typeof partial === "function" ? partial(prevState) : partial;
+
     let nextState = { ...state, ...nextPartial };
 
-    middlewares.forEach((fn) => {
+    for (const fn of middlewares) {
       const result = fn(prevState, nextState);
       if (result !== undefined) nextState = result;
-    });
+    }
 
     const changedKeys: (keyof T)[] = [];
     for (const key in nextState) {
@@ -93,5 +94,4 @@ function createStore<
   return { state: store, actions };
 }
 
-export type { Store };
 export default createStore;

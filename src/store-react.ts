@@ -27,7 +27,10 @@ function createReactStore<
   function useNexus<K extends keyof T>(key?: K): T | T[K] {
     return useSyncExternalStore(
       (callback) => store.nexusSubscribe(key ? [key] : "*", callback),
-      () => (key ? store.getNexus()[key] : store.getNexus())
+      () => {
+        const snapshot = store.getNexus();
+        return key ? snapshot[key] : snapshot;
+      }
     );
   }
 
@@ -36,7 +39,7 @@ function createReactStore<
     dependencies: (keyof T)[]
   ) {
     const lastSelected = useRef<R>(selector(store.getNexus()));
-    const [selected, setSelected] = useState(() => selector(store.getNexus()));
+    const [selected, setSelected] = useState<R>(lastSelected.current);
 
     useEffect(() => {
       const callback = () => {
@@ -51,7 +54,7 @@ function createReactStore<
       callback();
 
       return unsubscribe;
-    }, [selector]);
+    }, [dependencies, selector]);
 
     return selected;
   }
