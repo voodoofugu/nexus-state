@@ -112,8 +112,8 @@ This method returns the current state object.<br>
 <b>Example:</b>
 
 ```tsx
-const currentState = state.getNexus();
-console.log(currentState);
+const allState = state.getNexus();
+const count = state.getNexus("count");
 ```
 
 </div></ul></details>

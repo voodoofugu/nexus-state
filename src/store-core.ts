@@ -32,7 +32,11 @@ function createStore<
     listeners.get("*")?.forEach((cb) => cb());
   };
 
-  const getNexus = () => state;
+  function getNexus(): T;
+  function getNexus<K extends keyof T>(key: K): T[K];
+  function getNexus<K extends keyof T>(key?: K): T | T[K] {
+    return key ? state[key] : state;
+  }
 
   const setNexus: SetState<T> = (partial) => {
     const prevState = { ...state };

@@ -17,9 +17,10 @@ type SetState<T> = (partial: Partial<T> | ((prev: T) => Partial<T>)) => void;
  */
 interface Store<T> {
   /**---
-   * Returns the current state object.
+   * Returns the entire state or a specific key.
    */
   getNexus(): T;
+  getNexus<K extends keyof T>(key: K): T[K];
 
   /**---
    * Updates the state with a partial object or functional updater.
