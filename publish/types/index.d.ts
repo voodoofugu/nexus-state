@@ -1,50 +1,43 @@
-/**---
- * Middleware function type.
- * Intercepts state changes before they are applied.
- * Returning a new state overrides the next state.
- */
 type Middleware<T> = (prevState: T, nextState: T) => T | void;
-
-/**---
- * SetState function type.
- * Updates the store state partially or via functional updater.
- */
 type SetState<T> = (partial: Partial<T> | ((prev: T) => Partial<T>)) => void;
 
-/**---
- * Core Store Interface.
- * Exposes core methods for managing state.
- */
+// ------ CORE ------
 interface Store<T> {
   /**---
-   * Returns the entire state or a specific key.
+   * ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
+   * Returns the current state or a specific key.
    */
   getNexus(): T;
   getNexus<K extends keyof T>(key: K): T[K];
 
   /**---
+   * ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
    * Updates the state with a partial object or functional updater.
    */
   setNexus: SetState<T>;
 
   /**---
+   * ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
    * Resets state to its initial values.
    */
   nexusReset(): void;
 
   /**---
+   * ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
    * Subscribes to changes of specific keys or entire state.
    * Returns an unsubscribe function.
    */
   nexusSubscribe(keys: (keyof T)[] | "*", listener: () => void): () => void;
 
   /**---
+   * ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
    * Adds a middleware to intercept state changes before updates.
    */
   nexusGate(fn: Middleware<T>): void;
 }
 
 /**---
+ * ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
  * Creates a new core store instance.
  * @param options Store configuration including initial state and optional actions.
  * @returns Store instance with state methods and optional actions.
@@ -53,31 +46,23 @@ declare function createStore<
   T extends Record<string, unknown>,
   A extends object = object
 >(options: {
-  /**---
-   * Initial state object.
-   */
   state: T;
-
-  /**---
-   * Optional actions creator for defining store actions.
-   */
   actions?: (set: SetState<T>) => A;
 }): {
   /**---
+   * ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
    * Core store instance.
    */
   state: Store<T>;
 
   /**---
+   * ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
    * Optional actions object.
    */
   actions: A;
 };
 
-/**---
- * React Store Options.
- * Defines state and optional actions for React store.
- */
+// ------ REACT ------
 interface CreateReactStoreOptions<
   T extends Record<string, unknown>,
   A extends Record<string, (...args: unknown[]) => unknown>
@@ -89,6 +74,7 @@ interface CreateReactStoreOptions<
 }
 
 /**---
+ * ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
  * Creates a React-specific store with React bindings.
  * @param options Store configuration.
  * @returns Store instance with React hooks and core store methods.
@@ -103,10 +89,12 @@ declare function createReactStore<
   options: CreateReactStoreOptions<T, A>
 ): {
   /**---
+   * ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
    * State instance including React-specific hooks and core API.
    */
   state: Store<T> & {
     /**---
+     * ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
      * React hook to subscribe to entire state or a specific key.
      */
     useNexus: {
@@ -115,6 +103,7 @@ declare function createReactStore<
     };
 
     /**---
+     * ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
      * React hook for computed/derived values.
      * Re-renders only when specified dependencies change.
      */
@@ -125,6 +114,7 @@ declare function createReactStore<
   };
 
   /**---
+   * ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
    * Optional actions object for interacting with the state.
    */
   actions: A;
