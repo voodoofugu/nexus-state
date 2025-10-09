@@ -1,4 +1,6 @@
 import createStore from "../store-core";
 import createReactStore from "../store-react";
 
-export { createStore, createReactStore };
+import createActions from "../createActions";
+
+export { createStore, createReactStore, createActions };

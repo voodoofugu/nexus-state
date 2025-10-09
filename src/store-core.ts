@@ -11,8 +11,8 @@ interface Store<T> {
 }
 
 function createStore<
-  T extends Record<string, unknown>,
-  A extends object = object
+  T extends Record<string, any> = Record<string, any>,
+  A extends Record<string, any> = Record<string, any>
 >(options: {
   state: T;
   actions?: (set: SetState<T>) => A;

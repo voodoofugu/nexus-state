@@ -12,11 +12,8 @@ interface CreateReactStoreOptions<
 }
 
 function createReactStore<
-  T extends Record<string, unknown>,
-  A extends Record<string, (...args: any[]) => unknown> = Record<
-    string,
-    (...args: unknown[]) => unknown
-  >
+  T extends Record<string, any> = Record<string, any>,
+  A extends Record<string, any> = Record<string, any>
 >(options: CreateReactStoreOptions<T, A>) {
   const { state: store, actions: actionsInstance } = createStore(options);
 
