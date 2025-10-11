@@ -73,12 +73,9 @@ const { state, actions } = createStore({
 export { state, actions };
 ```
 
-<details><summary><b><code>TS:</code></b></summary>
-Snippet for strong typing and autocomplete:
+<details><summary><b><code>TypeScript snippet:</code></b></summary>
 
 ```ts
-import { createStore } from "nexus-state";
-
 type MyStateT = {
   count: number;
   user: string;
@@ -127,6 +124,24 @@ const { state, actions } = createReactStore({
 export { state, actions };
 ```
 
+<details><summary><b><code>TypeScript snippet:</code></b></summary>
+
+```ts
+type MyStateT = {
+  count: number;
+  user: string;
+};
+
+type MyActionsT = {
+  increment: () => void;
+  setUser: (name: string) => void;
+};
+
+const { state, actions } = createReactStore<MyStateT, MyActionsT>({...});
+```
+
+</details>
+
 </div></ul></details>
 
 <h2></h2>
@@ -138,7 +153,7 @@ Creates a monolithic action factory and useful for code splitting.<br>
 <b>Example:</b>
 
 ```js
-import { ✦, createActions } from "nexus-state"; // ✦ - createStore/createReactStore
+import { *store, createActions } from "nexus-state"; // *store - createStore or createReactStore
 
 const customActions = createActions((set) => ({
   increment() {
@@ -150,7 +165,7 @@ const customActions = createActions((set) => ({
   },
 }));
 
-const { state, actions } = ✦({
+const { state, actions } = *store({
   state: {
     count: 0,
     user: "Anonymous",
@@ -161,6 +176,32 @@ const { state, actions } = ✦({
 
 export { state, actions };
 ```
+
+<details><summary><b><code>TypeScript snippet:</code></b></summary>
+
+```ts
+type MyStateT = {
+  count: number;
+  user: string;
+};
+
+type MyActionsT = {
+  increment: () => void;
+  setUser: (name: string) => void;
+};
+
+const customActions = createActions<MyStateT, MyActionsT>((set) => ({
+  increment() {
+    set((prev) => ({ count: prev.count + 1 }));
+    this.setUser("John");
+  },
+  setUser(name) {
+    set({ user: name });
+  },
+}));
+```
+
+</details>
 
 </div></ul></details>
 
@@ -173,13 +214,13 @@ Creates a discrete action factory and useful for code splitting.<br>
 <b>Example:</b>
 
 ```js
-import { ✦, createDiscreteActions } from "nexus-state"; // ✦ - createStore/createReactStore
+import { *store, createDiscreteActions } from "nexus-state"; // *store - createStore or createReactStore
 
 const incrementAction = createDiscreteActions(
   (set) => ({
     increment() {
       set((prev) => ({ value2: prev.value2 + 1 }));
-      // this.setUser("John");
+      this.setUser("John");
     },
   })
 );
@@ -190,7 +231,7 @@ const changeNameAction = createDiscreteActions(() => ({
   },
 }));
 
-const { state, actions } = ✦({
+const { state, actions } = *store({
   state: {
     count: 0,
     user: "Anonymous",
@@ -201,6 +242,35 @@ const { state, actions } = ✦({
 
 export { state, actions };
 ```
+
+<details><summary><b><code>TypeScript snippet:</code></b></summary>
+
+```ts
+type MyStateT = {
+  count: number;
+  user: string;
+};
+
+type MyActionsT = {
+  increment: () => void;
+  setUser: (name: string) => void;
+};
+
+const incrementAction = createDiscreteActions<MyStateT, MyActionsT>((set) => ({
+  increment() {
+    set((prev) => ({ value2: prev.value2 + 1 }));
+    this.setUser("John");
+  },
+}));
+
+const changeNameAction = createDiscreteActions<MyStateT, MyActionsT>(() => ({
+  setUser(name) {
+    set({ user: name });
+  },
+}));
+```
+
+</details>
 
 </div></ul></details>
 
