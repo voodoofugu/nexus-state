@@ -153,7 +153,7 @@ Creates a monolithic action factory and useful for code splitting.<br>
 <b>Example:</b>
 
 ```js
-import { *store, createActions } from "nexus-state"; // *store - createStore or createReactStore
+import { *store, createActions } from "nexus-state";
 
 const customActions = createActions((set) => ({
   increment() {
@@ -166,11 +166,7 @@ const customActions = createActions((set) => ({
 }));
 
 const { state, actions } = *store({
-  state: {
-    count: 0,
-    user: "Anonymous",
-  },
-
+  state: {...},
   actions: customActions,
 });
 
@@ -202,6 +198,7 @@ const customActions = createActions<MyStateT, MyActionsT>((set) => ({
 ```
 
 </details>
+*store - createStore/createReactStore
 
 </div></ul></details>
 
@@ -214,7 +211,7 @@ Creates a discrete action factory and useful for code splitting.<br>
 <b>Example:</b>
 
 ```js
-import { *store, createDiscreteActions } from "nexus-state"; // *store - createStore or createReactStore
+import { *store, createDiscreteActions } from "nexus-state";
 
 const incrementAction = createDiscreteActions(
   (set) => ({
@@ -232,12 +229,8 @@ const changeNameAction = createDiscreteActions(() => ({
 }));
 
 const { state, actions } = *store({
-  state: {
-    count: 0,
-    user: "Anonymous",
-  },
-
-  actions: [incrementAction, changeNameAction],
+  state: {...},
+  actions: [incrementAction, changeNameAction], // array of discrete actions
 });
 
 export { state, actions };
@@ -259,7 +252,7 @@ type MyActionsT = {
 const incrementAction = createDiscreteActions<MyStateT, MyActionsT>((set) => ({
   increment() {
     set((prev) => ({ value2: prev.value2 + 1 }));
-    this.setUser("John");
+    this.setUser?.("John"); // here you need to use `?.`
   },
 }));
 
@@ -271,6 +264,7 @@ const changeNameAction = createDiscreteActions<MyStateT, MyActionsT>(() => ({
 ```
 
 </details>
+*store - createStore/createReactStore
 
 </div></ul></details>
 
