@@ -198,7 +198,8 @@ const customActions = createActions<MyStateT, MyActionsT>((set) => ({
 ```
 
 </details>
-> *store - createStore or createReactStore
+
+> \*store - createStore or createReactStore
 
 </div></ul></details>
 
@@ -264,7 +265,8 @@ const changeNameAction = createDiscreteActions<MyStateT, MyActionsT>(() => ({
 ```
 
 </details>
-> *store - createStore or createReactStore
+
+> \*store - createStore or createReactStore
 
 </div></ul></details>
 
