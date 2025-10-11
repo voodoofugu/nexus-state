@@ -1,21 +1,30 @@
-import { useSyncExternalStore, useEffect, useState, useRef } from "react";
+import {
+  useSyncExternalStore,
+  useEffect,
+  useState,
+  useRef,
+  useReducer,
+} from "react";
 import createStore from "./store-core";
+
+type SetState<T> = (partial: Partial<T> | ((prev: T) => Partial<T>)) => void;
 
 interface CreateReactStoreOptions<
   T extends Record<string, unknown>,
   A extends Record<string, (...args: unknown[]) => unknown>
 > {
   state: T;
-  actions?: (
-    set: (updater: Partial<T> | ((prev: T) => Partial<T>)) => void
-  ) => A;
+  actions?: ((set: SetState<T>) => A) | Array<(set: SetState<T>) => Partial<A>>;
 }
 
 function createReactStore<
   T extends Record<string, any> = Record<string, any>,
   A extends Record<string, any> = Record<string, any>
 >(options: CreateReactStoreOptions<T, A>) {
-  const { state: store, actions: actionsInstance } = createStore(options);
+  // для принудительного обновления
+  const [, useUpdate] = useReducer(() => ({}), {});
+
+  const { state: store, actions: actionsInstance } = createStore<T, A>(options);
 
   const actions = actionsInstance;
 
@@ -61,6 +70,7 @@ function createReactStore<
       ...store,
       useNexus,
       useNexusSelector,
+      useUpdate,
     },
     actions,
   };

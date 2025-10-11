@@ -1,7 +1,10 @@
+// store-core.ts
 type Middleware<T> = (prevState: T, nextState: T) => T | void;
-type SetState<T> = (partial: Partial<T> | ((prev: T) => Partial<T>)) => void;
+export type SetState<T> = (
+  partial: Partial<T> | ((prev: T) => Partial<T>)
+) => void;
 
-interface Store<T> {
+export interface Store<T> {
   getNexus(): T;
   getNexus<K extends keyof T>(key: K): T[K];
   setNexus: SetState<T>;
@@ -15,7 +18,9 @@ function createStore<
   A extends Record<string, any> = Record<string, any>
 >(options: {
   state: T;
-  actions?: (set: SetState<T>) => A;
+  actions?:
+    | ((this: A, set: SetState<T>) => A)
+    | Array<(this: Partial<A>, set: SetState<T>) => Partial<A>>;
 }): { state: Store<T>; actions: A } {
   const { state: initialState, actions: actionsCreator } = options;
 
@@ -42,17 +47,18 @@ function createStore<
     const prevState = { ...state };
     const nextPartial =
       typeof partial === "function" ? partial(prevState) : partial;
-
     let nextState = { ...state, ...nextPartial };
 
     for (const fn of middlewares) {
       const result = fn(prevState, nextState);
-      if (result !== undefined) nextState = result;
+      if (result !== undefined) nextState = result as T;
     }
 
     const changedKeys: (keyof T)[] = [];
     for (const key in nextState) {
-      if (state[key] !== nextState[key]) changedKeys.push(key);
+      if (Object.prototype.hasOwnProperty.call(nextState, key)) {
+        if (state[key] !== nextState[key]) changedKeys.push(key as keyof T);
+      }
     }
 
     if (changedKeys.length) {
@@ -89,7 +95,25 @@ function createStore<
     nexusGate,
   };
 
-  const actions = actionsCreator ? actionsCreator(setNexus) : ({} as A);
+  // --- собираем actions ---
+  const actions = {} as A;
+
+  if (Array.isArray(actionsCreator)) {
+    for (const factory of actionsCreator) {
+      const partial = factory.call(actions, setNexus);
+      if (partial && typeof partial === "object")
+        Object.assign(actions, partial);
+    }
+  } else if (typeof actionsCreator === "function") {
+    const partial = actionsCreator.call(actions, setNexus);
+    if (partial && typeof partial === "object") Object.assign(actions, partial);
+  }
+
+  // привязываем все функции к итоговому объекту
+  for (const key of Object.keys(actions)) {
+    const val = (actions as any)[key];
+    if (typeof val === "function") (actions as any)[key] = val.bind(actions);
+  }
 
   return { state: store, actions };
 }

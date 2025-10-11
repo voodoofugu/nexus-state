@@ -111,6 +111,12 @@ declare function createReactStore<
       selector: (state: T) => R,
       dependencies: (keyof T)[]
     ) => R;
+
+    /**---
+     * ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
+     * React hook for forcing a component re-render.
+     */
+    useUpdate: () => void;
   };
 
   /**---
@@ -120,4 +126,29 @@ declare function createReactStore<
   actions: A;
 };
 
-export { createStore, createReactStore };
+// ------ ACTIONS FACTORIES ------
+/**---
+ * ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
+ * Creates a monolithic action factory.
+ * @param factory Action factory function.
+ * @returns Action factory function.
+ */
+declare function createActions<
+  S extends Record<string, any>,
+  A extends Record<string, any> = Record<string, any>
+>(factory: (this: A, set: SetState<S>) => A): (set: SetState<S>) => A;
+
+/**---
+ * ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
+ * Creates a discrete action factory.
+ * @param factory Action factory function.
+ * @returns Action factory function.
+ */
+declare function createDiscreteActions<
+  S extends Record<string, any>,
+  A extends Record<string, any> = Record<string, any>
+>(
+  factory: (this: Partial<A>, set: SetState<S>) => Partial<A>
+): (set: SetState<S>) => Partial<A>;
+
+export { createStore, createReactStore, createActions, createDiscreteActions };

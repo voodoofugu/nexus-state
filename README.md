@@ -37,9 +37,10 @@ The library provides two separate builds:
 <br>
 
 > **✦ Note:**<br>
-> If you're using CommonJS, you won't have access to React bindings by default.<br>
-> You can define your store as a separate configuration file (recommended) or directly inside your components.<br>
-> Multiple stores are supported.
+>
+> - If you're using CommonJS, you won't have access to React bindings by default.<br>
+> - You can define your store as a separate configuration file (recommended) or directly inside your components.<br>
+> - Multiple stores are supported.
 
 <br>
 
@@ -59,13 +60,39 @@ const { state, actions } = createStore({
   },
 
   actions: (set) => ({
-    increment: () => set((prev) => ({ count: prev.count + 1 })),
-    setUser: (name) => set({ user: name }),
+    increment() {
+      set((prev) => ({ count: prev.count + 1 }));
+      this.setUser("John"); // calling another action from inside
+    },
+    setUser(name) {
+      set({ user: name });
+    },
   }),
 });
 
 export { state, actions };
 ```
+
+<details><summary><b><code>TS:</code></b></summary>
+Snippet for strong typing and autocomplete:
+
+```ts
+import { createStore } from "nexus-state";
+
+type MyStateT = {
+  count: number;
+  user: string;
+};
+
+type MyActionsT = {
+  increment: () => void;
+  setUser: (name: string) => void;
+};
+
+const { state, actions } = createStore<MyStateT, MyActionsT>({...});
+```
+
+</details>
 
 </div></ul></details>
 
@@ -73,7 +100,7 @@ export { state, actions };
 
 <details><summary><b><code>createReactStore</code></b></summary><br><ul><div>
 <b>Description:</b> <em><br>
-Extends <code>createStore</code> with React-specific hooks for subscribing to state in components.<br>
+Extends <code>createStore</code> with React-specific hooks.<br>
 </em><br>
 <b>Example:</b>
 
@@ -87,9 +114,89 @@ const { state, actions } = createReactStore({
   },
 
   actions: (set) => ({
-    increment: () => set((prev) => ({ count: prev.count + 1 })),
-    setUser: (name) => set({ user: name }),
+    increment() {
+      set((prev) => ({ count: prev.count + 1 }));
+      this.setUser("John"); // calling another action from inside
+    },
+    setUser(name) {
+      set({ user: name });
+    },
   }),
+});
+
+export { state, actions };
+```
+
+</div></ul></details>
+
+<h2></h2>
+
+<details><summary><b><code>createActions</code></b></summary><br><ul><div>
+<b>Description:</b> <em><br>
+Creates a monolithic action factory and useful for code splitting.<br>
+</em><br>
+<b>Example:</b>
+
+```js
+import { ✦, createActions } from "nexus-state"; // ✦ - createStore/createReactStore
+
+const customActions = createActions((set) => ({
+  increment() {
+    set((prev) => ({ count: prev.count + 1 }));
+    this.setUser("John");
+  },
+  setUser(name) {
+    set({ user: name });
+  },
+}));
+
+const { state, actions } = ✦({
+  state: {
+    count: 0,
+    user: "Anonymous",
+  },
+
+  actions: customActions,
+});
+
+export { state, actions };
+```
+
+</div></ul></details>
+
+<h2></h2>
+
+<details><summary><b><code>createDiscreteActions</code></b></summary><br><ul><div>
+<b>Description:</b> <em><br>
+Creates a discrete action factory and useful for code splitting.<br>
+</em><br>
+<b>Example:</b>
+
+```js
+import { ✦, createDiscreteActions } from "nexus-state"; // ✦ - createStore/createReactStore
+
+const incrementAction = createDiscreteActions(
+  (set) => ({
+    increment() {
+      set((prev) => ({ value2: prev.value2 + 1 }));
+      // this.setUser("John");
+    },
+  })
+);
+
+const changeNameAction = createDiscreteActions(() => ({
+   setUser(name) {
+    set({ user: name });
+  },
+}));
+
+const { state, actions } = ✦({
+  state: {
+    count: 0,
+    user: "Anonymous",
+  },
+
+  actions: [incrementAction, changeNameAction],
 });
 
 export { state, actions };
