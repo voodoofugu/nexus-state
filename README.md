@@ -62,10 +62,10 @@ const { state, actions } = createStore({
   actions: (set) => ({
     increment() {
       set((prev) => ({ count: prev.count + 1 }));
-      this.setUser("John"); // calling another action from inside
+      this.consoleCalling("Increment action called"); // calling another action from inside
     },
-    setUser(name) {
-      set({ user: name });
+    consoleCalling(text) {
+      console.log(text);
     },
   }),
 });
@@ -83,7 +83,7 @@ type MyStateT = {
 
 type MyActionsT = {
   increment: () => void;
-  setUser: (name: string) => void;
+  consoleCalling: (text: string) => void;
 };
 
 const { state, actions } = createStore<MyStateT, MyActionsT>({...});
@@ -113,10 +113,10 @@ const { state, actions } = createReactStore({
   actions: (set) => ({
     increment() {
       set((prev) => ({ count: prev.count + 1 }));
-      this.setUser("John"); // calling another action from inside
+      this.consoleCalling("Increment action called"); // calling another action from inside
     },
-    setUser(name) {
-      set({ user: name });
+    consoleCalling(text) {
+      console.log(text);
     },
   }),
 });
@@ -134,7 +134,7 @@ type MyStateT = {
 
 type MyActionsT = {
   increment: () => void;
-  setUser: (name: string) => void;
+  consoleCalling: (text: string) => void;
 };
 
 const { state, actions } = createReactStore<MyStateT, MyActionsT>({...});
@@ -153,21 +153,21 @@ Creates a monolithic action factory and useful for code splitting.<br>
 <b>Example:</b>
 
 ```js
-import { *store, createActions } from "nexus-state";
+import { ✦store, createActions } from "nexus-state";
 
 const customActions = createActions((set) => ({
   increment() {
     set((prev) => ({ count: prev.count + 1 }));
-    this.setUser("John");
+    this.consoleCalling("Increment action called");
   },
-  setUser(name) {
-    set({ user: name });
+  consoleCalling(text) {
+    console.log(text);
   },
 }));
 
-const { state, actions } = *store({
+const { state, actions } = ✦store({
   state: {...},
-  actions: customActions,
+  actions: customActions, // provide all actions
 });
 
 export { state, actions };
@@ -183,23 +183,23 @@ type MyStateT = {
 
 type MyActionsT = {
   increment: () => void;
-  setUser: (name: string) => void;
+  consoleCalling: (text: string) => void;
 };
 
 const customActions = createActions<MyStateT, MyActionsT>((set) => ({
   increment() {
     set((prev) => ({ count: prev.count + 1 }));
-    this.setUser("John");
+    this.consoleCalling("Increment action called");
   },
-  setUser(name) {
-    set({ user: name });
+  consoleCalling(text) {
+    console.log(text);
   },
 }));
 ```
 
 </details>
 
-> \*store - createStore or createReactStore
+> ✦store - createStore or createReactStore
 
 </div></ul></details>
 
@@ -212,26 +212,26 @@ Creates a discrete action factory and useful for code splitting.<br>
 <b>Example:</b>
 
 ```js
-import { *store, createDiscreteActions } from "nexus-state";
+import { ✦store, createDiscreteActions } from "nexus-state";
 
 const incrementAction = createDiscreteActions(
   (set) => ({
     increment() {
       set((prev) => ({ value2: prev.value2 + 1 }));
-      this.setUser("John");
+      this.consoleCalling("Increment action called");
     },
   })
 );
 
-const changeNameAction = createDiscreteActions(() => ({
-   setUser(name) {
-    set({ user: name });
+const consoleCallAction = createDiscreteActions(() => ({
+  consoleCalling(text) {
+    console.log(text);
   },
 }));
 
-const { state, actions } = *store({
+const { state, actions } = ✦store({
   state: {...},
-  actions: [incrementAction, changeNameAction], // array of discrete actions
+  actions: [incrementAction, consoleCallAction], // array of discrete actions
 });
 
 export { state, actions };
@@ -247,26 +247,26 @@ type MyStateT = {
 
 type MyActionsT = {
   increment: () => void;
-  setUser: (name: string) => void;
+  consoleCalling: (text: string) => void;
 };
 
 const incrementAction = createDiscreteActions<MyStateT, MyActionsT>((set) => ({
   increment() {
     set((prev) => ({ value2: prev.value2 + 1 }));
-    this.setUser?.("John"); // here you need to use `?.`
+    this.consoleCalling("Increment action called"); // here you need to use `?.`
   },
 }));
 
-const changeNameAction = createDiscreteActions<MyStateT, MyActionsT>(() => ({
-  setUser(name) {
-    set({ user: name });
+const consoleCallAction = createDiscreteActions<MyStateT, MyActionsT>(() => ({
+  consoleCalling(text) {
+    console.log(text);
   },
 }));
 ```
 
 </details>
 
-> \*store - createStore or createReactStore
+> ✦store - createStore or createReactStore
 
 </div></ul></details>
 
@@ -415,7 +415,7 @@ Optional actions object defined during store creation, simplifying state updates
 
 ```tsx
 actions.increment();
-actions.setUser("Admin");
+actions.consoleCalling("Some text");
 ```
 
 </div></ul></details>
