@@ -168,6 +168,8 @@ const { state, actions } = ✦store({
 });
 
 export { state, actions };
+
+// ✦ createStore or createReactStore
 ```
 
 <details><summary><b><code>TypeScript snippet:</code></b></summary>
@@ -187,8 +189,6 @@ const customActions = createActions<MyStateT, MyActionsT>((set) => ({...}));
 ```
 
 </details>
-
-> ✦store - createStore or createReactStore
 
 </div></ul></details>
 
@@ -224,6 +224,8 @@ const { state, actions } = ✦store({
 });
 
 export { state, actions };
+
+// ✦ createStore or createReactStore
 ```
 
 <details><summary><b><code>TypeScript snippet:</code></b></summary>
@@ -251,8 +253,6 @@ const consoleCallAction = createDiscreteActions<MyStateT, MyActionsT>(() => ({..
 
 </details>
 
-> ✦store - createStore or createReactStore
-
 </div></ul></details>
 </div></ul>
 
@@ -269,9 +269,9 @@ const consoleCallAction = createDiscreteActions<MyStateT, MyActionsT>(() => ({..
 <b>Description:</b> <em><br>
 Required state object.<br>
 </em><br>
-<b>Example:</b>
+<b>Usage Example:</b>
 
-Core `createStore`:<br>
+`createStore`:<br>
 
 <details><summary><b><code>getNexus()</code></b></summary><br><ul><div>
 <b>Description:</b> <em><br>
@@ -280,7 +280,7 @@ This method returns the current state object.<br>
 <b>Example:</b>
 
 ```tsx
-import { state } from "nexus-state";
+import { state } from "your-nexus-config";
 
 const allStates = state.getNexus();
 const count = state.getNexus("count");
@@ -297,7 +297,7 @@ This method updates the state object. You can pass a partial object or a functio
 <b>Example:</b>
 
 ```tsx
-import { state } from "nexus-state";
+import { state } from "your-nexus-config";
 
 // Direct update:
 state.setNexus({ count: 5 });
@@ -319,7 +319,7 @@ This method resets the state back to its initial values.<br>
 <b>Example:</b>
 
 ```tsx
-import { state } from "nexus-state";
+import { state } from "your-nexus-config";
 
 state.nexusReset();
 ```
@@ -335,7 +335,7 @@ This method subscribes to changes of specific keys or the entire state.<br>
 <b>Example:</b>
 
 ```tsx
-import { state } from "nexus-state";
+import { state } from "your-nexus-config";
 
 const unsubscribe = state.nexusSubscribe(["count"], () => {
   console.log("count changed:", state.getNexus().count);
@@ -357,7 +357,7 @@ Useful for adding logging, debugging, or integrating with developer tools.<br>
 <b>Example:</b><br>
 
 ```tsx
-import { state } from "nexus-state";
+import { state } from "your-nexus-config";
 
 state.nexusGate((prev, next) => {
   console.log("State changing from", prev, "to", next);
@@ -370,7 +370,7 @@ state.nexusGate((prev, next) => {
 <details><summary><b>Redux DevTools Integration</b></summary><br>
 
 ```tsx
-import { state } from "nexus-state";
+import { state } from "your-nexus-config";
 
 // Setup Redux DevTools connection
 const devtools = window.__REDUX_DEVTOOLS_EXTENSION__?.connect({
@@ -413,7 +413,7 @@ declare global {
 
 <h2></h2>
 
-+React Hooks `createReactStore`:<br>
+`createReactStore`:<br>
 
 <details><summary><b><code>useNexus()</code></b></summary><br><ul><div>
 <b>Description:</b> <em><br>
@@ -427,7 +427,7 @@ A React hook for subscribing to the store. Automatically triggers re-renders whe
 <b>Example:</b>
 
 ```tsx
-import { state } from "nexus-state";
+import { state } from "your-nexus-config";
 
 const fullState = state.useNexus();
 const count = state.useNexus("count");
@@ -451,7 +451,7 @@ Efficient: updates only when dependencies change.<br>
 <b>Example:</b>
 
 ```tsx
-import { state } from "nexus-state";
+import { state } from "your-nexus-config";
 
 const total = state.useNexusSelector(
   (state) => state.count + state.userCount,
@@ -487,10 +487,10 @@ state.useUpdate();
 <b>Description:</b> <em><br>
 Optional actions object defined during store creation, simplifying state updates.<br>
 </em><br>
-<b>Example:</b>
+<b>Usage Example:</b>
 
 ```tsx
-import { actions } from "nexus-state";
+import { actions } from "your-nexus-config";
 
 actions.increment();
 actions.consoleCalling("Some text");
