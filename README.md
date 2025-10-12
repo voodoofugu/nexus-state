@@ -411,8 +411,6 @@ declare global {
 
 <h2></h2>
 
-`createReactStore`<br>
-
 <details><summary><b><code>useNexus()</code></b></summary><br><ul><div>
 <b>Description:</b> <em><br>
 A React hook for subscribing to the store. Automatically triggers re-renders when subscribed state changes.<br>
@@ -430,6 +428,8 @@ import { state } from "your-nexus-config";
 const fullState = state.useNexus();
 const count = state.useNexus("count");
 ```
+
+> Available only in createReactStore.
 
 </div></ul></details>
 
@@ -457,6 +457,8 @@ const total = state.useNexusSelector(
 );
 ```
 
+> Available only in createReactStore.
+
 </div></ul></details>
 
 <h2></h2>
@@ -473,6 +475,8 @@ import { state } from "your-nexus-config";
 
 state.useUpdate();
 ```
+
+> Available only in createReactStore.
 
 </div></ul></details>
 
