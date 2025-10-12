@@ -262,9 +262,17 @@ const consoleCallAction = createDiscreteActions<MyStateT, MyActionsT>(() => ({..
 
 <ul><div>
 
-**State:**
+**state:**
+
+<b>Description:</b> <em><br>
+Required state object.<br>
+</em><br>
+<b>Example:</b>
 
 <ul><div>
+
+Core (`createStore`):<br>
+<br>
 
 <details><summary><b><code>getNexus()</code></b></summary><br><ul><div>
 <b>Description:</b> <em><br>
@@ -273,7 +281,9 @@ This method returns the current state object.<br>
 <b>Example:</b>
 
 ```tsx
-const allState = state.getNexus();
+import { state } from "nexus-state";
+
+const allStates = state.getNexus();
 const count = state.getNexus("count");
 ```
 
@@ -288,6 +298,8 @@ This method updates the state object. You can pass a partial object or a functio
 <b>Example:</b>
 
 ```tsx
+import { state } from "nexus-state";
+
 // Direct update:
 state.setNexus({ count: 5 });
 
@@ -308,6 +320,8 @@ This method resets the state back to its initial values.<br>
 <b>Example:</b>
 
 ```tsx
+import { state } from "nexus-state";
+
 state.nexusReset();
 ```
 
@@ -322,7 +336,9 @@ This method subscribes to changes of specific keys or the entire state.<br>
 <b>Example:</b>
 
 ```tsx
-sconst unsubscribe = state.nexusSubscribe(["count"], () => {
+import { state } from "nexus-state";
+
+const unsubscribe = state.nexusSubscribe(["count"], () => {
   console.log("count changed:", state.getNexus().count);
 });
 
@@ -342,6 +358,8 @@ Useful for adding logging, debugging, or integrating with developer tools.<br>
 <b>Example:</b><br>
 
 ```tsx
+import { state } from "nexus-state";
+
 state.nexusGate((prev, next) => {
   console.log("State changing from", prev, "to", next);
 
@@ -353,6 +371,8 @@ state.nexusGate((prev, next) => {
 <details><summary><b>Redux DevTools Integration</b></summary><br>
 
 ```tsx
+import { state } from "nexus-state";
+
 // Setup Redux DevTools connection
 const devtools = window.__REDUX_DEVTOOLS_EXTENSION__?.connect({
   name: "MyStore",
@@ -386,35 +406,12 @@ declare global {
 
 </details>
 
-<br>
-
-> **✦ Note:**<br>
-> Use nexusGate for middleware logic. Unlike React hooks, it runs before UI updates and doesn't trigger re-renders.
-
 </div></ul></details>
 
 <h2></h2>
 
-<details><summary><b><code>actions</code></b></summary><br><ul><div>
-<b>Description:</b> <em><br>
-Optional actions object defined during store creation, simplifying state updates.<br>
-</em><br>
-<b>Example:</b>
-
-```tsx
-actions.increment();
-actions.consoleCalling("Some text");
-```
-
-</div></ul></details>
-
-<h2></h2>
-
-</div></ul>
-
-**REACT HOOKS createReactStore:**
-
-<ul><div>
+- React Hooks (`createReactStore`):<br>
+  <br>
 
 <details><summary><b><code>useNexus()</code></b></summary><br><ul><div>
 <b>Description:</b> <em><br>
@@ -428,6 +425,8 @@ A React hook for subscribing to the store. Automatically triggers re-renders whe
 <b>Example:</b>
 
 ```tsx
+import { state } from "nexus-state";
+
 const fullState = state.useNexus();
 const count = state.useNexus("count");
 ```
@@ -450,6 +449,8 @@ Efficient: updates only when dependencies change.<br>
 <b>Example:</b>
 
 ```tsx
+import { state } from "nexus-state";
+
 const total = state.useNexusSelector(
   (state) => state.count + state.userCount,
   ["count", "userCount"]
@@ -472,6 +473,24 @@ state.useUpdate();
 ```
 
 </div></ul></details>
+
+</div></ul>
+
+**actions:**
+
+<b>Description:</b> <em><br>
+Optional actions object defined during store creation, simplifying state updates.<br>
+</em><br>
+<b>Example:</b>
+
+```tsx
+import { actions } from "nexus-state";
+
+actions.increment();
+actions.consoleCalling("Some text");
+```
+
+<ul><div>
 
 </div></ul>
 
