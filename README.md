@@ -262,7 +262,7 @@ const consoleCallAction = createDiscreteActions<MyStateT, MyActionsT>(() => ({..
 
 <ul><div>
 
-**state:**
+**`state`:**
 
 <ul><div>
 
@@ -271,7 +271,7 @@ Required state object.<br>
 </em><br>
 <b>Usage Example:</b>
 
-`createStore`:<br>
+`createStore`<br>
 
 <details><summary><b><code>getNexus()</code></b></summary><br><ul><div>
 <b>Description:</b> <em><br>
@@ -413,7 +413,7 @@ declare global {
 
 <h2></h2>
 
-`createReactStore`:<br>
+`createReactStore`<br>
 
 <details><summary><b><code>useNexus()</code></b></summary><br><ul><div>
 <b>Description:</b> <em><br>
@@ -480,7 +480,7 @@ state.useUpdate();
 
 <h2></h2>
 
-**actions:**
+**`actions`:**
 
 <ul><div>
 
