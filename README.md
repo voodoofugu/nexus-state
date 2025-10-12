@@ -72,8 +72,6 @@ export { state, actions };
 
 <details><summary><b><code>TypeScript snippet:</code></b></summary>
 
-</b>
-
 ```ts
 type MyStateT = {
   count: number;
@@ -125,8 +123,6 @@ export { state, actions };
 
 <details><summary><b><code>TypeScript snippet:</code></b></summary>
 
-</b>
-
 ```ts
 type MyStateT = {
   count: number;
@@ -177,8 +173,6 @@ export { state, actions };
 ```
 
 <details><summary><b><code>TypeScript snippet:</code></b></summary>
-
-</b>
 
 ```ts
 type MyStateT = {
@@ -235,8 +229,6 @@ export { state, actions };
 ```
 
 <details><summary><b><code>TypeScript snippet:</code></b></summary>
-
-</b>
 
 ```ts
 type MyStateT = {
@@ -392,8 +384,6 @@ state.nexusGate((_, next) => {
 ```
 
 <details><summary><b><code>TypeScript snippet:</code></b></summary>
-
-</b>
 
 ```tsx
 // TS for Redux DevTools
