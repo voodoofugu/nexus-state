@@ -22,7 +22,11 @@ function createReactStore<
   A extends Record<string, any> = Record<string, any>
 >(options: CreateReactStoreOptions<T, A>) {
   // для принудительного обновления
-  const [, useUpdate] = useReducer(() => ({}), {});
+
+  const useUpdate = () => {
+    const [, forceUpdate] = useReducer(() => ({}), {});
+    return forceUpdate;
+  };
 
   const { state: store, actions: actionsInstance } = createStore<T, A>(options);
 

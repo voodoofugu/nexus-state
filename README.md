@@ -34,8 +34,13 @@ The library provides two separate builds:
 - **ESM (import)** — full version including both `createStore` and `createReactStore`. Recommended for modern bundlers and projects.
 - **CJS (require)** — minimal version exposing only the core `createStore`. The React-specific store (`createReactStore`) is intentionally excluded to keep the CommonJS build clean and framework-agnostic.
 
-<br>
+<h2></h2>
 
+### API
+
+**Main:**
+
+<ul><div>
 <details><summary><b><code>createStore</code></b></summary><br><ul><div>
 <b>Description:</b> <em><br>
 Creates a new framework-agnostic store instance.<br>
@@ -249,12 +254,15 @@ const consoleCallAction = createDiscreteActions<MyStateT, MyActionsT>(() => ({..
 > ✦store - createStore or createReactStore
 
 </div></ul></details>
+</div></ul>
 
 <h2></h2>
 
-### API
+**Store:**
 
-**CORE createStore:**
+<ul><div>
+
+**State:**
 
 <ul><div>
 
@@ -464,6 +472,8 @@ state.useUpdate();
 ```
 
 </div></ul></details>
+
+</div></ul>
 
 </div></ul>
 
