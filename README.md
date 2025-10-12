@@ -72,6 +72,8 @@ export { state, actions };
 
 <details><summary><b><code>TypeScript snippet:</code></b></summary>
 
+</b>
+
 ```ts
 type MyStateT = {
   count: number;
@@ -123,6 +125,8 @@ export { state, actions };
 
 <details><summary><b><code>TypeScript snippet:</code></b></summary>
 
+</b>
+
 ```ts
 type MyStateT = {
   count: number;
@@ -169,10 +173,12 @@ const { state, actions } = ✦store({
 
 export { state, actions };
 
-// ✦ createStore or createReactStore
+// ✦store - createStore or createReactStore
 ```
 
 <details><summary><b><code>TypeScript snippet:</code></b></summary>
+
+</b>
 
 ```ts
 type MyStateT = {
@@ -225,10 +231,12 @@ const { state, actions } = ✦store({
 
 export { state, actions };
 
-// ✦ createStore or createReactStore
+// ✦store - createStore or createReactStore
 ```
 
 <details><summary><b><code>TypeScript snippet:</code></b></summary>
+
+</b>
 
 ```ts
 type MyStateT = {
@@ -280,7 +288,7 @@ This method returns the current state object.<br>
 ```tsx
 import { state } from "your-nexus-config";
 
-const allStates = state.getNexus();
+const allStates = state.getNexus(); // so you can get all states
 const count = state.getNexus("count");
 ```
 
@@ -384,6 +392,8 @@ state.nexusGate((_, next) => {
 ```
 
 <details><summary><b><code>TypeScript snippet:</code></b></summary>
+
+</b>
 
 ```tsx
 // TS for Redux DevTools
