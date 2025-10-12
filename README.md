@@ -15,7 +15,7 @@
 ### About
 
 Lightweight, framework-agnostic state management with optional actions and React bindings.
-Designed for simplicity and performance.
+Designed for simplicity and performance with TypeScript support.
 
 <h2></h2>
 
@@ -271,8 +271,6 @@ Required state object.<br>
 </em><br>
 <b>Usage Example:</b>
 
-`createStore`<br>
-
 <details><summary><b><code>getNexus()</code></b></summary><br><ul><div>
 <b>Description:</b> <em><br>
 This method returns the current state object.<br>
@@ -413,9 +411,7 @@ declare global {
 
 <h2></h2>
 
-`createReactStore`<br>
-
-<details><summary><b><code>useNexus()</code></b></summary><br><ul><div>
+<details><summary><b><code>useNexus() ✦R</code></b></summary><br><ul><div>
 <b>Description:</b> <em><br>
 A React hook for subscribing to the store. Automatically triggers re-renders when subscribed state changes.<br>
 <br>
@@ -437,7 +433,7 @@ const count = state.useNexus("count");
 
 <h2></h2>
 
-<details><summary><b><code>useNexusSelector()</code></b></summary><br><ul><div>
+<details><summary><b><code>useNexusSelector() ✦R</code></b></summary><br><ul><div>
 <b>Description:</b> <em><br>
 A React hook for creating derived values from the state.<br>
 <br>
@@ -463,7 +459,7 @@ const total = state.useNexusSelector(
 
 <h2></h2>
 
-<details><summary><b><code>useUpdate()</code></b></summary><br><ul><div>
+<details><summary><b><code>useUpdate() ✦R</code></b></summary><br><ul><div>
 <b>Description:</b> <em><br>
 Forces a component to re-render manually.<br>
 Useful for updating refs or non-reactive values.<br>
@@ -471,10 +467,14 @@ Useful for updating refs or non-reactive values.<br>
 <b>Example:</b>
 
 ```tsx
+import { state } from "your-nexus-config";
+
 state.useUpdate();
 ```
 
 </div></ul></details>
+
+> ✦ Available only in createReactStore.
 
 </div></ul>
 
