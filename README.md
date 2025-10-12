@@ -36,14 +36,6 @@ The library provides two separate builds:
 
 <br>
 
-> **✦ Note:**<br>
->
-> - If you're using CommonJS, you won't have access to React bindings by default.<br>
-> - You can define your store as a separate configuration file (recommended) or directly inside your components.<br>
-> - Multiple stores are supported.
-
-<br>
-
 <details><summary><b><code>createStore</code></b></summary><br><ul><div>
 <b>Description:</b> <em><br>
 Creates a new framework-agnostic store instance.<br>
@@ -56,13 +48,13 @@ import { createStore } from "nexus-state";
 const { state, actions } = createStore({
   state: {
     count: 0,
-    user: "Anonymous",
+    userCount: 0,
   },
 
   actions: (set) => ({
     increment() {
       set((prev) => ({ count: prev.count + 1 }));
-      this.consoleCalling("Increment action called"); // calling another action from inside
+      this.consoleCalling("Increment called"); // calling another action
     },
     consoleCalling(text) {
       console.log(text);
@@ -78,7 +70,7 @@ export { state, actions };
 ```ts
 type MyStateT = {
   count: number;
-  user: string;
+  userCount: number;
 };
 
 type MyActionsT = {
@@ -113,7 +105,7 @@ const { state, actions } = createReactStore({
   actions: (set) => ({
     increment() {
       set((prev) => ({ count: prev.count + 1 }));
-      this.consoleCalling("Increment action called"); // calling another action from inside
+      this.consoleCalling("Increment called"); // calling another action
     },
     consoleCalling(text) {
       console.log(text);
@@ -129,7 +121,7 @@ export { state, actions };
 ```ts
 type MyStateT = {
   count: number;
-  user: string;
+  userCount: number;
 };
 
 type MyActionsT = {
@@ -158,7 +150,7 @@ import { ✦store, createActions } from "nexus-state";
 const customActions = createActions((set) => ({
   increment() {
     set((prev) => ({ count: prev.count + 1 }));
-    this.consoleCalling("Increment action called");
+    this.consoleCalling("Increment called");
   },
   consoleCalling(text) {
     console.log(text);
@@ -178,7 +170,7 @@ export { state, actions };
 ```ts
 type MyStateT = {
   count: number;
-  user: string;
+  userCount: number;
 };
 
 type MyActionsT = {
@@ -186,15 +178,7 @@ type MyActionsT = {
   consoleCalling: (text: string) => void;
 };
 
-const customActions = createActions<MyStateT, MyActionsT>((set) => ({
-  increment() {
-    set((prev) => ({ count: prev.count + 1 }));
-    this.consoleCalling("Increment action called");
-  },
-  consoleCalling(text) {
-    console.log(text);
-  },
-}));
+const customActions = createActions<MyStateT, MyActionsT>((set) => ({...}));
 ```
 
 </details>
@@ -218,7 +202,7 @@ const incrementAction = createDiscreteActions(
   (set) => ({
     increment() {
       set((prev) => ({ value2: prev.value2 + 1 }));
-      this.consoleCalling("Increment action called");
+      this.consoleCalling("Increment called");
     },
   })
 );
@@ -242,7 +226,7 @@ export { state, actions };
 ```ts
 type MyStateT = {
   count: number;
-  user: string;
+  userCount: number;
 };
 
 type MyActionsT = {
@@ -252,16 +236,12 @@ type MyActionsT = {
 
 const incrementAction = createDiscreteActions<MyStateT, MyActionsT>((set) => ({
   increment() {
-    set((prev) => ({ value2: prev.value2 + 1 }));
-    this.consoleCalling("Increment action called"); // here you need to use `?.`
+    ...
+    this.consoleCalling?.("Increment called"); // here you need to use `?.`
   },
 }));
 
-const consoleCallAction = createDiscreteActions<MyStateT, MyActionsT>(() => ({
-  consoleCalling(text) {
-    console.log(text);
-  },
-}));
+const consoleCallAction = createDiscreteActions<MyStateT, MyActionsT>(() => ({...}));
 ```
 
 </details>
@@ -274,7 +254,7 @@ const consoleCallAction = createDiscreteActions<MyStateT, MyActionsT>(() => ({
 
 ### API
 
-**CORE API:**
+**CORE createStore:**
 
 <ul><div>
 
@@ -424,10 +404,7 @@ actions.consoleCalling("Some text");
 
 </div></ul>
 
-**REACT-SPECIFIC HOOKS:**
-
-> **✦ Note:**<br>
-> Available only in `createReactStore`
+**REACT HOOKS createReactStore:**
 
 <ul><div>
 
@@ -466,15 +443,25 @@ Efficient: updates only when dependencies change.<br>
 
 ```tsx
 const total = state.useNexusSelector(
-  (s) => s.count + s.user.length,
-  ["count", "user"]
+  (state) => state.count + state.userCount,
+  ["count", "userCount"]
 );
 ```
 
-<br>
+</div></ul></details>
 
-> **✦ Note:**<br>
-> Memoize your selector with `useCallback` if it’s recreated often due to frequent re-renders — this prevents unnecessary re-subscriptions.
+<h2></h2>
+
+<details><summary><b><code>useUpdate()</code></b></summary><br><ul><div>
+<b>Description:</b> <em><br>
+Forces a component to re-render manually.<br>
+Useful for updating refs or non-reactive values.<br>
+</em><br>
+<b>Example:</b>
+
+```tsx
+state.useUpdate();
+```
 
 </div></ul></details>
 
