@@ -411,7 +411,7 @@ declare global {
 
 <h2></h2>
 
-<details><summary><b><code>useNexus() ✦R</code></b></summary><br><ul><div>
+<details><summary><b><code>useNexus()</code></b>✦RS</summary><br><ul><div>
 <b>Description:</b> <em><br>
 A React hook for subscribing to the store. Automatically triggers re-renders when subscribed state changes.<br>
 <br>
@@ -433,7 +433,7 @@ const count = state.useNexus("count");
 
 <h2></h2>
 
-<details><summary><b><code>useNexusSelector() ✦R</code></b></summary><br><ul><div>
+<details><summary><b><code>useNexusSelector()</code></b>✦RS</summary><br><ul><div>
 <b>Description:</b> <em><br>
 A React hook for creating derived values from the state.<br>
 <br>
@@ -459,7 +459,7 @@ const total = state.useNexusSelector(
 
 <h2></h2>
 
-<details><summary><b><code>useUpdate() ✦R</code></b></summary><br><ul><div>
+<details><summary><b><code>useUpdate()</code></b>✦RS</summary><br><ul><div>
 <b>Description:</b> <em><br>
 Forces a component to re-render manually.<br>
 Useful for updating refs or non-reactive values.<br>
@@ -474,7 +474,7 @@ state.useUpdate();
 
 </div></ul></details>
 
-> ✦ Available only in createReactStore.
+> ✦RS - Available only in createReactStore.
 
 </div></ul>
 
