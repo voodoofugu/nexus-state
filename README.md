@@ -262,7 +262,7 @@ const consoleCallAction = createDiscreteActions<MyStateT, MyActionsT>(() => ({..
 
 <ul><div>
 
-**`state`:**
+<details><summary><b><code>state</code></b></summary>
 
 <ul><div>
 
@@ -429,6 +429,9 @@ const fullState = state.useNexus();
 const count = state.useNexus("count");
 ```
 
+<br>
+
+> ✦ Note:
 > Available only in createReactStore.
 
 </div></ul></details>
@@ -457,6 +460,9 @@ const total = state.useNexusSelector(
 );
 ```
 
+<br>
+
+> ✦ Note:
 > Available only in createReactStore.
 
 </div></ul></details>
@@ -476,15 +482,19 @@ import { state } from "your-nexus-config";
 state.useUpdate();
 ```
 
+<br>
+
+> ✦ Note:
 > Available only in createReactStore.
 
 </div></ul></details>
 
 </div></ul>
+</details>
 
 <h2></h2>
 
-**`actions`:**
+<details><summary><b><code>actions</code></b></summary>
 
 <ul><div>
 
@@ -501,6 +511,7 @@ actions.consoleCalling("Some text");
 ```
 
 </div></ul>
+</details>
 
 </div></ul>
 
