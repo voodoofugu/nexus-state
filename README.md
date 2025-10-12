@@ -264,15 +264,14 @@ const consoleCallAction = createDiscreteActions<MyStateT, MyActionsT>(() => ({..
 
 **state:**
 
+<ul><div>
+
 <b>Description:</b> <em><br>
 Required state object.<br>
 </em><br>
 <b>Example:</b>
 
-<ul><div>
-
-Core (`createStore`):<br>
-<br>
+Core `createStore`:<br>
 
 <details><summary><b><code>getNexus()</code></b></summary><br><ul><div>
 <b>Description:</b> <em><br>
@@ -386,6 +385,8 @@ state.nexusGate((_, next) => {
 });
 ```
 
+<details><summary><b><code>TypeScript snippet:</code></b></summary>
+
 ```tsx
 // TS for Redux DevTools
 interface ReduxDevToolsConnection {
@@ -406,12 +407,13 @@ declare global {
 
 </details>
 
+</details>
+
 </div></ul></details>
 
 <h2></h2>
 
-- React Hooks (`createReactStore`):<br>
-  <br>
++React Hooks `createReactStore`:<br>
 
 <details><summary><b><code>useNexus()</code></b></summary><br><ul><div>
 <b>Description:</b> <em><br>
@@ -476,7 +478,11 @@ state.useUpdate();
 
 </div></ul>
 
+<h2></h2>
+
 **actions:**
+
+<ul><div>
 
 <b>Description:</b> <em><br>
 Optional actions object defined during store creation, simplifying state updates.<br>
@@ -489,8 +495,6 @@ import { actions } from "nexus-state";
 actions.increment();
 actions.consoleCalling("Some text");
 ```
-
-<ul><div>
 
 </div></ul>
 
