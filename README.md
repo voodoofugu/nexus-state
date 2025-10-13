@@ -514,7 +514,7 @@ actions.consoleCalling("Some text");
 <br>
 
 > ✦ Note:<br>
-> Arrow functions can be used for actions, but they don’t support calling other actions via `this`, since arrow functions don’t bind their own this context.
+> Arrow functions can be used for actions, but they don’t support calling other actions via `this`.
 
 ```js
 // regular function
