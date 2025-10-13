@@ -84,6 +84,7 @@ type MyActionsT = {
 };
 
 const { state, actions } = createStore<MyStateT, MyActionsT>({...});
+//                                      ^ provide of type
 ```
 
 </details>
