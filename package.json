@@ -7,7 +7,7 @@
   "license": "MIT",
   "type": "module",
   "scripts": {
-    "build": "rollup -c && tsc --emitDeclarationOnly",
+    "build": "rollup -c",
     "publish": "cp README.md publish/ && cd publish && npm publish",
     "lint": "eslint src"
   },

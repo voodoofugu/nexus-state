@@ -3,7 +3,7 @@ export type SetState<T> = (
   partial: Partial<T> | ((prev: T) => Partial<T>)
 ) => void;
 
-/** Монолитная фабрика — возвращает полный набор действий A */
+// Монолитная фабрика — возвращает полный набор действий A
 export function createActions<
   S extends Record<string, any>,
   A extends Record<string, any> = Record<string, any>
@@ -13,7 +13,7 @@ export function createActions<
   };
 }
 
-/** Дискретная фабрика — возвращает только часть A (Partial<A>) */
+// Дискретная фабрика — возвращает только часть A (Partial<A>)
 export function createDiscreteActions<
   S extends Record<string, any>,
   A extends Record<string, any> = Record<string, any>

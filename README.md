@@ -31,8 +31,8 @@ npm install nexus-state
 
 The library provides two separate builds:
 
-- **ESM (import)** — full version including both `createStore` and `createReactStore`. Recommended for modern bundlers and projects.
-- **CJS (require)** — minimal version exposing only the core `createStore`. The React-specific store (`createReactStore`) is intentionally excluded to keep the CommonJS build clean and framework-agnostic.
+> - **Modern bundlers** use the **ESM** (`import`) build
+> - **Node.js** use the **CommonJS** (`require`) build
 
 <h2></h2>
 

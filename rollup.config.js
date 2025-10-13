@@ -28,36 +28,24 @@ const plugins = [
 ];
 
 export default [
-  // Shared ESM-библиотека
+  // ESM точка входа
   {
-    input: "./src/shared/index.ts",
+    input: "./src/index.ts",
     output: {
-      dir: "dist/shared",
+      file: "dist/esm/index.js",
       format: "esm",
-      preserveModules: true,
-      entryFileNames: "[name].js",
     },
     plugins: [del({ targets: "dist/*" }), ...plugins],
     external: (id) => /^react/.test(id),
   },
 
-  // ESM точка входа
-  {
-    input: "./src/entry.esm.ts",
-    output: {
-      file: "dist/esm/index.js",
-      format: "esm",
-    },
-    plugins,
-    external: (id) => /^react/.test(id),
-  },
-
   // CJS точка входа
   {
-    input: "./src/entry.cjs.ts",
+    input: "./src/index.ts",
     output: {
       file: "dist/cjs/index.js",
       format: "cjs",
+      exports: "named",
     },
     plugins,
     external: (id) => /^react/.test(id),
