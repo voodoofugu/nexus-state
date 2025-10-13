@@ -255,21 +255,6 @@ const consoleCallAction = createDiscreteActions<MyStateT, MyActionsT>(() => ({..
 
 </div></ul></details>
 
-> ✦ Note:<br>
-> Arrow functions can be used for actions, but they don’t support calling other actions via `this`, since arrow functions don’t bind their own this context.
-
-```js
-// regular function
-increment() {
-  this.consoleCalling("Increment called"); // working
-}
-
-// arrow function
-increment: () => {
-  this.consoleCalling("Increment called"); // not working
-}
-```
-
 </div></ul>
 
 <h2></h2>
@@ -524,6 +509,23 @@ import { actions } from "your-nexus-config";
 
 actions.increment();
 actions.consoleCalling("Some text");
+```
+
+<br>
+
+> ✦ Note:<br>
+> Arrow functions can be used for actions, but they don’t support calling other actions via `this`, since arrow functions don’t bind their own this context.
+
+```js
+// regular function
+increment() {
+  this.consoleCalling("Increment called"); // working
+}
+
+// arrow function
+increment: () => {
+  this.consoleCalling("Increment called"); // not working
+}
 ```
 
 </div></ul>
