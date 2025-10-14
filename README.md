@@ -70,7 +70,7 @@ const { state, actions } = createStore({
 export { state, actions };
 ```
 
-<details><summary><b><code>TypeScript snippet:</code></b></summary>
+<details><summary><b><code>TypeScript Snippet:</code></b></summary>
 
 ```ts
 type MyStateT = {
@@ -121,7 +121,7 @@ const { state, actions } = createReactStore({
 export { state, actions };
 ```
 
-<details><summary><b><code>TypeScript snippet:</code></b></summary>
+<details><summary><b><code>TypeScript Snippet:</code></b></summary>
 
 ```ts
 type MyStateT = {
@@ -172,7 +172,7 @@ export { state, actions };
 // ✦store - createStore or createReactStore
 ```
 
-<details><summary><b><code>TypeScript snippet:</code></b></summary>
+<details><summary><b><code>TypeScript Snippet:</code></b></summary>
 
 ```ts
 type MyStateT = {
@@ -228,7 +228,7 @@ export { state, actions };
 // ✦store - createStore or createReactStore
 ```
 
-<details><summary><b><code>TypeScript snippet:</code></b></summary>
+<details><summary><b><code>TypeScript Snippet:</code></b></summary>
 
 ```ts
 type MyStateT = {
@@ -243,8 +243,8 @@ type MyActionsT = {
 
 const incrementAction = createDiscreteActions<MyStateT, MyActionsT>((set) => ({
   increment() {
-    ...
-    this.consoleCalling?.("Increment called"); // here you need to use `?.`
+    // Use `?.` when referencing optional actions type (MyActionsT)
+    this.consoleCalling?.("Increment called");
   },
 }));
 
@@ -281,8 +281,8 @@ This method returns the current state object.<br>
 ```tsx
 import { state } from "your-nexus-config";
 
-const allStates = state.getNexus(); // so you can get all states
-const count = state.getNexus("count");
+const allStates = state.getNexus(); // all states
+const count = state.getNexus("count"); // specific state
 ```
 
 </div></ul></details>
@@ -350,23 +350,30 @@ unsubscribe();
 
 <details><summary><b><code>nexusGate()</code></b></summary><br><ul><div>
 <b>Description:</b> <em><br>
-Registers middleware to intercept state updates. You can modify or cancel the update.<br>
-Useful for adding logging, debugging, or integrating with developer tools.<br>
+Registers middleware to intercept or modify state updates.<br>
+Useful for logging, debugging, or integrating with developer tools.<br>
 </em><br>
 <b>Example:</b><br>
 
-```tsx
+```jsx
 import { state } from "your-nexus-config";
 
+// Example: logging state changes
 state.nexusGate((prev, next) => {
   console.log("State changing from", prev, "to", next);
+});
 
-  // Optionally, return a modified next state:
-  // return { ...next, forced: true };
+// Example: modifying next state before applying
+state.nexusGate((prev, next) => {
+  return { ...next, forced: true };
 });
 ```
 
-<details><summary><b>Redux DevTools Integration</b></summary><br>
+<details><summary><b>Redux DevTools Integration</b></summary><br><ul><div>
+<b>Description:</b> <em><br>
+You can connect your Nexus store to Redux DevTools for time-travel debugging and state inspection.<br>
+</em><br>
+<b>Example:</b><br>
 
 ```tsx
 import { state } from "your-nexus-config";
@@ -384,10 +391,9 @@ state.nexusGate((_, next) => {
 });
 ```
 
-<details><summary><b><code>TypeScript snippet:</code></b></summary>
+<details><summary><b><code>TypeScript Snippet:</code></b></summary>
 
 ```tsx
-// TS for Redux DevTools
 interface ReduxDevToolsConnection {
   send: (action: unknown, state: unknown) => void;
   init: (state: unknown) => void;
@@ -406,7 +412,7 @@ declare global {
 
 </details>
 
-</details>
+</div></ul></details>
 
 </div></ul></details>
 
