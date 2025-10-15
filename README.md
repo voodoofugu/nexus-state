@@ -272,7 +272,7 @@ Required state object.<br>
 </em><br>
 <b>Usage Example:</b>
 
-<h5>createStore</h5>
+<h5><mark>createStore</mark></h5>
 
 <details><summary><b><code>getNexus()</code></b></summary><br><ul><div>
 <b>Description:</b> <em><br>
@@ -420,7 +420,7 @@ declare global {
 
 <h2></h2>
 
-<h5>createReactStore</h5>
+<h5><mark>createReactStore</mark></h5>
 
 <details><summary><b><code>useNexus()</code></b></summary><br><ul><div>
 <b>Description:</b> <em><br>
