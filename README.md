@@ -272,6 +272,8 @@ Required state object.<br>
 </em><br>
 <b>Usage Example:</b>
 
+<h5>createStore</h5>
+
 <details><summary><b><code>getNexus()</code></b></summary><br><ul><div>
 <b>Description:</b> <em><br>
 This method returns the current state object.<br>
@@ -418,6 +420,8 @@ declare global {
 
 <h2></h2>
 
+<h5>createReactStore</h5>
+
 <details><summary><b><code>useNexus()</code></b></summary><br><ul><div>
 <b>Description:</b> <em><br>
 A React hook for subscribing to the store. Automatically triggers re-renders when subscribed state changes.<br>
@@ -438,9 +442,6 @@ const count = state.useNexus("count");
 
 <br>
 
-> ✦ Note:
-> Available only in createReactStore.
-
 </div></ul></details>
 
 <h2></h2>
@@ -454,7 +455,7 @@ A React hook for creating derived values from the state.<br>
   <li><code>dependencies</code>: array of state keys to watch for changes.</li>
 </ul>
 <br>
-Efficient: updates only when dependencies change.<br>
+Updates only when dependencies change.<br>
 </em><br>
 <b>Example:</b>
 
@@ -463,14 +464,23 @@ import { state } from "your-nexus-config";
 
 const total = state.useNexusSelector(
   (state) => state.count + state.userCount,
+  ["count", "userCount"] // dependencies
+);
+```
+
+If the component using useNexusSelector re-renders frequently, it’s best to wrap the selector function in a useCallback:
+
+```tsx
+import { useCallback } from "react";
+import { state } from "your-nexus-config";
+
+const total = state.useNexusSelector(
+  useCallback((state) => state.count + state.userCount, []), // avoid unnecessary re-renders
   ["count", "userCount"]
 );
 ```
 
 <br>
-
-> ✦ Note:
-> Available only in createReactStore.
 
 </div></ul></details>
 
@@ -490,9 +500,6 @@ state.useUpdate();
 ```
 
 <br>
-
-> ✦ Note:
-> Available only in createReactStore.
 
 </div></ul></details>
 
