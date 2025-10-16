@@ -9,7 +9,10 @@ export interface Store<T> {
   getNexus<K extends keyof T>(key: K): T[K];
   setNexus: SetState<T>;
   nexusReset(): void;
-  nexusSubscribe(keys: (keyof T)[] | "*", listener: () => void): () => void;
+  nexusSubscribe(
+    observer: (state: T) => void,
+    dependencies: (keyof T)[]
+  ): () => void;
   nexusGate(fn: Middleware<T>): void;
 }
 
@@ -72,14 +75,29 @@ function createStore<
     notify("*");
   };
 
-  const nexusSubscribe: Store<T>["nexusSubscribe"] = (keys, listener) => {
-    const keysArray = Array.isArray(keys) ? keys : [keys];
-    keysArray.forEach((key) => {
+  const nexusSubscribe: Store<T>["nexusSubscribe"] = (
+    observer,
+    dependencies
+  ) => {
+    const wrappedObserver = () => observer(state);
+
+    if (dependencies.length === 0) {
+      // подписка на всё
+      if (!listeners.has("*")) listeners.set("*", new Set());
+      listeners.get("*")!.add(wrappedObserver);
+
+      return () => listeners.get("*")?.delete(wrappedObserver);
+    }
+
+    dependencies.forEach((key) => {
       if (!listeners.has(key)) listeners.set(key, new Set());
-      listeners.get(key)!.add(listener);
+      listeners.get(key)!.add(wrappedObserver);
     });
+
     return () => {
-      keysArray.forEach((key) => listeners.get(key)?.delete(listener));
+      dependencies.forEach((key) =>
+        listeners.get(key)?.delete(wrappedObserver)
+      );
     };
   };
 

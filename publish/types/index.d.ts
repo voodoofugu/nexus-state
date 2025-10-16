@@ -5,7 +5,7 @@ type SetState<T> = (partial: Partial<T> | ((prev: T) => Partial<T>)) => void;
 interface Store<T> {
   /**---
    * ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
-   * Returns the current state or a specific key.
+   * Returns the entire state or a specific state value.
    */
   getNexus(): T;
   getNexus<K extends keyof T>(key: K): T[K];
@@ -25,9 +25,14 @@ interface Store<T> {
   /**---
    * ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
    * Subscribes to changes of specific keys or entire state.
-   * Returns an unsubscribe function.
+   * @param observer Callback function to be called when the state changes.
+   * @param dependencies Array of keys to subscribe to or empty array for entire state.
+   * @returns An unsubscribe function.
    */
-  nexusSubscribe(keys: (keyof T)[] | "*", listener: () => void): () => void;
+  nexusSubscribe(
+    observer: (state: T) => void,
+    dependencies: (keyof T)[]
+  ): () => void;
 
   /**---
    * ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
@@ -39,8 +44,8 @@ interface Store<T> {
 /**---
  * ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
  * Creates a new core store instance.
- * @param options Store configuration including initial state and optional actions.
- * @returns Store instance with state methods and optional actions.
+ * @param options Store configuration including entire initial `state` and optional `actions`.
+ * @returns Store instance with state methods and actions.
  */
 declare function createStore<
   T extends Record<string, unknown>,
@@ -75,9 +80,9 @@ interface CreateReactStoreOptions<
 
 /**---
  * ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
- * Creates a React-specific store with React bindings.
- * @param options Store configuration.
- * @returns Store instance with React hooks and core store methods.
+ * Creates a store with React bindings.
+ * @param options Store configuration including entire initial `state` and optional `actions`.
+ * @returns Store instance with React Hooks and `createStore` methods.
  */
 declare function createReactStore<
   T extends Record<string, unknown>,
@@ -95,7 +100,7 @@ declare function createReactStore<
   state: Store<T> & {
     /**---
      * ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
-     * React hook to subscribe to entire state or a specific key.
+     * `React` hook to subscribe to entire state or a state value.
      */
     useNexus: {
       (): T;
@@ -104,17 +109,19 @@ declare function createReactStore<
 
     /**---
      * ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
-     * React hook for computed/derived values.
-     * Re-renders only when specified dependencies change.
+     * `React` hook for creating derived values from the state.
+     * @param observer Callback function to be called when the state changes.
+     * @param dependencies Array of keys to subscribe to or empty array for entire state.
+     * @returns The derived value.
      */
     useNexusSelector: <R>(
-      selector: (state: T) => R,
+      observer: (state: T) => R,
       dependencies: (keyof T)[]
     ) => R;
 
     /**---
      * ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
-     * React hook for forcing a component re-render.
+     * `React` hook for forcing a component re-render.
      */
     useUpdate: () => void;
   };

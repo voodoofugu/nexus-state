@@ -276,7 +276,7 @@ Required state object.<br>
 
 <details><summary><b><code>getNexus()</code></b></summary><br><ul><div>
 <b>Description:</b> <em><br>
-This method returns the current state object.<br>
+Returns the entire state or a specific state value.<br>
 </em><br>
 <b>Example:</b>
 
@@ -293,7 +293,7 @@ const count = state.getNexus("count"); // specific state
 
 <details><summary><b><code>setNexus()</code></b></summary><br><ul><div>
 <b>Description:</b> <em><br>
-This method updates the state object. You can pass a partial object or a function with access to the previous state.<br>
+Updates the state object. You can pass a partial object or a function with access to the previous state.<br>
 </em><br>
 <b>Example:</b>
 
@@ -315,7 +315,7 @@ state.setNexus((prev) => ({
 
 <details><summary><b><code>nexusReset()</code></b></summary><br><ul><div>
 <b>Description:</b> <em><br>
-This method resets the state back to its initial values.<br>
+Resets state to its initial values.<br>
 </em><br>
 <b>Example:</b>
 
@@ -331,19 +331,30 @@ state.nexusReset();
 
 <details><summary><b><code>nexusSubscribe()</code></b></summary><br><ul><div>
 <b>Description:</b> <em><br>
-This method subscribes to changes of specific keys or the entire state.<br>
+Subscribes to changes of specific keys or entire state and returns an unsubscribe function.<br>
 </em><br>
 <b>Example:</b>
 
 ```tsx
 import { state } from "your-nexus-config";
 
-const unsubscribe = state.nexusSubscribe(["count"], () => {
-  console.log("count changed:", state.getNexus().count);
-});
+const unsubscribe = state.nexusSubscribe(
+  (state) => console.log("count changed:", state.count),
+  ["count"]
+);
 
-// Later:
+// Unsubscribe
 unsubscribe();
+```
+
+> ✦ Note:<br>
+> If you pass an empty array, it will subscribe to the entire state.<br>
+
+```tsx
+const unsubscribe = state.nexusSubscribe(
+  (state) => console.log("count changed:", state.count),
+  [] // subscribe to the entire state
+);
 ```
 
 </div></ul></details>
@@ -352,7 +363,7 @@ unsubscribe();
 
 <details><summary><b><code>nexusGate()</code></b></summary><br><ul><div>
 <b>Description:</b> <em><br>
-Registers middleware to intercept or modify state updates.<br>
+Adds a middleware to intercept state changes before updates.<br>
 Useful for logging, debugging, or integrating with developer tools.<br>
 </em><br>
 <b>Example:</b><br>
@@ -424,7 +435,7 @@ declare global {
 
 <details><summary><b><code>useNexus()</code></b></summary><br><ul><div>
 <b>Description:</b> <em><br>
-A React hook for subscribing to the store. Automatically triggers re-renders when subscribed state changes.<br>
+`React` hook to subscribe to entire state or a state value. Automatically triggers re-renders when subscribed state changes.<br>
 <br>
 <ul>
   <li><b>Without arguments:</b> returns the entire state object.</li>
@@ -446,16 +457,15 @@ const count = state.useNexus("count");
 
 <h2></h2>
 
-<details><summary><b><code>useNexusSelector()</code></b></summary><br><ul><div>
+<details><summary><b><code>useNexusSelector(observer, dependencies)</code></b></summary><br><ul><div>
 <b>Description:</b> <em><br>
-A React hook for creating derived values from the state.<br>
+A `React` hook for creating derived values from the state.<br>
 <br>
 <ul>
-  <li><code>selector</code>: function that returns any derived value from the state.</li>
-  <li><code>dependencies</code>: array of state keys to watch for changes.</li>
+  <li><code>observer</code>: function that returns any derived value from the state.</li>
+  <li><code>dependencies</code>: array of keys to subscribe to or empty array for entire state..</li>
 </ul>
 <br>
-Updates only when dependencies change.<br>
 </em><br>
 <b>Example:</b>
 
@@ -468,15 +478,27 @@ const total = state.useNexusSelector(
 );
 ```
 
-If the component using useNexusSelector re-renders frequently, it’s best to wrap the selector function in a useCallback:
+> ✦ Note:<br>
+> If the component using `useNexusSelector` re-renders frequently, it’s best to wrap the selector function in a `useCallback`:
 
 ```tsx
 import { useCallback } from "react";
 import { state } from "your-nexus-config";
 
 const total = state.useNexusSelector(
-  useCallback((state) => state.count + state.userCount, []), // avoid unnecessary re-renders
+  // avoid unnecessary subscriptions
+  useCallback((state) => state.count + state.userCount, []),
   ["count", "userCount"]
+);
+```
+
+> ✦ Note:<br>
+> If you pass an empty array, it will subscribe to the entire state.<br>
+
+```tsx
+const total = state.useNexusSelector(
+  (state) => state.count + state.userCount,
+  [] // subscribe to the entire state
 );
 ```
 
@@ -488,7 +510,7 @@ const total = state.useNexusSelector(
 
 <details><summary><b><code>useUpdate()</code></b></summary><br><ul><div>
 <b>Description:</b> <em><br>
-Forces a component to re-render manually.<br>
+`React` hook for forcing a component re-render.<br>
 Useful for updating refs or non-reactive values.<br>
 </em><br>
 <b>Example:</b>

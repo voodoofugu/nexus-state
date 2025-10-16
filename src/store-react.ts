@@ -30,7 +30,7 @@ function createReactStore<
   function useNexus<K extends keyof T>(key: K): T[K];
   function useNexus<K extends keyof T>(key?: K): T | T[K] {
     return useSyncExternalStore(
-      (callback) => store.nexusSubscribe(key ? [key] : "*", callback),
+      (callback) => store.nexusSubscribe(callback, key ? [key] : []),
       () => {
         const snapshot = store.getNexus();
         return key ? snapshot[key] : snapshot;
@@ -39,28 +39,28 @@ function createReactStore<
   }
 
   function useNexusSelector<R>(
-    selector: (state: T) => R,
+    observer: (state: T) => R,
     dependencies: (keyof T)[]
   ) {
     const updater = useUpdate();
-
-    const lastSelected = useRef<R>(selector(store.getNexus()));
+    const lastSelected = useRef<R>(observer(store.getNexus()));
 
     useEffect(() => {
       console.log("subscribe");
-      const callback = () => {
-        const newSelected = selector(store.getNexus());
+      const callback = (state: T) => {
+        const newSelected = observer(state);
         if (newSelected !== lastSelected.current) {
           lastSelected.current = newSelected;
           updater();
         }
       };
 
-      const unsubscribe = store.nexusSubscribe(dependencies, callback);
-      callback();
+      const unsubscribe = store.nexusSubscribe(callback, dependencies);
+
+      callback(store.getNexus());
 
       return unsubscribe;
-    }, [selector, dependencies.join()]);
+    }, [observer, dependencies.join()]);
 
     return lastSelected.current;
   }
