@@ -46,6 +46,11 @@ interface Store<T> {
  * Creates a new core store instance.
  * @param options Store configuration including entire initial `state` and optional `actions`.
  * @returns Store instance with state methods and actions.
+ * @example
+ * const { state, actions } = createStore({
+ *   state: {...},
+ *   actions: (set) => ({...})
+ * })
  */
 declare function createStore<
   T extends Record<string, unknown>,

@@ -59,7 +59,7 @@ const { state, actions } = createStore({
   actions: (set) => ({
     increment() {
       set((prev) => ({ count: prev.count + 1 }));
-      this.consoleCalling("Increment called"); // calling another action
+      this.consoleCalling("Increment called"); // ! calling another action via "this"
     },
     consoleCalling(text) {
       console.log(text);
@@ -102,20 +102,8 @@ Extends <code>createStore</code> with React-specific hooks.<br>
 import { createReactStore } from "nexus-state";
 
 const { state, actions } = createReactStore({
-  state: {
-    count: 0,
-    userCount: 0,
-  },
-
-  actions: (set) => ({
-    increment() {
-      set((prev) => ({ count: prev.count + 1 }));
-      this.consoleCalling("Increment called"); // calling another action
-    },
-    consoleCalling(text) {
-      console.log(text);
-    },
-  }),
+  state: {...},
+  actions: (set) => ({...}),
 });
 
 export { state, actions };
@@ -124,15 +112,8 @@ export { state, actions };
 <details><summary><b>TypeScript Snippet:</b></summary>
 
 ```ts
-type MyStateT = {
-  count: number;
-  userCount: number;
-};
-
-type MyActionsT = {
-  increment: () => void;
-  consoleCalling: (text: string) => void;
-};
+type MyStateT = {...};
+type MyActionsT = {...};
 
 const { state, actions } = createReactStore<MyStateT, MyActionsT>({...});
 ```
@@ -145,7 +126,7 @@ const { state, actions } = createReactStore<MyStateT, MyActionsT>({...});
 
 <details><summary><b><code>createActions</code></b></summary><br><ul><div>
 <b>Description:</b> <em><br>
-Creates a monolithic action factory and useful for code splitting.<br>
+Creates a monolithic action factory that is useful for code splitting.<br>
 </em><br>
 <b>Example:</b>
 
@@ -184,7 +165,7 @@ const customActions = createActions<MyStateT, MyActionsT>((set) => ({...}));
 
 <details><summary><b><code>createDiscreteActions</code></b></summary><br><ul><div>
 <b>Description:</b> <em><br>
-Creates a discrete action factory and useful for code splitting.<br>
+Creates a discrete action factory that is useful for code splitting.<br>
 </em><br>
 <b>Example:</b>
 
@@ -192,7 +173,6 @@ Creates a discrete action factory and useful for code splitting.<br>
 import { ✦store, createDiscreteActions } from "nexus-state";
 
 const incrementAction = createDiscreteActions((set) => ({...}));
-
 const consoleCallAction = createDiscreteActions(() => ({...}));
 
 const { state, actions } = ✦store({
@@ -280,7 +260,7 @@ const count = state.getNexus("count"); // specific state value
 
 <details><summary><b><code>setNexus()</code></b></summary><br><ul><div>
 <b>Description:</b> <em><br>
-Updates the state object. You can pass a partial object or a function with access to the previous state.<br>
+Updates the state. Accepts a partial object or a function with the previous state.<br>
 </em><br>
 <b>Example:</b>
 
@@ -322,6 +302,11 @@ state.nexusReset();
 <details><summary><b><code>nexusSubscribe()</code></b></summary><br><ul><div>
 <b>Description:</b> <em><br>
 Subscribes to changes of specific keys or entire state and returns an unsubscribe function.<br>
+Arguments:
+<ul>
+  <li><code>observer</code>: function to be called when state changes.</li>
+  <li><code>dependencies</code>: array of keys to subscribe to or empty array for entire state.</li>
+</ul>
 </em><br>
 <b>Example:</b>
 
@@ -329,19 +314,14 @@ Subscribes to changes of specific keys or entire state and returns an unsubscrib
 import { state } from "your-nexus-config";
 
 const unsubscribe = state.nexusSubscribe(
-  (state) => console.log("count changed:", state.count),
-  ["count"]
+  (state) => {
+    console.log("count changed:", state.count);
+  },
+  ["count"] // ! empty dependency array subscribes to all state changes
 );
 
 // Unsubscribe
 unsubscribe();
-
-// Note:
-// an empty dependency array subscribes to all state changes:
-const unsubscribe = state.nexusSubscribe(
-  (state) => console.log("count changed:", state.count),
-  [] // ! entire state
-);
 ```
 
 </div></ul></details>
@@ -438,6 +418,8 @@ const fullState = state.useNexus(); // entire state
 const count = state.useNexus("count"); // specific state value
 ```
 
+<br>
+
 > ✦ Note:<br>
 > Unlike **getNexus**, **useNexus** triggers a re-render when the state changes.
 
@@ -462,14 +444,7 @@ import { state } from "your-nexus-config";
 
 const total = state.useNexusSelector(
   (state) => state.count + state.userCount, // observer function
-  ["count", "userCount"] // dependencies
-);
-
-// Note:
-// an empty dependency array subscribes to all state changes:
-const total = state.useNexusSelector(
-  (state) => state.count + state.userCount,
-  [] // ! entire state
+  ["count", "userCount"] // ! empty dependency array subscribes to all state changes
 );
 ```
 
@@ -530,7 +505,7 @@ actions.consoleCalling("Some text");
 
 <br>
 <b>Important:</b><em><br>
-Arrow functions can be used for actions, but they don’t support calling other actions via <code>this</code>:<br>
+Arrow functions can be used for actions, but they don’t support calling other actions via <code>this</code>:
 </em><br>
 
 ```js
