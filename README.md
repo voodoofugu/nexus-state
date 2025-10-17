@@ -255,23 +255,25 @@ const consoleCallAction = createDiscreteActions<MyStateT, MyActionsT>(() => ({..
 
 </div></ul></details>
 
+</div></ul>
+
+<h2></h2>
+
 > ✦ Note:<br>
-> If you want to rename the store, use the following syntax:<br>
+> If you want to rename an store, use the following syntax:<br>
 
 ```js
 import { ✦store, createDiscreteActions } from "nexus-state";
 
 const { state: myStore, actions: myActions } = ✦store({
   state: {...},
-  actions: (set) => ({...}),
+  actions: () => ({...}),
 });
 
 export { myStore, myActions };
 
 // ✦store - createStore or createReactStore
 ```
-
-</div></ul>
 
 <h2></h2>
 
