@@ -46,7 +46,6 @@ function createReactStore<
     const lastSelected = useRef<R>(observer(store.getNexus()));
 
     useEffect(() => {
-      console.log("subscribe");
       const callback = (state: T) => {
         const newSelected = observer(state);
         if (newSelected !== lastSelected.current) {
