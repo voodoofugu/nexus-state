@@ -150,7 +150,7 @@ Creates a monolithic action factory and useful for code splitting.<br>
 <b>Example:</b>
 
 ```js
-import { ✦store, createActions } from "nexus-state";
+import { *store, createActions } from "nexus-state";
 
 const customActions = createActions((set) => ({
   increment() {
@@ -162,14 +162,14 @@ const customActions = createActions((set) => ({
   },
 }));
 
-const { state, actions } = ✦store({
+const { state, actions } = *store({
   state: {...},
   actions: customActions, // provide all actions
 });
 
 export { state, actions };
 
-// ✦store - createStore or createReactStore
+// *store - createStore or createReactStore
 ```
 
 <details><summary><b><code>TypeScript Snippet:</code></b></summary>
@@ -201,7 +201,7 @@ Creates a discrete action factory and useful for code splitting.<br>
 <b>Example:</b>
 
 ```js
-import { ✦store, createDiscreteActions } from "nexus-state";
+import { *store, createDiscreteActions } from "nexus-state";
 
 const incrementAction = createDiscreteActions(
   (set) => ({
@@ -218,14 +218,14 @@ const consoleCallAction = createDiscreteActions(() => ({
   },
 }));
 
-const { state, actions } = ✦store({
+const { state, actions } = *store({
   state: {...},
   actions: [incrementAction, consoleCallAction], // array of discrete actions
 });
 
 export { state, actions };
 
-// ✦store - createStore or createReactStore
+// *store - createStore or createReactStore
 ```
 
 <details><summary><b><code>TypeScript Snippet:</code></b></summary>
@@ -259,21 +259,21 @@ const consoleCallAction = createDiscreteActions<MyStateT, MyActionsT>(() => ({..
 
 <h2></h2>
 
-> ✦ Note:<br>
-> If you want to rename an store, use the following syntax:<br>
+<details><summary><b><code>Recommendations:</code></b></summary><br><ul><div>
+<br>
+If you want to rename an store, use the following syntax:<br>
 
 ```js
-import { ✦store, createDiscreteActions } from "nexus-state";
+import { *store, createDiscreteActions } from "nexus-state";
 
-const { state: myStore, actions: myActions } = ✦store({
-  state: {...},
-  actions: () => ({...}),
-});
+const { state: myStore, actions: myActions } = *store({...});
 
 export { myStore, myActions };
 
-// ✦store - createStore or createReactStore
+// *store - createStore or createReactStore
 ```
+
+</div></ul></details>
 
 <h2></h2>
 
