@@ -213,7 +213,8 @@ type MyActionsT = {...};
 
 const incrementAction = createDiscreteActions<MyStateT, MyActionsT>(() => ({...}));
 
-// Use optional chaining (?.) when accessing optional action type (MyActionsT) via "this"
+// Note:
+// use optional chaining (?.) when accessing optional action type via "this"
 const incrementAction = createDiscreteActions<MyStateT, MyActionsT>(() => ({
   increment() {
     this.consoleCalling?.("Increment called"); // ?.
@@ -229,7 +230,7 @@ const incrementAction = createDiscreteActions<MyStateT, MyActionsT>(() => ({
 
 <h2></h2>
 
-<details><summary><b>Recommendations:</b></summary><br><ul><div>
+<details><summary>Recommendations:</summary><br>
 If you want to rename an store, use the following syntax:<br>
 <br>
 
@@ -238,12 +239,12 @@ import { ✦store } from "nexus-state";
 
 const { state: myStore, actions: myActions } = ✦store({...});
 
-export { myStore, myActions };
+export { myStore, myActions }; // ! renamed
 
 // ✦store - createStore or createReactStore
 ```
 
-</div></ul></details>
+</details>
 
 <h2></h2>
 
@@ -334,15 +335,12 @@ const unsubscribe = state.nexusSubscribe(
 
 // Unsubscribe
 unsubscribe();
-```
 
-> ✦ Note:<br>
-> If you pass an empty array, it will subscribe to the entire state.<br>
-
-```tsx
+// Note:
+// If you pass an empty array, it will subscribe to the entire state:
 const unsubscribe = state.nexusSubscribe(
   (state) => console.log("count changed:", state.count),
-  [] // subscribe to the entire state
+  [] // ! subscribe to the entire state
 );
 ```
 
@@ -424,7 +422,7 @@ declare global {
 
 <details><summary><b><code>useNexus()</code></b></summary><br><ul><div>
 <b>Description:</b> <em><br>
-`React` hook to subscribe to entire state or a state value. Automatically triggers re-renders when subscribed state changes.<br>
+React hook to subscribe to entire state or a state value. Automatically triggers re-renders when subscribed state changes.<br>
 <br>
 <ul>
   <li><b>Without arguments:</b> returns the entire state object.</li>
@@ -441,22 +439,21 @@ const count = state.useNexus("count"); // specific state value
 ```
 
 > ✦ Note:<br>
-> The main difference between **useNexus** and **getNexus** is that changing a state value accessed through **useNexus** automatically triggers a rerender.
+> Unlike **getNexus**, **useNexus** triggers a re-render when the state changes.
 
 </div></ul></details>
 
 <h2></h2>
 
 <details><summary><b><code>useNexusSelector()</code></b></summary><br><ul><div>
-<b>Description:</b> <em><br>
+<b>Description:</b><em><br>
 A React hook for creating derived values from the state.<br>
 <br>
 Arguments:
 <ul>
   <li><code>observer</code>: function that returns any derived value from the state.</li>
-  <li><code>dependencies</code>: array of keys to subscribe to or empty array for entire state..</li>
+  <li><code>dependencies</code>: array of keys to subscribe to or empty array for entire state.</li>
 </ul>
-<br>
 </em><br>
 <b>Example:</b>
 
@@ -468,22 +465,25 @@ const total = state.useNexusSelector(
   ["count", "userCount"] // dependencies
 );
 
-// If you pass an empty array in the dependencies, it will subscribe to the entire state:
+// Note:
+// if you pass an empty array in the dependencies, it will subscribe to the entire state:
 const total = state.useNexusSelector(
   (state) => state.count + state.userCount,
-  [] // subscribe to the entire state
+  [] // ! subscribe to the entire state
 );
 ```
 
-> ✦ Note:<br>
-> If the component using **useNexusSelector** re-renders frequently, it’s best to wrap the selector function in a **useCallback**:
+<br>
+<b>Optimization:</b><em><br>
+If the component using `useNexusSelector` re-renders frequently, it’s best to wrap the observer function in a `useCallback`:
+</em><br>
 
 ```tsx
 import { useCallback } from "react";
 import { state } from "your-nexus-config";
 
 const total = state.useNexusSelector(
-  // avoid unnecessary subscriptions
+  // ! "useCallback" avoid unnecessary subscriptions
   useCallback((state) => state.count + state.userCount, []),
   ["count", "userCount"]
 );
