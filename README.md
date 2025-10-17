@@ -230,21 +230,21 @@ const incrementAction = createDiscreteActions<MyStateT, MyActionsT>(() => ({
 
 <h2></h2>
 
-<details><summary>Recommendations:</summary><br>
-If you want to rename an store, use the following syntax:<br>
-<br>
+<details><summary>Recommendations:</summary><br><ul><div>
+If you want to use multiple stores in a single file, or if you want to simply rename an store, use the following syntax:
+</em><br>
 
 ```js
 import { ✦store } from "nexus-state";
 
-const { state: myStore, actions: myActions } = ✦store({...});
+const { state: myStore1, actions: myActions1 } = ✦store({...});
 
-export { myStore, myActions }; // ! renamed
+export { myStore1, myActions1 }; // ! renamed
 
 // ✦store - createStore or createReactStore
 ```
 
-</details>
+</div></ul></details>
 
 <h2></h2>
 
@@ -337,10 +337,10 @@ const unsubscribe = state.nexusSubscribe(
 unsubscribe();
 
 // Note:
-// If you pass an empty array, it will subscribe to the entire state:
+// an empty dependency array subscribes to all state changes:
 const unsubscribe = state.nexusSubscribe(
   (state) => console.log("count changed:", state.count),
-  [] // ! subscribe to the entire state
+  [] // ! entire state
 );
 ```
 
@@ -466,16 +466,16 @@ const total = state.useNexusSelector(
 );
 
 // Note:
-// if you pass an empty array in the dependencies, it will subscribe to the entire state:
+// an empty dependency array subscribes to all state changes:
 const total = state.useNexusSelector(
   (state) => state.count + state.userCount,
-  [] // ! subscribe to the entire state
+  [] // ! entire state
 );
 ```
 
 <br>
 <b>Optimization:</b><em><br>
-If the component using `useNexusSelector` re-renders frequently, it’s best to wrap the observer function in a `useCallback`:
+If the component re-renders often, wrap the observer function in <code>useCallback</code>:
 </em><br>
 
 ```tsx
@@ -516,7 +516,7 @@ updater(); // force re-render
 
 <details><summary><b><code>actions</code></b></summary><br><ul><div>
 
-<b>Description:</b> <em><br>
+<b>Description:</b><em><br>
 Optional actions object defined during store creation, simplifying state updates.<br>
 </em><br>
 <b>Usage Example:</b>
@@ -528,8 +528,10 @@ actions.increment();
 actions.consoleCalling("Some text");
 ```
 
-> ✦ Note:<br>
-> Arrow functions can be used for actions, but they don’t support calling other actions via **this**:
+<br>
+<b>Important:</b><em><br>
+Arrow functions can be used for actions, but they don’t support calling other actions via <code>this</code>:<br>
+</em><br>
 
 ```js
 // regular function
