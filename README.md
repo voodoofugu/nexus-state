@@ -70,7 +70,7 @@ const { state, actions } = createStore({
 export { state, actions };
 ```
 
-<details><summary><b><code>TypeScript Snippet:</code></b></summary>
+<details><summary><b>TypeScript Snippet:</b></summary>
 
 ```ts
 type MyStateT = {
@@ -121,7 +121,7 @@ const { state, actions } = createReactStore({
 export { state, actions };
 ```
 
-<details><summary><b><code>TypeScript Snippet:</code></b></summary>
+<details><summary><b>TypeScript Snippet:</b></summary>
 
 ```ts
 type MyStateT = {
@@ -150,40 +150,28 @@ Creates a monolithic action factory and useful for code splitting.<br>
 <b>Example:</b>
 
 ```js
-import { *store, createActions } from "nexus-state";
+import { ✦store, createActions } from "nexus-state";
 
 const customActions = createActions((set) => ({
-  increment() {
-    set((prev) => ({ count: prev.count + 1 }));
-    this.consoleCalling("Increment called");
-  },
-  consoleCalling(text) {
-    console.log(text);
-  },
+  increment() {...},
+  consoleCalling(text) {...},
 }));
 
-const { state, actions } = *store({
+const { state, actions } = ✦store({
   state: {...},
-  actions: customActions, // provide all actions
+  actions: customActions, // ! provide all actions
 });
 
 export { state, actions };
 
-// *store - createStore or createReactStore
+// ✦store - createStore or createReactStore
 ```
 
-<details><summary><b><code>TypeScript Snippet:</code></b></summary>
+<details><summary><b>TypeScript Snippet:</b></summary>
 
 ```ts
-type MyStateT = {
-  count: number;
-  userCount: number;
-};
-
-type MyActionsT = {
-  increment: () => void;
-  consoleCalling: (text: string) => void;
-};
+type MyStateT = {...};
+type MyActionsT = {...};
 
 const customActions = createActions<MyStateT, MyActionsT>((set) => ({...}));
 ```
@@ -201,54 +189,36 @@ Creates a discrete action factory and useful for code splitting.<br>
 <b>Example:</b>
 
 ```js
-import { *store, createDiscreteActions } from "nexus-state";
+import { ✦store, createDiscreteActions } from "nexus-state";
 
-const incrementAction = createDiscreteActions(
-  (set) => ({
-    increment() {
-      set((prev) => ({ value2: prev.value2 + 1 }));
-      this.consoleCalling("Increment called");
-    },
-  })
-);
+const incrementAction = createDiscreteActions((set) => ({...}));
 
-const consoleCallAction = createDiscreteActions(() => ({
-  consoleCalling(text) {
-    console.log(text);
-  },
-}));
+const consoleCallAction = createDiscreteActions(() => ({...}));
 
-const { state, actions } = *store({
+const { state, actions } = ✦store({
   state: {...},
-  actions: [incrementAction, consoleCallAction], // array of discrete actions
+  actions: [incrementAction, consoleCallAction], // ! array of discrete actions
 });
 
 export { state, actions };
 
-// *store - createStore or createReactStore
+// ✦store - createStore or createReactStore
 ```
 
-<details><summary><b><code>TypeScript Snippet:</code></b></summary>
+<details><summary><b>TypeScript Snippet:</b></summary>
 
 ```ts
-type MyStateT = {
-  count: number;
-  userCount: number;
-};
+type MyStateT = {...};
+type MyActionsT = {...};
 
-type MyActionsT = {
-  increment: () => void;
-  consoleCalling: (text: string) => void;
-};
+const incrementAction = createDiscreteActions<MyStateT, MyActionsT>(() => ({...}));
 
-const incrementAction = createDiscreteActions<MyStateT, MyActionsT>((set) => ({
+// Use optional chaining (?.) when accessing optional action type (MyActionsT) via "this"
+const incrementAction = createDiscreteActions<MyStateT, MyActionsT>(() => ({
   increment() {
-    // Use `?.` when referencing optional actions type (MyActionsT)
-    this.consoleCalling?.("Increment called");
+    this.consoleCalling?.("Increment called"); // ?.
   },
 }));
-
-const consoleCallAction = createDiscreteActions<MyStateT, MyActionsT>(() => ({...}));
 ```
 
 </details>
@@ -259,18 +229,18 @@ const consoleCallAction = createDiscreteActions<MyStateT, MyActionsT>(() => ({..
 
 <h2></h2>
 
-<details><summary><b><code>Recommendations:</code></b></summary><br><ul><div>
-<br>
+<details><summary><b>Recommendations:</b></summary><br><ul><div>
 If you want to rename an store, use the following syntax:<br>
+<br>
 
 ```js
-import { *store, createDiscreteActions } from "nexus-state";
+import { ✦store } from "nexus-state";
 
-const { state: myStore, actions: myActions } = *store({...});
+const { state: myStore, actions: myActions } = ✦store({...});
 
 export { myStore, myActions };
 
-// *store - createStore or createReactStore
+// ✦store - createStore or createReactStore
 ```
 
 </div></ul></details>
@@ -423,7 +393,7 @@ state.nexusGate((_, next) => {
 });
 ```
 
-<details><summary><b><code>TypeScript Snippet:</code></b></summary>
+<details><summary><b>TypeScript Snippet:</b></summary>
 
 ```tsx
 interface ReduxDevToolsConnection {
