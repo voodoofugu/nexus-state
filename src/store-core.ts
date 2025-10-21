@@ -1,37 +1,37 @@
 // store-core.ts
-type Middleware<T> = (prevState: T, nextState: T) => T | void;
-export type SetState<T> = (
-  partial: Partial<T> | ((prev: T) => Partial<T>)
-) => void;
+type Middleware<S> = (prevState: S, nextState: S) => S | void;
 
-export interface Store<T> {
-  getNexus(): T;
-  getNexus<K extends keyof T>(key: K): T[K];
-  setNexus: SetState<T>;
+// Тип функции для обновления состояния
+type SetState<S> = (update: Partial<S> | ((prev: S) => Partial<S>)) => void;
+
+type Store<S> = {
+  getNexus(): S;
+  getNexus<K extends keyof S>(key: K): S[K];
+  setNexus: SetState<S>;
   nexusReset(): void;
   nexusSubscribe(
-    observer: (state: T) => void,
-    dependencies: (keyof T)[]
+    observer: (state: S) => void,
+    dependencies: (keyof S)[]
   ): () => void;
-  nexusGate(fn: Middleware<T>): void;
-}
+  nexusGate(middleware: Middleware<S>): void;
+};
 
 function createStore<
-  T extends Record<string, any> = Record<string, any>,
+  S extends Record<string, any> = Record<string, any>,
   A extends Record<string, any> = Record<string, any>
 >(options: {
-  state: T;
+  state: S;
   actions?:
-    | ((this: A, set: SetState<T>) => A)
-    | Array<(this: Partial<A>, set: SetState<T>) => Partial<A>>;
-}): { state: Store<T>; actions: A } {
+    | ((this: A, set: SetState<S>) => A)
+    | Array<(this: Partial<A>, set: SetState<S>) => Partial<A>>;
+}): { store: Store<S>; actions: A } {
   const { state: initialState, actions: actionsCreator } = options;
 
-  let state: T = { ...initialState };
-  const listeners = new Map<keyof T | "*", Set<() => void>>();
-  const middlewares: Middleware<T>[] = [];
+  let state: S = { ...initialState };
+  const listeners = new Map<keyof S | "*", Set<() => void>>();
+  const localMiddleware: Middleware<S>[] = [];
 
-  const notify = (keys: (keyof T)[] | "*") => {
+  const notify = (keys: (keyof S)[] | "*") => {
     if (keys === "*") {
       listeners.forEach((set) => set.forEach((cb) => cb()));
     } else {
@@ -40,27 +40,27 @@ function createStore<
     }
   };
 
-  function getNexus(): T;
-  function getNexus<K extends keyof T>(key: K): T[K];
-  function getNexus<K extends keyof T>(key?: K): T | T[K] {
+  function getNexus(): S;
+  function getNexus<K extends keyof S>(key: K): S[K];
+  function getNexus<K extends keyof S>(key?: K): S | S[K] {
     return key !== undefined ? state[key] : state;
   }
 
-  const setNexus: SetState<T> = (partial) => {
+  const setNexus: SetState<S> = (partial) => {
     const prevState = { ...state };
     const nextPartial =
       typeof partial === "function" ? partial(prevState) : partial;
     let nextState = { ...state, ...nextPartial };
 
-    for (const fn of middlewares) {
-      const result = fn(prevState, nextState);
-      if (result !== undefined) nextState = result as T;
+    for (const middleware of localMiddleware) {
+      const result = middleware(prevState, nextState);
+      if (result !== undefined) nextState = result as S;
     }
 
-    const changedKeys: (keyof T)[] = [];
+    const changedKeys: (keyof S)[] = [];
     for (const key in nextState) {
       if (Object.prototype.hasOwnProperty.call(nextState, key)) {
-        if (state[key] !== nextState[key]) changedKeys.push(key as keyof T);
+        if (state[key] !== nextState[key]) changedKeys.push(key as keyof S);
       }
     }
 
@@ -75,7 +75,7 @@ function createStore<
     notify("*");
   };
 
-  const nexusSubscribe: Store<T>["nexusSubscribe"] = (
+  const nexusSubscribe: Store<S>["nexusSubscribe"] = (
     observer,
     dependencies
   ) => {
@@ -101,11 +101,11 @@ function createStore<
     };
   };
 
-  const nexusGate: Store<T>["nexusGate"] = (fn) => {
-    middlewares.push(fn);
+  const nexusGate: Store<S>["nexusGate"] = (middleware) => {
+    localMiddleware.push(middleware);
   };
 
-  const store: Store<T> = {
+  const store: Store<S> = {
     getNexus,
     setNexus,
     nexusReset,
@@ -133,7 +133,8 @@ function createStore<
     if (typeof val === "function") (actions as any)[key] = val.bind(actions);
   }
 
-  return { state: store, actions };
+  return { store, actions };
 }
 
 export default createStore;
+export type { SetState, Store };
