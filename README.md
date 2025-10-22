@@ -34,6 +34,16 @@ The library provides two separate builds:
 > - **Modern bundlers** use the **ESM** (`import`) build
 > - **Node.js** use the **CommonJS** (`require`) build
 
+Import the entire API via the default export or as individual named imports:
+
+```js
+import nexus, {
+  createStore,
+  createReactStore,
+  createActions,
+} from "nexus-state";
+```
+
 <h2></h2>
 
 ### API
@@ -46,7 +56,9 @@ The library provides two separate builds:
 Creates a new framework-agnostic store instance.<br>
 </em><br>
 <b>Arguments:</b><em><br>
-<code>options</code>: object with <code>state</code> and <code>actions</code>.<br>
+<ul>
+  <li><code>options</code>: object with <code>state</code> and <code>actions</code>.</li>
+</ul>
 </em><br>
 <b>Example:</b>
 
@@ -99,6 +111,11 @@ const { store, actions } = createStore<MyStateT, MyActionsT>({...});
 <b>Description:</b><em><br>
 Extends <code>createStore</code> with React-specific hooks.<br>
 </em><br>
+<b>Arguments:</b><em><br>
+<ul>
+  <li><code>options</code>: object with <code>state</code> and <code>actions</code>.</li>
+</ul>
+</em><br>
 <b>Example:</b>
 
 ```js
@@ -115,8 +132,15 @@ export { store, actions };
 <details><summary><b>TypeScript Snippet:</b></summary>
 
 ```ts
-type MyStateT = {...};
-type MyActionsT = {...};
+type MyStateT = {
+  count: number;
+  userCount: number;
+};
+
+type MyActionsT = {
+  increment: () => void;
+  consoleCalling: (text: string) => void;
+};
 
 const { store, actions } = createReactStore<MyStateT, MyActionsT>({...});
 ```
@@ -130,6 +154,11 @@ const { store, actions } = createReactStore<MyStateT, MyActionsT>({...});
 <details><summary><b><code>createActions</code></b></summary><br><ul><div>
 <b>Description:</b><em><br>
 Creates a monolithic action factory that is useful for code splitting.<br>
+</em><br>
+<b>Arguments:</b><em><br>
+<ul>
+  <li><code>create</code>: function that returns an object containing actions methods.</li>
+</ul>
 </em><br>
 <b>Example:</b>
 
@@ -208,7 +237,9 @@ Required state object.<br>
 Returns the entire state or a specific state value.<br>
 </em><br>
 <b>Arguments:</b><em><br>
-Optional string key.<br>
+<ul>
+  <li><code>key</code>: optional state name.</li>
+</ul>
 </em><br>
 <b>Example:</b>
 
@@ -228,7 +259,9 @@ const count = store.getNexus("count"); // specific state value
 Updates the state with either a partial object or a functional updater.<br>
 </em><br>
 <b>Arguments:</b><em><br>
-Partial object or function with the previous state.<br>
+<ul>
+  <li><code>update</code>: partial object or function with the previous state.</li>
+</ul>
 </em><br>
 <b>Example:</b>
 
@@ -268,7 +301,8 @@ store.nexusReset();
 <details><summary><b><code>nexusSubscribe()</code></b></summary><br><ul><div>
 <b>Description:</b><em><br>
 Subscribes to changes of specific keys or entire state and returns an unsubscribe function.<br>
-Arguments:
+</em><br>
+<b>Arguments:</b><em><br>
 <ul>
   <li><code>observer</code>: function to be called when state changes.</li>
   <li><code>dependencies</code>: array of keys to subscribe to or empty array for entire state.</li>
@@ -300,7 +334,9 @@ Adds a middleware to intercept state changes before updates.<br>
 Useful for logging, debugging, or integrating with developer tools.<br>
 </em><br>
 <b>Arguments:</b><em><br>
-- <code>middleware</code> function with previous and next state.<br>
+<ul>
+  <li><code>middleware</code>: function with previous and next state.</li>
+</ul>
 </em><br>
 <b>Example:</b><br>
 
@@ -399,8 +435,8 @@ const count = store.useNexus("count"); // specific state value
 <details><summary><b><code>useNexusSelector()</code></b></summary><br><ul><div>
 <b>Description:</b><em><br>
 A React hook for creating derived values from the state.<br>
-<br>
-Arguments:
+</em><br>
+<b>Arguments:</b><em><br>
 <ul>
   <li><code>observer</code>: function that returns any derived value from the state.</li>
   <li><code>dependencies</code>: array of keys to subscribe to or empty array for entire state.</li>

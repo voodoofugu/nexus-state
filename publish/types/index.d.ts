@@ -7,11 +7,13 @@ type Store<S> = {
   /**---
    * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png) NEXUS-STATE
    *---
+   * ### *`getNexus`*
    * Updates the state with either a partial object or a functional updater.
-   * @param key optional string key.
+   * @param key optional state name.
    * @example
    * const entireState = store.getNexus();
    * const specificValue = store.getNexus("key");
+   * @link [nexus-state](https://www.npmjs.com/package/nexus-state)
    */
   getNexus(): S;
   getNexus<K extends keyof S>(key: K): S[K];
@@ -19,6 +21,7 @@ type Store<S> = {
   /**---
    * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png) NEXUS-STATE
    *---
+   * ### *`setNexus`*
    * Updates the state with a partial object or functional updater.
    * @param update partial object or function with the previous state.
    * @example
@@ -30,28 +33,37 @@ type Store<S> = {
    * store.setNexus((prevState) => ({
    *   key: prevState.key + 1
    * }));
+   * @link [nexus-state](https://www.npmjs.com/package/nexus-state)
    */
   setNexus(update: Partial<S> | ((prev: S) => Partial<S>)): void;
 
   /**---
    * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png) NEXUS-STATE
    *---
+   * ### *`nexusReset`*
    * Resets state to its initial values.
    * @example
    * store.nexusReset();
+   * @link [nexus-state](https://www.npmjs.com/package/nexus-state)
    */
   nexusReset(): void;
 
   /**---
-   * ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
+   * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png) NEXUS-STATE
+   *---
+   * ### *`nexusSubscribe`*
    * Subscribes to changes of specific keys or entire state.
    * @param observer callback function to be called when the state changes.
    * @param dependencies array of keys to subscribe to or empty array for entire state.
    * @returns an unsubscribe function.
    * @example
-   * const unsubscribe = store.nexusSubscribe((state) => {
-   *   console.log("State changed:", state);
-   * });
+   * const unsubscribe = store.nexusSubscribe(
+   *   (state) => {
+   *     console.log("kay changed:", state.kay);
+   *   },
+   *   ["kay"] // ! empty dependency array subscribes to all state changes
+   * );
+   * @link [nexus-state](https://www.npmjs.com/package/nexus-state)
    */
   nexusSubscribe(
     observer: (state: S) => void,
@@ -61,6 +73,7 @@ type Store<S> = {
   /**---
    * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png) NEXUS-STATE
    *---
+   * ### *`nexusGate`*
    * Adds a middleware to intercept state changes before updates.
    * @param middleware function receiving previous and next state.
    * @example
@@ -68,6 +81,7 @@ type Store<S> = {
    *   // You can modify nextState, perform side effects or return modified state
    *   return nextState;
    * });
+   * @link [nexus-state](https://www.npmjs.com/package/nexus-state)
    */
   nexusGate(middleware: (prevState: S, nextState: S) => S | void): void;
 };
@@ -76,11 +90,13 @@ type ReactStore<S> = Store<S> & {
   /**---
    * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png) NEXUS-STATE
    *---
+   * ### *`useNexus`*
    * `React` hook to subscribe to entire state or a state value.
-   * @param key optional string key.
+   * @param key optional state name.
    * @example
    * const entireState = store.useNexus();
    * const specificValue = store.useNexus("key");
+   * @link [nexus-state](https://www.npmjs.com/package/nexus-state)
    */
   useNexus: {
     (): S;
@@ -90,6 +106,7 @@ type ReactStore<S> = Store<S> & {
   /**---
    * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png) NEXUS-STATE
    *---
+   * ### *`useNexusSelector`*
    * `React` hook for creating derived values from the state.
    * @param observer callback function to be called when the state changes.
    * @param dependencies array of keys to subscribe to or empty array for entire state.
@@ -97,8 +114,9 @@ type ReactStore<S> = Store<S> & {
    * @example
    * const derivedValue = store.useNexusSelector(
    *   (state) => state.key + 1,
-   *   ["key"]
+   *   ["key"] // ! empty dependency array subscribes to all state changes
    * );
+   * @link [nexus-state](https://www.npmjs.com/package/nexus-state)
    */
   useNexusSelector: <R>(
     observer: (state: S) => R,
@@ -121,7 +139,8 @@ type ReactStore<S> = Store<S> & {
 /**---
  * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png) NEXUS-STATE
  *---
- * Creates a new core store instance.
+ * ### *`createStore`*
+ * Creates a new framework-agnostic store instance.
  * @param options store configuration including entire initial `state` and optional `actions`.
  * @returns store instance with methods and actions.
  * @example
@@ -134,6 +153,7 @@ type ReactStore<S> = Store<S> & {
  *     actionName() { setNexus({ key: "newValue" }); }
  *   })
  * })
+ * @link [nexus-state](https://www.npmjs.com/package/nexus-state)
  */
 declare function createStore<
   S extends RecordAny,
@@ -162,7 +182,8 @@ declare function createStore<
 /**---
  * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png) NEXUS-STATE
  *---
- * Creates a store with React bindings.
+ * ### *`createReactStore`*
+ * Creates an extended store with React bindings and hooks.
  * @param options Store configuration including entire initial `state` and optional `actions`.
  * @returns store instance with React Hooks, `createStore` methods and actions.
  * @example
@@ -175,6 +196,7 @@ declare function createStore<
  *     actionName() { setNexus({ key: "newValue" }); }
  *   })
  * })
+ * @link [nexus-state](https://www.npmjs.com/package/nexus-state)
  */
 declare function createReactStore<
   S extends RecordAny,
@@ -199,11 +221,13 @@ declare function createReactStore<
 };
 
 // ------ ACTIONS ------
+
 /**---
  * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png) NEXUS-STATE
  *---
+ * ### *`createActions`*
  * Defines a group of actions that have access to the internal `setNexus` function.
- * @param create function that returns an object containing action methods.
+ * @param create function that returns an object containing actions methods.
  * @example
  * const myActions = createActions((setNexus) => ({
  *   actionName() {
@@ -216,10 +240,51 @@ declare function createReactStore<
  *   state: {...},
  *   actions: myActions, // ! or provide multiple: [myActions, myAnotherActions]
  * });
+ * @link [nexus-state](https://www.npmjs.com/package/nexus-state)
  */
 declare function createActions<
   S extends RecordAny,
   A extends RecordAny = RecordAny
 >(create: (this: A, setNexus: SetState<S>) => A): (setNexus: SetState<S>) => A;
 
+// ------ NEXUS ------
+
+/**---
+ * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png) NEXUS-STATE
+ *---
+ * ### *`nexus`*
+ * The entire library exported as a single default object.
+ *
+ * Provides access to the main API functions:
+ * - {@link createStore}
+ * - {@link createReactStore}
+ * - {@link createActions}
+ * @link [nexus-state](https://www.npmjs.com/package/nexus-state)
+ */
+declare const nexus: {
+  /** Reference to {@link createStore} */
+  createStore: <S extends RecordAny, A extends object = object>(options: {
+    state: S;
+    actions?: (setNexus: SetState<S>) => A;
+  }) => {
+    state: Store<S>;
+    actions: A;
+  };
+  /** Reference to {@link createReactStore} */
+  createReactStore: <S extends RecordAny, A extends object = object>(options: {
+    state: S;
+    actions?: (setNexus: SetState<S>) => A;
+  }) => {
+    state: ReactStore<S>;
+    actions: A;
+  };
+  /** Reference to {@link createActions} */
+  createActions: <S extends RecordAny, A extends RecordAny = RecordAny>(
+    create: (this: A, setNexus: SetState<S>) => A
+  ) => (setNexus: SetState<S>) => A;
+};
+
+// ------ EXPORT ------
+
 export { createStore, createReactStore, createActions };
+export default nexus;
