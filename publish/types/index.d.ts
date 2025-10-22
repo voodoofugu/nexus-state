@@ -116,6 +116,12 @@ type ReactStore<S> = Store<S> & {
    *   (state) => state.key + 1,
    *   ["key"] // ! empty dependency array subscribes to all state changes
    * );
+   *
+   * // If the component re-renders often, wrap the observer function in useCallback
+   * const derivedValue = store.useNexusSelector(
+   *   useCallback((state) => state.key + 1, []),
+   *   ["key"]
+   * );
    * @link [nexus-state](https://www.npmjs.com/package/nexus-state)
    */
   useNexusSelector: <R>(
@@ -238,7 +244,7 @@ declare function createReactStore<
  * // Add actions to the ✦store (createStore or createReactStore)
  * const { store, actions } = ✦store({
  *   state: {...},
- *   actions: myActions, // ! or provide multiple: [myActions, myAnotherActions]
+ *   actions: myActions, // ! multiple actions support: [myActions, myAnotherActions]
  * });
  * @link [nexus-state](https://www.npmjs.com/package/nexus-state)
  */

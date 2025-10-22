@@ -38,8 +38,7 @@ function createReactStore<
     return useSyncExternalStore(
       (callback) => store.nexusSubscribe(callback, key ? [key] : []),
       () => {
-        const snapshot = store.getNexus();
-        return key ? snapshot[key] : snapshot;
+        return key ? store.getNexus(key) : store.getNexus();
       }
     );
   }
@@ -74,8 +73,8 @@ function createReactStore<
     store: {
       ...store,
       useNexus,
-      useNexusSelector,
       useUpdate,
+      useNexusSelector,
     },
     actions: actionsLocal,
   };

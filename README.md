@@ -37,11 +37,9 @@ The library provides two separate builds:
 Import the entire API via the default export or as individual named imports:
 
 ```js
-import nexus, {
-  createStore,
-  createReactStore,
-  createActions,
-} from "nexus-state";
+import nexus from "nexus-state";
+// or
+import { createStore, createReactStore, createActions } from "nexus-state";
 ```
 
 <h2></h2>
@@ -71,9 +69,9 @@ const { store, actions } = createStore({
     userCount: 0,
   },
 
-  actions: (set) => ({
+  actions: (setNexus) => ({
     increment() {
-      set((prev) => ({ count: prev.count + 1 }));
+      setNexus((prev) => ({ count: prev.count + 1 }));
       this.consoleCalling("Increment called"); // ! calling another action via "this"
     },
     consoleCalling(text) {
@@ -123,7 +121,7 @@ import { createReactStore } from "nexus-state";
 
 const { store, actions } = createReactStore({
   state: {...},
-  actions: (set) => ({...}),
+  actions: (setNexus) => ({...}),
 });
 
 export { store, actions };
@@ -165,14 +163,14 @@ Creates a monolithic action factory that is useful for code splitting.<br>
 ```js
 import { ✦store, createActions } from "nexus-state"; // ✦ createStore or createReactStore
 
-const customActions = createActions((set) => ({
+const customActions = createActions((setNexus) => ({
   increment() {...},
   consoleCalling(text) {...},
 }));
 
 const { store, actions } = ✦store({
   state: {...},
-  actions: customActions, // ! provide all actions
+  actions: customActions, // ! multiple actions support: [myActions, myAnotherActions]
 });
 
 export { store, actions };
@@ -184,7 +182,7 @@ export { store, actions };
 type MyStateT = {...};
 type MyActionsT = {...};
 
-const customActions = createActions<MyStateT, MyActionsT>((set) => ({...}));
+const customActions = createActions<MyStateT, MyActionsT>((setNexus) => ({...}));
 
 // Note:
 // use optional chaining (?.) when referencing actions from other createActions scopes.
@@ -246,8 +244,8 @@ Returns the entire state or a specific state value.<br>
 ```tsx
 import { store } from "your-nexus-config";
 
-const allStates = store.getNexus(); // entire state
-const count = store.getNexus("count"); // specific state value
+const entireState = store.getNexus();
+const specificValue = store.getNexus("key");
 ```
 
 </div></ul></details>
@@ -407,11 +405,11 @@ declare global {
 
 <details><summary><b><code>useNexus()</code></b></summary><br><ul><div>
 <b>Description:</b><em><br>
-React hook to subscribe to entire state or a state value. Automatically triggers re-renders when subscribed state changes.<br>
-<br>
+<code>React</code> hook to subscribe to entire state or a state value.<br>
+</em><br>
+<b>Arguments:</b><em><br>
 <ul>
-  <li><b>Without arguments:</b> returns the entire state object.</li>
-  <li><b>With key argument:</b> subscribes to a specific state value.</li>
+  <li><code>key</code>: optional state name.</li>
 </ul>
 </em><br>
 <b>Example:</b>
@@ -419,8 +417,8 @@ React hook to subscribe to entire state or a state value. Automatically triggers
 ```tsx
 import { store } from "your-nexus-config";
 
-const fullState = store.useNexus(); // entire state
-const count = store.useNexus("count"); // specific state value
+const entireState = store.useNexus();
+const specificValue = store.useNexus("key");
 ```
 
 <br>
@@ -434,7 +432,7 @@ const count = store.useNexus("count"); // specific state value
 
 <details><summary><b><code>useNexusSelector()</code></b></summary><br><ul><div>
 <b>Description:</b><em><br>
-A React hook for creating derived values from the state.<br>
+<code>React</code> hook for creating derived values from the state.<br>
 </em><br>
 <b>Arguments:</b><em><br>
 <ul>
@@ -475,7 +473,7 @@ const total = store.useNexusSelector(
 
 <details><summary><b><code>useUpdate()</code></b></summary><br><ul><div>
 <b>Description:</b><em><br>
-React hook for forcing a component re-render.<br>
+<code>React</code> hook for forcing a component re-render.<br>
 Useful for updating refs or non-reactive values.<br>
 </em><br>
 <b>Example:</b>
@@ -509,7 +507,7 @@ actions.consoleCalling("Some text");
 ```
 
 <br>
-<b>Important:</b><em><br>
+<b>!Important:</b><em><br>
 Arrow functions can be used for actions, but they don’t support calling other actions via <code>this</code>:
 </em><br>
 
