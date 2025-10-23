@@ -49,7 +49,7 @@ import { createStore, createReactStore, createActions } from "nexus-state";
 #### Main:
 
 <ul><div>
-<details><h4><summary><b><code>createStore</code></b></summary></h4><br><ul><div>
+<details><summary><h4><b><code>createStore</code></b></h4></summary><br><ul><div>
 <b>Description:</b><em><br>
 Creates a new framework-agnostic store instance.<br>
 </em><br>
