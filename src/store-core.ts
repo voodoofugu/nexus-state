@@ -11,7 +11,7 @@ type Store<S> = {
   nexusReset(): void;
   nexusSubscribe(
     observer: (state: S) => void,
-    dependencies: (keyof S)[]
+    dependencies: ["*"] | (keyof S)[]
   ): () => void;
   nexusGate(middleware: Middleware<S>): void;
 };
@@ -79,13 +79,15 @@ function createStore<
     observer,
     dependencies
   ) => {
+    if (dependencies.length === 0) {
+      return () => {};
+    }
+
     const wrappedObserver = () => observer(state);
 
-    if (dependencies.length === 0) {
-      // подписка на всё
+    if (dependencies[0] === "*") {
       if (!listeners.has("*")) listeners.set("*", new Set());
       listeners.get("*")!.add(wrappedObserver);
-
       return () => listeners.get("*")?.delete(wrappedObserver);
     }
 

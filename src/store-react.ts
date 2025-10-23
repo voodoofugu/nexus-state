@@ -10,7 +10,7 @@ type ReactStore<S> = Store<S> & {
   };
   useNexusSelector: <R>(
     observer: (state: S) => R,
-    dependencies: (keyof S)[]
+    dependencies: ["*"] | (keyof S)[]
   ) => R;
   useUpdate: () => React.DispatchWithoutAction;
 };

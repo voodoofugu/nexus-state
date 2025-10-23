@@ -54,15 +54,23 @@ type Store<S> = {
    * ### *`nexusSubscribe`*
    * Subscribes to changes of specific keys or entire state.
    * @param observer callback function to be called when the state changes.
-   * @param dependencies array of keys to subscribe to or empty array for entire state.
+   * @param dependencies array of keys for subscription.
    * @returns an unsubscribe function.
    * @example
    * const unsubscribe = store.nexusSubscribe(
+   *   // observer:
    *   (state) => {
    *     console.log("kay changed:", state.kay);
    *   },
-   *   ["kay"] // ! empty dependency array subscribes to all state changes
+   *   // dependencies:
+   *   ["key"]
+   *   // ["key1", "key2"] - listen to specific state changes
+   *   // ["*"] - listen to all state changes
+   *   // [] - no subscription
    * );
+   *
+   * // Unsubscribe
+   * unsubscribe();
    * @link [nexus-state](https://www.npmjs.com/package/nexus-state)
    */
   nexusSubscribe(
@@ -109,15 +117,20 @@ type ReactStore<S> = Store<S> & {
    * ### *`useNexusSelector`*
    * `React` hook for creating derived values from the state.
    * @param observer callback function to be called when the state changes.
-   * @param dependencies array of keys to subscribe to or empty array for entire state.
+   * @param dependencies array of keys for subscription.
    * @returns the derived value.
    * @example
    * const derivedValue = store.useNexusSelector(
+   *   // observer:
    *   (state) => state.key + 1,
-   *   ["key"] // ! empty dependency array subscribes to all state changes
+   *   // dependencies:
+   *   ["key"]
+   *   // ["key1", "key2"] - listen to specific state changes
+   *   // ["*"] - listen to all state changes
+   *   // [] - no subscription
    * );
    *
-   * // If the component re-renders often, wrap the observer function in useCallback
+   * // ! If the component re-renders often, wrap the observer function in useCallback
    * const derivedValue = store.useNexusSelector(
    *   useCallback((state) => state.key + 1, []),
    *   ["key"]
@@ -233,18 +246,23 @@ declare function createReactStore<
  *---
  * ### *`createActions`*
  * Defines a group of actions that have access to the internal `setNexus` function.
- * @param create function that returns an object containing actions methods.
+ * @param create function that receives `setNexus` and has `this` bound to the actions object.
+ * @returns actions object containing all defined methods.
  * @example
  * const myActions = createActions((setNexus) => ({
  *   actionName() {
- *     setNexus({ key: "newValue" });
+ *     setNexus({ key: "newValue" }); // direct state update
+ *     this.anotherAction(); // ! calling another action via "this"
  *   },
+ *   anotherAction() {
+ *     setNexus((prev) => ({ key: prev.key + "!" })); // functional state update
+ *   }
  * }));
  *
  * // Add actions to the ✦store (createStore or createReactStore)
  * const { store, actions } = ✦store({
  *   state: {...},
- *   actions: myActions, // ! multiple actions support: [myActions, myAnotherActions]
+ *   actions: myActions, // ! supports multiple: [myActions, myAnotherActions]
  * });
  * @link [nexus-state](https://www.npmjs.com/package/nexus-state)
  */

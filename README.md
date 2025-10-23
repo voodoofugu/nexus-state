@@ -46,7 +46,7 @@ import { createStore, createReactStore, createActions } from "nexus-state";
 
 ### API
 
-**Main:**
+#### Main:
 
 <ul><div>
 <details><summary><b><code>createStore</code></b></summary><br><ul><div>
@@ -120,8 +120,20 @@ Extends <code>createStore</code> with React-specific hooks.<br>
 import { createReactStore } from "nexus-state";
 
 const { store, actions } = createReactStore({
-  state: {...},
-  actions: (setNexus) => ({...}),
+  state: {
+    count: 0,
+    userCount: 0,
+  },
+
+  actions: (setNexus) => ({
+    increment() {
+      setNexus((prev) => ({ count: prev.count + 1 }));
+      this.consoleCalling("Increment called"); // ! calling another action via "this"
+    },
+    consoleCalling(text) {
+      console.log(text);
+    },
+  }),
 });
 
 export { store, actions };
@@ -155,7 +167,7 @@ Creates a monolithic action factory that is useful for code splitting.<br>
 </em><br>
 <b>Arguments:</b><em><br>
 <ul>
-  <li><code>create</code>: function that returns an object containing actions methods.</li>
+  <li><code>create</code>: function that receives <code>setNexus</code> and has <code>this</code> bound to the actions object.</li>
 </ul>
 </em><br>
 <b>Example:</b>
@@ -164,8 +176,13 @@ Creates a monolithic action factory that is useful for code splitting.<br>
 import { ✦store, createActions } from "nexus-state"; // ✦ createStore or createReactStore
 
 const customActions = createActions((setNexus) => ({
-  increment() {...},
-  consoleCalling(text) {...},
+  increment() {
+    setNexus((prev) => ({ count: prev.count + 1 }));
+    this.consoleCalling("Increment called"); // ! calling another action via "this"
+  },
+  consoleCalling(text) {
+    console.log(text);
+  },
 }));
 
 const { store, actions } = ✦store({
@@ -187,7 +204,8 @@ const customActions = createActions<MyStateT, MyActionsT>((setNexus) => ({...}))
 // Note:
 // use optional chaining (?.) when referencing actions from other createActions scopes.
 const incrementAction = createActions<MyStateT, MyActionsT>(() => ({
-  increment() {
+  increment(setNexus) {
+    // increment logic
     this.consoleCalling?.("Increment called"); // ?.
   },
 }));
@@ -217,7 +235,7 @@ export { myStore1, myActions1 }; // ! renamed
 
 <h2></h2>
 
-**Store:**
+#### Store:
 
 <ul><div>
 
@@ -303,7 +321,7 @@ Subscribes to changes of specific keys or entire state and returns an unsubscrib
 <b>Arguments:</b><em><br>
 <ul>
   <li><code>observer</code>: function to be called when state changes.</li>
-  <li><code>dependencies</code>: array of keys to subscribe to or empty array for entire state.</li>
+  <li><code>dependencies</code>: array of keys for subscription.</li>
 </ul>
 </em><br>
 <b>Example:</b>
@@ -312,10 +330,15 @@ Subscribes to changes of specific keys or entire state and returns an unsubscrib
 import { store } from "your-nexus-config";
 
 const unsubscribe = store.nexusSubscribe(
+  // observer:
   (state) => {
     console.log("count changed:", state.count);
   },
-  ["count"] // ! empty dependency array subscribes to all state changes
+  // dependencies:
+  ["count"]
+  // ["key1", "key2"] - listen to specific state changes
+  // ["*"] - listen to all state changes
+  // [] - no subscription
 );
 
 // Unsubscribe
@@ -437,7 +460,7 @@ const specificValue = store.useNexus("key");
 <b>Arguments:</b><em><br>
 <ul>
   <li><code>observer</code>: function that returns any derived value from the state.</li>
-  <li><code>dependencies</code>: array of keys to subscribe to or empty array for entire state.</li>
+  <li><code>dependencies</code>: array of keys for subscription.</li>
 </ul>
 </em><br>
 <b>Example:</b>
@@ -446,8 +469,13 @@ const specificValue = store.useNexus("key");
 import { store } from "your-nexus-config";
 
 const total = store.useNexusSelector(
-  (state) => state.count + state.userCount, // observer function
-  ["count", "userCount"] // ! empty dependency array subscribes to all state changes
+  // observer:
+  (state) => state.count + state.userCount,
+  // dependencies:
+  ["count", "userCount"]
+  // ["key1", "key2"] - listen to specific state changes
+  // ["*"] - listen to all state changes
+  // [] - no subscription
 );
 ```
 
