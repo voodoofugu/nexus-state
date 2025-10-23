@@ -64,13 +64,15 @@ type Store<S> = {
    *   },
    *   // dependencies:
    *   ["key"]
-   *   // ["key1", "key2"] - listen to specific state changes
-   *   // ["*"] - listen to all state changes
-   *   // [] - no subscription
    * );
    *
    * // Unsubscribe
    * unsubscribe();
+   *
+   * // Dependency options:
+   * // ["key1", "key2"] - listen to specific state changes
+   * // ["*"] - listen to all state changes
+   * // [] - no subscription
    * @link [nexus-state](https://www.npmjs.com/package/nexus-state)
    */
   nexusSubscribe(
@@ -125,9 +127,6 @@ type ReactStore<S> = Store<S> & {
    *   (state) => state.key + 1,
    *   // dependencies:
    *   ["key"]
-   *   // ["key1", "key2"] - listen to specific state changes
-   *   // ["*"] - listen to all state changes
-   *   // [] - no subscription
    * );
    *
    * // ! If the component re-renders often, wrap the observer function in useCallback
@@ -135,6 +134,11 @@ type ReactStore<S> = Store<S> & {
    *   useCallback((state) => state.key + 1, []),
    *   ["key"]
    * );
+   *
+   * // Dependency options:
+   * // ["key1", "key2"] - listen to specific state changes
+   * // ["*"] - listen to all state changes
+   * // [] - no subscription
    * @link [nexus-state](https://www.npmjs.com/package/nexus-state)
    */
   useNexusSelector: <R>(
@@ -252,7 +256,7 @@ declare function createReactStore<
  * const myActions = createActions((setNexus) => ({
  *   actionName() {
  *     setNexus({ key: "newValue" }); // direct state update
- *     this.anotherAction(); // ! calling another action via "this"
+ *     this.anotherAction(); // ! calling another action
  *   },
  *   anotherAction() {
  *     setNexus((prev) => ({ key: prev.key + "!" })); // functional state update
