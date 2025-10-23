@@ -1,8 +1,16 @@
-// store-core.ts
+type RecordAny = Record<string, any>;
+
 type Middleware<S> = (prevState: S, nextState: S) => S | void;
 
 // Тип функции для обновления состояния
 type SetState<S> = (update: Partial<S> | ((prev: S) => Partial<S>)) => void;
+
+type Action<A, S> = (
+  this: A | Partial<A>,
+  setNexus: SetState<S>
+) => A | Partial<A>;
+
+type ActionCreate<A, S> = Action<A, S> | Array<Action<A, S>>;
 
 type Store<S> = {
   getNexus(): S;
@@ -17,13 +25,11 @@ type Store<S> = {
 };
 
 function createStore<
-  S extends Record<string, any> = Record<string, any>,
-  A extends Record<string, any> = Record<string, any>
+  S extends RecordAny = RecordAny,
+  A extends RecordAny = RecordAny
 >(options: {
   state: S;
-  actions?:
-    | ((this: A, set: SetState<S>) => A)
-    | Array<(this: Partial<A>, set: SetState<S>) => Partial<A>>;
+  actions?: ActionCreate<A, S>;
 }): { store: Store<S>; actions: A } {
   const { state: initialState, actions: actionsCreator } = options;
 
@@ -129,7 +135,7 @@ function createStore<
     if (partial && typeof partial === "object") Object.assign(actions, partial);
   }
 
-  // привязываем все функции к итоговому объекту
+  // привязываем все функции к итоговому объекту (bind this)
   for (const key of Object.keys(actions)) {
     const val = (actions as any)[key];
     if (typeof val === "function") (actions as any)[key] = val.bind(actions);
@@ -139,4 +145,4 @@ function createStore<
 }
 
 export default createStore;
-export type { SetState, Store };
+export type { SetState, Store, Action, ActionCreate, RecordAny };

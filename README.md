@@ -204,10 +204,10 @@ type MyActionsT = {...};
 const customActions = createActions<MyStateT, MyActionsT>((setNexus) => ({...}));
 
 // Note:
-// use optional chaining (?.) when calling actions from other scopes.
+// use optional chaining (?) when calling actions from other scopes
 const incrementAction = createActions<MyStateT, MyActionsT>(() => ({
   increment(setNexus) {
-    // increment logic
+    setNexus(...);
     this.consoleCalling?.("Increment called"); // ?.
   },
 }));
@@ -554,9 +554,8 @@ increment() {
 }
 
 // arrow function
-increment: () => {
-  this.consoleCalling("Increment called"); // not working
-}
+increment: () => this.consoleCalling("Increment called") // not working
+// but syntax is shorter
 ```
 
 </div></ul>

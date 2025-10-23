@@ -1,7 +1,7 @@
 import { useSyncExternalStore, useEffect, useRef, useReducer } from "react";
 import createStore from "./store-core";
 
-import type { SetState, Store } from "./store-core";
+import type { Store, ActionCreate, RecordAny } from "./store-core";
 
 type ReactStore<S> = Store<S> & {
   useNexus: {
@@ -16,13 +16,11 @@ type ReactStore<S> = Store<S> & {
 };
 
 function createReactStore<
-  S extends Record<string, any> = Record<string, any>,
-  A extends Record<string, any> = Record<string, any>
+  S extends RecordAny = RecordAny,
+  A extends RecordAny = RecordAny
 >(options: {
   state: S;
-  actions?:
-    | ((this: A, set: SetState<S>) => A)
-    | Array<(this: Partial<A>, set: SetState<S>) => Partial<A>>;
+  actions?: ActionCreate<A, S>;
 }): { store: ReactStore<S>; actions: A } {
   // для принудительного обновления
   const useUpdate = () => {
