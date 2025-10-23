@@ -49,7 +49,7 @@ import { createStore, createReactStore, createActions } from "nexus-state";
 #### Main:
 
 <ul><div>
-<details><summary><h4><b><code>createStore</code></b></h4></summary><br><ul><div>
+<details><summary><h5><b><code>createStore</code></b></h5></summary><br><ul><div>
 <b>Description:</b><em><br>
 Creates a new framework-agnostic store instance.<br>
 </em><br>
@@ -105,7 +105,7 @@ const { store, actions } = createStore<MyStateT, MyActionsT>({...});
 
 <h2></h2>
 
-<details><summary><b><code>createReactStore</code></b></summary><br><ul><div>
+<details><summary><h5><b><code>createReactStore</code></b></h5></summary><br><ul><div>
 <b>Description:</b><em><br>
 Extends <code>createStore</code> with React-specific hooks.<br>
 </em><br>
@@ -161,7 +161,7 @@ const { store, actions } = createReactStore<MyStateT, MyActionsT>({...});
 
 <h2></h2>
 
-<details><summary><b><code>createActions</code></b></summary><br><ul><div>
+<details><summary><h5><b><code>createActions</code></b></h5></summary><br><ul><div>
 <b>Description:</b><em><br>
 Creates a monolithic action factory that is useful for code splitting.<br>
 </em><br>
@@ -239,7 +239,7 @@ export { myStore1, myActions1 }; // ! renamed
 
 <ul><div>
 
-<details><summary><b><code>state</code></b></summary><br><ul><div>
+<details><summary><h5><b><code>state</code></b></h5></summary><br><ul><div>
 
 <b>Description:</b><em><br>
 Required state object.<br>
@@ -248,7 +248,7 @@ Required state object.<br>
 
 <h6><mark>core</mark></h6>
 
-<details><summary><b><code>getNexus()</code></b></summary><br><ul><div>
+<details><summary><h5><b><code>getNexus()</code></b></h5></summary><br><ul><div>
 <b>Description:</b><em><br>
 Returns the entire state or a specific state value.<br>
 </em><br>
@@ -270,7 +270,7 @@ const specificValue = store.getNexus("key");
 
 <h2></h2>
 
-<details><summary><b><code>setNexus()</code></b></summary><br><ul><div>
+<details><summary><h5><b><code>setNexus()</code></b></h5></summary><br><ul><div>
 <b>Description:</b><em><br>
 Updates the state with either a partial object or a functional updater.<br>
 </em><br>
@@ -298,7 +298,7 @@ store.setNexus((prev) => ({
 
 <h2></h2>
 
-<details><summary><b><code>nexusReset()</code></b></summary><br><ul><div>
+<details><summary><h5><b><code>nexusReset()</code></b></h5></summary><br><ul><div>
 <b>Description:</b><em><br>
 Resets state to its initial values.<br>
 </em><br>
@@ -314,7 +314,7 @@ store.nexusReset();
 
 <h2></h2>
 
-<details><summary><b><code>nexusSubscribe()</code></b></summary><br><ul><div>
+<details><summary><h5><b><code>nexusSubscribe()</code></b></h5></summary><br><ul><div>
 <b>Description:</b><em><br>
 Subscribes to changes of specific keys or entire state and returns an unsubscribe function.<br>
 </em><br>
@@ -349,7 +349,7 @@ unsubscribe();
 
 <h2></h2>
 
-<details><summary><b><code>nexusGate()</code></b></summary><br><ul><div>
+<details><summary><h5><b><code>nexusGate()</code></b></h5></summary><br><ul><div>
 <b>Description:</b><em><br>
 Adds a middleware to intercept state changes before updates.<br>
 Useful for logging, debugging, or integrating with developer tools.<br>
@@ -426,7 +426,7 @@ declare global {
 
 <h6><mark>react</mark></h6>
 
-<details><summary><b><code>useNexus()</code></b></summary><br><ul><div>
+<details><summary><h5><b><code>useNexus()</code></b></h5></summary><br><ul><div>
 <b>Description:</b><em><br>
 <code>React</code> hook to subscribe to entire state or a state value.<br>
 </em><br>
@@ -453,7 +453,7 @@ const specificValue = store.useNexus("key");
 
 <h2></h2>
 
-<details><summary><b><code>useNexusSelector()</code></b></summary><br><ul><div>
+<details><summary><h5><b><code>useNexusSelector()</code></b></h5></summary><br><ul><div>
 <b>Description:</b><em><br>
 <code>React</code> hook for creating derived values from the state.<br>
 </em><br>
@@ -499,7 +499,7 @@ const total = store.useNexusSelector(
 
 <h2></h2>
 
-<details><summary><b><code>useUpdate()</code></b></summary><br><ul><div>
+<details><summary><h5><b><code>useUpdate()</code></b></h5></summary><br><ul><div>
 <b>Description:</b><em><br>
 <code>React</code> hook for forcing a component re-render.<br>
 Useful for updating refs or non-reactive values.<br>
@@ -520,7 +520,7 @@ updater(); // force re-render
 
 <h2></h2>
 
-<details><summary><b><code>actions</code></b></summary><br><ul><div>
+<details><summary><h5><b><code>actions</code></b></h5></summary><br><ul><div>
 
 <b>Description:</b><em><br>
 Optional actions object defined during store creation, simplifying state updates.<br>
