@@ -159,7 +159,6 @@ type ReactStore<S> = Store<S> & {
 
 /**---
  * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
- *---
  * ### *`createStore:`*
  * creates a new framework-agnostic store instance.
  * @param options store configuration including entire initial `state` and optional `actions`.
@@ -183,7 +182,28 @@ declare function createStore<
   state: S;
   actions?: ActionCreate<A, S>;
 }): {
+  /**---
+   * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
+   * ### *`store:`*
+   * object containing core methods and custom states.
+   *
+   * Methods:
+   * - `getNexus` — get the entire state or a specific state value
+   * - `setNexus` — update the entire state or a specific state value
+   * - `nexusReset` — reset the entire state
+   * - `nexusSubscribe` — subscribe to changes of specific keys or entire state
+   * - `nexusGate` — add a middleware to intercept state changes
+   * @link [nexus-state](https://www.npmjs.com/package/nexus-state)
+   */
   store: Store<S>;
+  /**---
+   * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
+   * ### *`actions:`*
+   * object containing custom actions.
+   * @example
+   * actions.actionName();
+   * @link [nexus-state](https://www.npmjs.com/package/nexus-state)
+   */
   actions: A;
 };
 
@@ -214,7 +234,35 @@ declare function createReactStore<
   state: S;
   actions?: ActionCreate<A, S>;
 }): {
+  /**---
+   * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
+   * ### *`store:`*
+   * object containing core methods with react specific hooks and custom states.
+   *
+   * Methods:
+   *
+   * **core**
+   * - `getNexus` — get the entire state or a specific state value
+   * - `setNexus` — update the entire state or a specific state value
+   * - `nexusReset` — reset the entire state
+   * - `nexusSubscribe` — subscribe to changes of specific keys or entire state
+   * - `nexusGate` — add a middleware to intercept state changes
+   *
+   * **react** ( hooks for rendering and UI updates )
+   * - `useNexus` — get the entire state or a specific state value
+   * - `useUpdate` — force re-render
+   * - `useSubscribe` — subscribe to changes of specific keys or entire state
+   * @link [nexus-state](https://www.npmjs.com/package/nexus-state)
+   */
   store: ReactStore<S>;
+  /**---
+   * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
+   * ### *`actions:`*
+   * object containing custom actions.
+   * @example
+   * actions.actionName();
+   * @link [nexus-state](https://www.npmjs.com/package/nexus-state)
+   */
   actions: A;
 };
 
