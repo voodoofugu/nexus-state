@@ -183,7 +183,7 @@ declare function createStore<
   state: S;
   actions?: ActionCreate<A, S>;
 }): {
-  state: Store<S>;
+  store: Store<S>;
   actions: A;
 };
 
@@ -214,7 +214,7 @@ declare function createReactStore<
   state: S;
   actions?: ActionCreate<A, S>;
 }): {
-  state: ReactStore<S>;
+  store: ReactStore<S>;
   actions: A;
 };
 
@@ -271,7 +271,7 @@ declare const nexus: {
     state: S;
     actions?: ActionCreate<A, S>;
   }) => {
-    state: Store<S>;
+    store: Store<S>;
     actions: A;
   };
   /** More information in import { createReactStore } */
@@ -282,7 +282,7 @@ declare const nexus: {
     state: S;
     actions?: ActionCreate<A, S>;
   }) => {
-    state: ReactStore<S>;
+    store: ReactStore<S>;
     actions: A;
   };
   /** More information in import { createActions } */
