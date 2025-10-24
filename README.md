@@ -8,6 +8,8 @@
 - [Installation](#installation)
 - [Configuration](#configuration)
 - [API](#api)
+  - [Main](#main)
+  - [Store](#store)
 - [License](#license)
 
 <h2></h2>
@@ -65,13 +67,13 @@ import { createStore } from "nexus-state";
 
 const { store, actions } = createStore({
   state: {
-    count: 0,
-    userCount: 0,
+    count1: 0,
+    count2: 0,
   },
 
   actions: (setNexus) => ({
     increment() {
-      setNexus((prev) => ({ count: prev.count + 1 }));
+      setNexus((state) => ({ count1: state.count1 + 1 }));
       this.consoleCalling("Increment called"); // ! calling another action
     },
     consoleCalling(text) {
@@ -81,14 +83,16 @@ const { store, actions } = createStore({
 });
 
 export { store, actions };
+
+// more about "setNexus" in API/Store/state/setNexus
 ```
 
 <details><summary><b>TypeScript Snippet:</b></summary>
 
 ```ts
 type MyStateT = {
-  count: number;
-  userCount: number;
+  count1: number;
+  count2: number;
 };
 
 type MyActionsT = {
@@ -121,13 +125,13 @@ import { createReactStore } from "nexus-state";
 
 const { store, actions } = createReactStore({
   state: {
-    count: 0,
-    userCount: 0,
+    count1: 0,
+    count2: 0,
   },
 
   actions: (setNexus) => ({
     increment() {
-      setNexus((prev) => ({ count: prev.count + 1 }));
+      setNexus((state) => ({ count1: state.count1 + 1 }));
       this.consoleCalling("Increment called"); // ! calling another action
     },
     consoleCalling(text) {
@@ -137,14 +141,16 @@ const { store, actions } = createReactStore({
 });
 
 export { store, actions };
+
+// more about "setNexus" in API/Store/state/setNexus
 ```
 
 <details><summary><b>TypeScript Snippet:</b></summary>
 
 ```ts
 type MyStateT = {
-  count: number;
-  userCount: number;
+  count1: number;
+  count2: number;
 };
 
 type MyActionsT = {
@@ -177,7 +183,7 @@ import { ✦store, createActions } from "nexus-state";
 
 const customActions = createActions((setNexus) => ({
   increment() {
-    setNexus((prev) => ({ count: prev.count + 1 }));
+    setNexus((state) => ({ count1: state.count1 + 1 }));
     this.consoleCalling("Increment called"); // ! calling another action
   },
   consoleCalling(text) {
@@ -185,6 +191,7 @@ const customActions = createActions((setNexus) => ({
   },
 }));
 
+// Usage:
 const { store, actions } = ✦store({
   state: {...},
   actions: customActions, // ! supports multiple: [myActions, myAnotherActions]
@@ -193,6 +200,7 @@ const { store, actions } = ✦store({
 export { store, actions };
 
 // ✦store - createStore or createReactStore
+// more about "setNexus" in API/Store/state/setNexus
 ```
 
 <details><summary><b>TypeScript Snippet:</b></summary>
@@ -203,8 +211,8 @@ type MyActionsT = {...};
 
 const customActions = createActions<MyStateT, MyActionsT>((setNexus) => ({...}));
 
-// Note:
-// use optional chaining (?) when calling actions from other scopes
+// ✦ Note:
+// use optional chaining (?) when calling other actions via "this"
 const incrementAction = createActions<MyStateT, MyActionsT>(() => ({
   increment(setNexus) {
     setNexus(...);
@@ -222,7 +230,7 @@ const incrementAction = createActions<MyStateT, MyActionsT>(() => ({
 <h2></h2>
 
 <details><summary>Recommendations:</summary><br><ul><div>
-If you want to use multiple stores in a single file, or if you want to simply rename an store, use the following syntax:
+For multiple stores or renaming a store, use:
 </em><br>
 
 ```js
@@ -289,12 +297,12 @@ Updates the state with either a partial object or a functional updater.<br>
 import { store } from "your-nexus-config";
 
 // Direct update:
-store.setNexus({ count: 5 });
-store.setNexus({ count: 5, userCount: 10 }); // multiple updates
+store.setNexus({ count1: 5 });
+store.setNexus({ count1: 5, count2: 10 }); // multiple
 
 // Functional update:
-store.setNexus((prev) => ({
-  count: prev.count + 1,
+store.setNexus((state) => ({
+  count1: state.count1 + 1,
 }));
 ```
 
@@ -336,10 +344,10 @@ import { store } from "your-nexus-config";
 const unsubscribe = store.nexusSubscribe(
   // observer:
   (state) => {
-    console.log("count changed:", state.count);
+    console.log("count1 changed:", state.count1);
   },
   // dependencies:
-  ["count"]
+  ["count1"]
 );
 
 // Unsubscribe
@@ -371,12 +379,12 @@ Useful for logging, debugging, or integrating with developer tools.<br>
 import { store } from "your-nexus-config";
 
 // Example: logging state changes
-store.nexusGate((prev, next) => {
-  console.log("State changing from", prev, "to", next);
+store.nexusGate((state, next) => {
+  console.log("State changing from", state, "to", next);
 });
 
 // Example: modifying next state before applying
-store.nexusGate((prev, next) => {
+store.nexusGate((state, next) => {
   return { ...next, forced: true };
 });
 ```
@@ -476,9 +484,9 @@ import { store } from "your-nexus-config";
 
 const total = store.useNexusSelector(
   // observer:
-  (state) => state.count + state.userCount,
+  (state) => state.count1 + state.count2,
   // dependencies:
-  ["count", "userCount"]
+  ["count1", "count2"]
 );
 
 // Dependency options:
@@ -489,7 +497,7 @@ const total = store.useNexusSelector(
 
 <br>
 <b>Optimization:</b><em><br>
-If the component re-renders often, wrap the observer function in <code>useCallback</code>:
+Use <code>useCallback</code> in frequently re-rendered components to avoid unnecessary subscriptions:
 </em><br>
 
 ```tsx
@@ -497,9 +505,8 @@ import { useCallback } from "react";
 import { store } from "your-nexus-config";
 
 const total = store.useNexusSelector(
-  // ! "useCallback" avoid unnecessary subscriptions
-  useCallback((state) => state.count + state.userCount, []),
-  ["count", "userCount"]
+  useCallback((state) => state.count1 + state.count2, []),
+  ["count1", "count2"]
 );
 ```
 
@@ -531,7 +538,7 @@ updater(); // force re-render
 <details><summary><b><code>actions</code></b></summary><br><ul><div>
 
 <b>Description:</b><em><br>
-Optional actions object defined during store creation, simplifying state updates.<br>
+Optional actions object defined during store creation.<br>
 </em><br>
 <b>Usage Example:</b>
 
@@ -550,13 +557,15 @@ Arrow functions can be used for actions, but they don’t support calling other 
 ```js
 // regular function
 increment() {
-  this.consoleCalling("Increment called"); // working
+  this.consoleCalling("Increment called"); // "this" is working
 }
 
 // arrow function
-increment: () => this.consoleCalling("Increment called") // not working
-// but syntax is shorter
+increment: () => this.consoleCalling("Increment called") // "this" is't working
+// but syntax is compacter
 ```
+
+More info: [Arrow Functions](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions)
 
 </div></ul>
 </details>

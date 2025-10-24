@@ -1,9 +1,9 @@
 type RecordAny = Record<string, any>;
 
-type Middleware<S> = (prevState: S, nextState: S) => S | void;
+type Middleware<S> = (prevState: S, nextState: S) => void | S;
 
 // Тип функции для обновления состояния
-type SetState<S> = (update: Partial<S> | ((prev: S) => Partial<S>)) => void;
+type SetState<S> = (update: Partial<S> | ((state: S) => Partial<S>)) => void;
 
 type Action<A, S> = (
   this: A | Partial<A>,
