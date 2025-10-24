@@ -11,9 +11,8 @@ type ActionCreate<A, S> = Action<A, S> | Array<Action<A, S>>;
 type Store<S> = {
   /**---
    * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
-   *---
-   * ### *`getNexus`*
-   * Updates the state with either a partial object or a functional updater.
+   * ### *`getNexus:`*
+   * updates the state with either a partial object or a functional updater.
    * @param key optional state name.
    * @example
    * const entireState = store.getNexus();
@@ -25,9 +24,8 @@ type Store<S> = {
 
   /**---
    * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
-   *---
-   * ### *`setNexus`*
-   * Updates the state with a partial object or functional updater.
+   * ### *`setNexus:`*
+   * updates the state with a partial object or functional updater.
    * @param update partial object or function with access to all states.
    * @example
    * // Using a partial object
@@ -44,9 +42,8 @@ type Store<S> = {
 
   /**---
    * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
-   *---
-   * ### *`nexusReset`*
-   * Resets state to its initial values.
+   * ### *`nexusReset:`*
+   * resets state to its initial values.
    * @example
    * store.nexusReset();
    * @link [nexus-state](https://www.npmjs.com/package/nexus-state)
@@ -55,9 +52,8 @@ type Store<S> = {
 
   /**---
    * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
-   *---
-   * ### *`nexusSubscribe`*
-   * Subscribes to changes of specific keys or entire state.
+   * ### *`nexusSubscribe:`*
+   * subscribes to changes of specific keys or entire state.
    * @param observer callback function to be called when the state changes.
    * @param dependencies array of keys for subscription.
    * @returns an unsubscribe function.
@@ -87,9 +83,8 @@ type Store<S> = {
 
   /**---
    * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
-   *---
-   * ### *`nexusGate`*
-   * Adds a middleware to intercept state changes before updates.
+   * ### *`nexusGate:`*
+   * adds a middleware to intercept state changes before updates.
    * @param middleware function receiving previous and next state.
    * @example
    * store.nexusGate((prevState, nextState) => {
@@ -104,9 +99,8 @@ type Store<S> = {
 type ReactStore<S> = Store<S> & {
   /**---
    * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
-   *---
-   * ### *`useNexus`*
-   * `React` hook to subscribe to entire state or a state value.
+   * ### *`useNexus:`*
+   * `react` hook to subscribe to entire state or a state value.
    * @param key optional state name.
    * @example
    * const entireState = store.useNexus();
@@ -120,9 +114,8 @@ type ReactStore<S> = Store<S> & {
 
   /**---
    * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
-   *---
-   * ### *`useNexusSelector`*
-   * `React` hook for creating derived values from the state.
+   * ### *`useNexusSelector:`*
+   * `react` hook for creating derived values from the state.
    * @param observer callback function to be called when the state changes.
    * @param dependencies array of keys for subscription.
    * @returns the derived value.
@@ -153,11 +146,11 @@ type ReactStore<S> = Store<S> & {
 
   /**---
    * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
-   *---
-   * `React` hook for forcing a component re-render.
+   * ### *`useUpdate:`*
+   * `react` hook for forcing a component re-render.
    * @example
    * const update = store.useUpdate();
-   * // Call update() to force re-render
+   * // call update() to force re-render
    */
   useUpdate: () => React.DispatchWithoutAction;
 };
@@ -167,8 +160,8 @@ type ReactStore<S> = Store<S> & {
 /**---
  * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
  *---
- * ### *`createStore`*
- * Creates a new framework-agnostic store instance.
+ * ### *`createStore:`*
+ * creates a new framework-agnostic store instance.
  * @param options store configuration including entire initial `state` and optional `actions`.
  * @returns store instance with methods and actions.
  * @example
@@ -198,9 +191,8 @@ declare function createStore<
 
 /**---
  * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
- *---
- * ### *`createReactStore`*
- * Creates an extended store with React bindings and hooks.
+ * ### *`createReactStore:`*
+ * creates an extended store with React bindings and hooks.
  * @param options Store configuration including entire initial `state` and optional `actions`.
  * @returns store instance with React Hooks, `createStore` methods and actions.
  * @example
@@ -230,9 +222,8 @@ declare function createReactStore<
 
 /**---
  * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
- *---
- * ### *`createActions`*
- * Defines a group of actions that have access to the internal `setNexus` function.
+ * ### *`createActions:`*
+ * defines a group of actions that have access to the internal `setNexus` function.
  * @param create function that receives `setNexus` and has `this` bound to the actions object.
  * @returns actions object containing all defined methods.
  * @example
@@ -246,8 +237,8 @@ declare function createReactStore<
  *   }
  * }));
  *
- * // Add actions to the ✦store (createStore or createReactStore)
- * const { store, actions } = ✦store({
+ * // Usage:
+ * const { store, actions } = ✦store({ // ✦ createStore or createReactStore
  *   state: {...},
  *   actions: myActions, // ! supports multiple: [myActions, myAnotherActions]
  * });
@@ -262,9 +253,8 @@ declare function createActions<
 
 /**---
  * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
- *---
- * ### *`nexus`*
- * The entire library exported as a single default object.
+ * ### *`nexus:`*
+ * the entire library exported as a single default object.
  *
  * Provides access to the main API functions:
  * - {@link createStore}
