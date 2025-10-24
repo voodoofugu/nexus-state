@@ -8,8 +8,6 @@
 - [Installation](#installation)
 - [Configuration](#configuration)
 - [API](#api)
-  - [Main](#main)
-  - [Store](#store)
 - [License](#license)
 
 <h2></h2>
@@ -288,7 +286,7 @@ Updates the state with either a partial object or a functional updater.<br>
 </em><br>
 <b>Arguments:</b><em><br>
 <ul>
-  <li><code>update</code>: partial object or function with the previous state.</li>
+  <li><code>update</code>: partial object or function with access to all states.</li>
 </ul>
 </em><br>
 <b>Example:</b>

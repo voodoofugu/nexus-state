@@ -28,7 +28,7 @@ type Store<S> = {
    *---
    * ### *`setNexus`*
    * Updates the state with a partial object or functional updater.
-   * @param update partial object or function with the previous state.
+   * @param update partial object or function with access to all states.
    * @example
    * // Using a partial object
    * store.setNexus({ key: newValue });
