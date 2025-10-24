@@ -8,7 +8,8 @@
   "type": "module",
   "scripts": {
     "build": "rollup -c",
-    "publish": "cp README.md publish/ && cd publish && npm publish",
+    "filesTransfer": "cp README.md publish/ && cp dist/cjs/index.js publish/cjs/ && cp dist/esm/index.js publish/esm/",
+    "publish": "cd publish && npm publish",
     "lint": "eslint src"
   },
   "devDependencies": {
