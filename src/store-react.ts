@@ -12,7 +12,7 @@ type ReactStore<S> = Store<S> & {
     observer: (state: S) => R,
     dependencies: ["*"] | (keyof S)[]
   ) => R;
-  useUpdate: () => React.DispatchWithoutAction;
+  useNexusUpdate: () => React.DispatchWithoutAction;
 };
 
 function createReactStore<
@@ -23,7 +23,7 @@ function createReactStore<
   actions?: ActionCreate<A, S>;
 }): { store: ReactStore<S>; actions: A } {
   // для принудительного обновления
-  const useUpdate = () => {
+  const useNexusUpdate = () => {
     const [, forceUpdate] = useReducer(() => ({}), {});
     return forceUpdate;
   };
@@ -45,7 +45,7 @@ function createReactStore<
     observer: (state: S) => R,
     dependencies: (keyof S)[]
   ) {
-    const updater = useUpdate();
+    const updater = useNexusUpdate();
     const lastSelected = useRef<R>(observer(store.getNexus()));
 
     useEffect(() => {
@@ -71,7 +71,7 @@ function createReactStore<
     store: {
       ...store,
       useNexus,
-      useUpdate,
+      useNexusUpdate,
       useNexusSelector,
     },
     actions: actionsLocal,

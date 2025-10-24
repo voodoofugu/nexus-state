@@ -512,7 +512,7 @@ const total = store.useNexusSelector(
 
 <h2></h2>
 
-<details><summary><b><code>useUpdate()</code></b></summary><br><ul><div>
+<details><summary><b><code>useNexusUpdate()</code></b></summary><br><ul><div>
 <b>Description:</b><em><br>
 <code>React</code> hook for forcing a component re-render.<br>
 Useful for updating refs or non-reactive values.<br>
@@ -522,7 +522,7 @@ Useful for updating refs or non-reactive values.<br>
 ```tsx
 import { store } from "your-nexus-config";
 
-const updater = store.useUpdate();
+const updater = store.useNexusUpdate();
 updater(); // force re-render
 ```
 

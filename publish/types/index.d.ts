@@ -17,7 +17,7 @@ type Store<S> = {
    * @example
    * const entireState = store.getNexus();
    * const specificValue = store.getNexus("key");
-   * @link [nexus-state](https://www.npmjs.com/package/nexus-state)
+   * @see [nexus-state](https://www.npmjs.com/package/nexus-state)
    */
   getNexus(): S;
   getNexus<K extends keyof S>(key: K): S[K];
@@ -36,7 +36,7 @@ type Store<S> = {
    * store.setNexus((prevState) => ({
    *   key: prevState.key + 1
    * }));
-   * @link [nexus-state](https://www.npmjs.com/package/nexus-state)
+   * @see [nexus-state](https://www.npmjs.com/package/nexus-state)
    */
   setNexus(update: Partial<S> | ((state: S) => Partial<S>)): void;
 
@@ -46,7 +46,7 @@ type Store<S> = {
    * resets state to its initial values.
    * @example
    * store.nexusReset();
-   * @link [nexus-state](https://www.npmjs.com/package/nexus-state)
+   * @see [nexus-state](https://www.npmjs.com/package/nexus-state)
    */
   nexusReset(): void;
 
@@ -74,7 +74,7 @@ type Store<S> = {
    * // ["key1", "key2"] - listen to specific state changes
    * // ["*"] - listen to all state changes
    * // [] - no subscription
-   * @link [nexus-state](https://www.npmjs.com/package/nexus-state)
+   * @see [nexus-state](https://www.npmjs.com/package/nexus-state)
    */
   nexusSubscribe(
     observer: (state: S) => void,
@@ -91,7 +91,7 @@ type Store<S> = {
    *   // You can modify nextState, perform side effects or return modified state
    *   return nextState;
    * });
-   * @link [nexus-state](https://www.npmjs.com/package/nexus-state)
+   * @see [nexus-state](https://www.npmjs.com/package/nexus-state)
    */
   nexusGate(middleware: (prevState: S, nextState: S) => void | S): void;
 };
@@ -105,7 +105,7 @@ type ReactStore<S> = Store<S> & {
    * @example
    * const entireState = store.useNexus();
    * const specificValue = store.useNexus("key");
-   * @link [nexus-state](https://www.npmjs.com/package/nexus-state)
+   * @see [nexus-state](https://www.npmjs.com/package/nexus-state)
    */
   useNexus: {
     (): S;
@@ -137,7 +137,7 @@ type ReactStore<S> = Store<S> & {
    * // ["key1", "key2"] - listen to specific state changes
    * // ["*"] - listen to all state changes
    * // [] - no subscription
-   * @link [nexus-state](https://www.npmjs.com/package/nexus-state)
+   * @see [nexus-state](https://www.npmjs.com/package/nexus-state)
    */
   useNexusSelector: <R>(
     observer: (state: S) => R,
@@ -146,13 +146,13 @@ type ReactStore<S> = Store<S> & {
 
   /**---
    * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
-   * ### *`useUpdate:`*
+   * ### *`useNexusUpdate:`*
    * `react` hook for forcing a component re-render.
    * @example
-   * const update = store.useUpdate();
+   * const update = store.useNexusUpdate();
    * // call update() to force re-render
    */
-  useUpdate: () => React.DispatchWithoutAction;
+  useNexusUpdate: () => React.DispatchWithoutAction;
 };
 
 // ------ CORE ------
@@ -173,7 +173,7 @@ type ReactStore<S> = Store<S> & {
  *     actionName() { setNexus({ key: "newValue" }); }
  *   })
  * })
- * @link [nexus-state](https://www.npmjs.com/package/nexus-state)
+ * @see [nexus-state](https://www.npmjs.com/package/nexus-state)
  */
 declare function createStore<
   S extends RecordAny = RecordAny,
@@ -193,7 +193,7 @@ declare function createStore<
    * - `nexusReset` — reset the entire state
    * - `nexusSubscribe` — subscribe to changes of specific keys or entire state
    * - `nexusGate` — add a middleware to intercept state changes
-   * @link [nexus-state](https://www.npmjs.com/package/nexus-state)
+   * @see [nexus-state](https://www.npmjs.com/package/nexus-state)
    */
   store: Store<S>;
   /**---
@@ -202,7 +202,7 @@ declare function createStore<
    * object containing custom actions.
    * @example
    * actions.actionName();
-   * @link [nexus-state](https://www.npmjs.com/package/nexus-state)
+   * @see [nexus-state](https://www.npmjs.com/package/nexus-state)
    */
   actions: A;
 };
@@ -225,7 +225,7 @@ declare function createStore<
  *     actionName() { setNexus({ key: "newValue" }); }
  *   })
  * })
- * @link [nexus-state](https://www.npmjs.com/package/nexus-state)
+ * @see [nexus-state](https://www.npmjs.com/package/nexus-state)
  */
 declare function createReactStore<
   S extends RecordAny = RecordAny,
@@ -250,9 +250,9 @@ declare function createReactStore<
    *
    * **react** ( hooks for rendering and UI updates )
    * - `useNexus` — get the entire state or a specific state value
-   * - `useUpdate` — force re-render
-   * - `useSubscribe` — subscribe to changes of specific keys or entire state
-   * @link [nexus-state](https://www.npmjs.com/package/nexus-state)
+   * - `useNexusUpdate` — force re-render
+   * - `useNexusSelector` — subscribe to changes of specific keys or entire state
+   * @see [nexus-state](https://www.npmjs.com/package/nexus-state)
    */
   store: ReactStore<S>;
   /**---
@@ -261,7 +261,7 @@ declare function createReactStore<
    * object containing custom actions.
    * @example
    * actions.actionName();
-   * @link [nexus-state](https://www.npmjs.com/package/nexus-state)
+   * @see [nexus-state](https://www.npmjs.com/package/nexus-state)
    */
   actions: A;
 };
@@ -290,7 +290,7 @@ declare function createReactStore<
  *   state: {...},
  *   actions: myActions, // ! supports multiple: [myActions, myAnotherActions]
  * });
- * @link [nexus-state](https://www.npmjs.com/package/nexus-state)
+ * @see [nexus-state](https://www.npmjs.com/package/nexus-state)
  */
 declare function createActions<
   S extends RecordAny,
@@ -305,10 +305,10 @@ declare function createActions<
  * the entire library exported as a single default object.
  *
  * Provides access to the main API functions:
- * - {@link createStore}
- * - {@link createReactStore}
- * - {@link createActions}
- * @link [nexus-state](https://www.npmjs.com/package/nexus-state)
+ * - {@see createStore}
+ * - {@see createReactStore}
+ * - {@see createActions}
+ * @see [nexus-state](https://www.npmjs.com/package/nexus-state)
  */
 declare const nexus: {
   /** More information in import { createStore } */
