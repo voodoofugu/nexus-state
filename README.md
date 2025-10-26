@@ -8,8 +8,8 @@
 - [Installation](#installation)
 - [Configuration](#configuration)
 - [API](#api)
-  - [Main](#main)
-  - [Store](#store)
+  - [main](#main)
+  - [nexus](#nexus)
 - [License](#license)
 
 <h2></h2>
@@ -48,7 +48,7 @@ import { createNexus, createReactNexus, createActs } from "nexus-state";
 
 ### API
 
-#### Main:
+#### main:
 
 <ul><div>
 <details><summary><b><code>createNexus</code></b></summary><br><ul><div>
@@ -65,7 +65,7 @@ creates a new framework-agnostic store instance.<br>
 ```js
 import { createNexus } from "nexus-state";
 
-const store = createNexus({
+const nexus = createNexus({
   state: {
     count1: 0,
     count2: 0,
@@ -82,7 +82,7 @@ const store = createNexus({
   }),
 });
 
-export default store;
+export default nexus;
 ```
 
 <details><summary><b>TypeScript Snippet:</b></summary>
@@ -98,7 +98,7 @@ type MyActionsT = {
   consoleCalling: (text: string) => void;
 };
 
-const store = createNexus<MyStateT, MyActionsT>({...});
+const nexus = createNexus<MyStateT, MyActionsT>({...});
 ```
 
 </details>
@@ -121,7 +121,7 @@ extends <code>createNexus</code> with React-specific hooks.<br>
 ```js
 import { createReactNexus } from "nexus-state";
 
-const store = createReactNexus({
+const nexus = createReactNexus({
   state: {
     count1: 0,
     count2: 0,
@@ -138,7 +138,7 @@ const store = createReactNexus({
   }),
 });
 
-export default store;
+export default nexus;
 ```
 
 <details><summary><b>TypeScript Snippet:</b></summary>
@@ -154,7 +154,7 @@ type MyActionsT = {
   consoleCalling: (text: string) => void;
 };
 
-const store = createReactNexus<MyStateT, MyActionsT>({...});
+const nexus = createReactNexus<MyStateT, MyActionsT>({...});
 ```
 
 </details>
@@ -188,15 +188,14 @@ const customActions = createActs((get, set) => ({
 }));
 
 // Usage:
-const store = ✦create({
+const nexus = ✦create({
   state: {...},
-  actions: customActions, // ! supports multiple: [myActions, myAnotherActions]
+  acts: customActions, // ! supports multiple: [myActions, myAnotherActions]
 });
 
-export default store;
+export default nexus;
 
 // ✦create - createNexus or createReactNexus
-// more about "set" in API/Store/state/set
 ```
 
 <details><summary><b>TypeScript Snippet:</b></summary>
@@ -211,7 +210,7 @@ const customActions = createActs<MyStateT, MyActionsT>(...);
 // use optional chaining (?) when calling other actions via "this"
 const incrementAction = createActs<MyStateT, MyActionsT>(() => ({
   increment() {
-    this.consoleCalling?.("Increment called"); // ?.
+    this.getState?.("count1"); // ?.
   },
 }));
 ```
@@ -225,15 +224,15 @@ const incrementAction = createActs<MyStateT, MyActionsT>(() => ({
 <h2></h2>
 
 <details><summary>Recommendations:</summary><br><ul><div>
-The store name is arbitrary, which can be helpful when working with multiple store instances:
+The nexus name is arbitrary, which can be helpful when working with multiple nexus instances:
 </em><br>
 
 ```js
 import { ✦create } from "nexus-state";
 
-const myNamedStore = ✦create({...});
+const nexus1 = ✦create({...});
 
-export default myNamedStore; // ! renamed
+export default nexus1; // ! renamed
 
 // ✦create - createNexus or createReactNexus
 ```
@@ -242,7 +241,7 @@ export default myNamedStore; // ! renamed
 
 <h2></h2>
 
-#### Store:
+#### nexus:
 
 <ul><div>
 
@@ -260,10 +259,10 @@ returns the entire state or a specific state value.<br>
 <b>Example:</b>
 
 ```tsx
-import store from "your-nexus-config";
+import nexus from "your-nexus-config";
 
-const entireState = store.get();
-const specificValue = store.get("key");
+const entireState = nexus.get();
+const specificValue = nexus.get("key");
 ```
 
 </div></ul></details>
@@ -282,14 +281,14 @@ updates the state with a partial object or functional updater.<br>
 <b>Example:</b>
 
 ```tsx
-import store from "your-nexus-config";
+import nexus from "your-nexus-config";
 
 // Direct update:
-store.set({ count1: 5 });
-store.set({ count1: 5, count2: 10 }); // multiple
+nexus.set({ count1: 5 });
+nexus.set({ count1: 5, count2: 10 }); // multiple
 
 // Functional update:
-store.set((state) => ({
+nexus.set((state) => ({
   count1: state.count1 + 1,
 }));
 ```
@@ -305,9 +304,9 @@ resets state to its initial values.<br>
 <b>Example:</b>
 
 ```tsx
-import store from "your-nexus-config";
+import nexus from "your-nexus-config";
 
-store.reset();
+nexus.reset();
 ```
 
 </div></ul></details>
@@ -327,9 +326,9 @@ subscribes to changes of specific keys or entire state and returns an unsubscrib
 <b>Example:</b>
 
 ```tsx
-import store from "your-nexus-config";
+import nexus from "your-nexus-config";
 
-const unsubscribe = store.subscribe(
+const unsubscribe = nexus.subscribe(
   // observer:
   (state) => {
     console.log("count1 changed:", state.count1);
@@ -359,37 +358,37 @@ Useful for logging, debugging, or integrating with developer tools.<br>
 <b>Example:</b><br>
 
 ```jsx
-import store from "your-nexus-config";
+import nexus from "your-nexus-config";
 
 // Example: logging state changes
-store.middleware((state, next) => {
+nexus.middleware((state, next) => {
   console.log("State changing from", state, "to", next);
 });
 
 // Example: modifying next state before applying
-store.middleware((state, next) => {
+nexus.middleware((state, next) => {
   return { ...next, forced: true };
 });
 ```
 
 <details><summary><b>Redux DevTools Integration</b></summary><br><ul><div>
 <b>Description:</b><em><br>
-you can connect your store to Redux DevTools for time-travel debugging and state inspection.<br>
+you can connect your nexus to Redux DevTools for time-travel debugging and state inspection.<br>
 </em><br>
 <b>Example:</b><br>
 
 ```tsx
-import store from "your-nexus-config";
+import nexus from "your-nexus-config";
 
 // Setup Redux DevTools connection
 const devtools = window.__REDUX_DEVTOOLS_EXTENSION__?.connect({
   name: "MyStore",
 });
 
-devtools?.init(store.get());
+devtools?.init(nexus.get());
 
 // Register middleware to send state updates to DevTools
-store.middleware((_, next) => {
+nexus.middleware((_, next) => {
   devtools?.send?.({ type: "UPDATE" }, next);
 });
 ```
@@ -429,10 +428,10 @@ object containing custom actions.<br>
 <b>Usage Example:</b>
 
 ```tsx
-import store from "your-nexus-config";
+import nexus from "your-nexus-config";
 
-store.acts.increment();
-store.acts.consoleCalling("Some text");
+nexus.acts.increment();
+nexus.acts.consoleCalling("Some text");
 ```
 
 <br>
@@ -471,10 +470,10 @@ More info: [Arrow Functions](https://developer.mozilla.org/en-US/docs/Web/JavaSc
 <b>Example:</b>
 
 ```tsx
-import store from "your-nexus-config";
+import nexus from "your-nexus-config";
 
-const entireState = store.use();
-const specificValue = store.use("key");
+const entireState = nexus.use();
+const specificValue = nexus.use("key");
 ```
 
 <br>
@@ -499,9 +498,9 @@ const specificValue = store.use("key");
 <b>Example:</b>
 
 ```tsx
-import store from "your-nexus-config";
+import nexus from "your-nexus-config";
 
-const total = store.useSelector(
+const total = nexus.useSelector(
   // observer:
   (state) => state.count1 + state.count2,
   // dependencies:
@@ -516,9 +515,9 @@ use <code>useCallback</code> in frequently re-rendered components to avoid unnec
 
 ```tsx
 import { useCallback } from "react";
-import store from "your-nexus-config";
+import nexus from "your-nexus-config";
 
-const total = store.useSelector(
+const total = nexus.useSelector(
   useCallback((state) => state.count1 + state.count2, []),
   ["count1", "count2"]
 );
@@ -536,9 +535,9 @@ Useful for updating refs or non-reactive values.<br>
 <b>Example:</b>
 
 ```tsx
-import store from "your-nexus-config";
+import nexus from "your-nexus-config";
 
-const updater = store.useRerender();
+const updater = nexus.useRerender();
 updater(); // force re-render
 ```
 
