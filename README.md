@@ -8,6 +8,8 @@
 - [Installation](#installation)
 - [Configuration](#configuration)
 - [API](#api)
+  - [Main](#main)
+  - [Store](#store)
 - [License](#license)
 
 <h2></h2>
@@ -69,20 +71,18 @@ const store = createStore({
     count2: 0,
   },
 
-  actions: (setNexus) => ({
+  actions: (getNexus, setNexus) => ({
     increment() {
       setNexus((state) => ({ count1: state.count1 + 1 }));
-      this.consoleCalling("Increment called"); // ! calling another action
+      this.getState("count1"); // ! calling another action
     },
-    consoleCalling(text) {
-      console.log(text);
+    getState(value) {
+      console.log(`${value}:`, getNexus(value));
     },
   }),
 });
 
 export default store;
-
-// more about "setNexus" in API/Store/state/setNexus
 ```
 
 <details><summary><b>TypeScript Snippet:</b></summary>
@@ -127,20 +127,18 @@ const store = createReactStore({
     count2: 0,
   },
 
-  actions: (setNexus) => ({
+  actions: (getNexus, setNexus) => ({
     increment() {
       setNexus((state) => ({ count1: state.count1 + 1 }));
-      this.consoleCalling("Increment called"); // ! calling another action
+      this.getState("count1"); // ! calling another action
     },
-    consoleCalling(text) {
-      console.log(text);
+    getState(value) {
+      console.log(`${value}:`, getNexus(value));
     },
   }),
 });
 
 export default store;
-
-// more about "setNexus" in API/Store/state/setNexus
 ```
 
 <details><summary><b>TypeScript Snippet:</b></summary>
@@ -179,13 +177,13 @@ creates a monolithic action factory that is useful for code splitting.<br>
 ```js
 import { ✦create, createActions } from "nexus-state";
 
-const customActions = createActions((setNexus) => ({
+const customActions = createActions((getNexus, setNexus) => ({
   increment() {
     setNexus((state) => ({ count1: state.count1 + 1 }));
-    this.consoleCalling("Increment called"); // ! calling another action
+    this.getState("count1"); // ! calling another action
   },
-  consoleCalling(text) {
-    console.log(text);
+  getState(value) {
+    console.log(`${value}:`, getNexus(value));
   },
 }));
 
@@ -207,13 +205,12 @@ export default store;
 type MyStateT = {...};
 type MyActionsT = {...};
 
-const customActions = createActions<MyStateT, MyActionsT>((setNexus) => ({...}));
+const customActions = createActions<MyStateT, MyActionsT>(...);
 
 // ✦ Note:
 // use optional chaining (?) when calling other actions via "this"
 const incrementAction = createActions<MyStateT, MyActionsT>(() => ({
-  increment(setNexus) {
-    setNexus(...);
+  increment() {
     this.consoleCalling?.("Increment called"); // ?.
   },
 }));
@@ -234,9 +231,9 @@ The store name is arbitrary, which can be helpful when working with multiple sto
 ```js
 import { ✦create } from "nexus-state";
 
-const myPerfectStore = ✦create({...});
+const myNamedStore = ✦create({...});
 
-export default myPerfectStore; // ! renamed
+export default myNamedStore; // ! renamed
 
 // ✦create - createStore or createReactStore
 ```
@@ -275,7 +272,7 @@ const specificValue = store.getNexus("key");
 
 <details><summary><b><code>setNexus()</code></b></summary><br><ul><div>
 <b>Description:</b><em><br>
-updates the state with either a partial object or a functional updater.<br>
+updates the state with a partial object or functional updater.<br>
 </em><br>
 <b>Arguments:</b><em><br>
 <ul>
@@ -324,7 +321,7 @@ subscribes to changes of specific keys or entire state and returns an unsubscrib
 <b>Arguments:</b><em><br>
 <ul>
   <li><code>observer</code>: function to be called when state changes.</li>
-  <li><code>dependencies</code>: array of keys for subscription.</li>
+  <li><code>dependencies</code>: keys to subscribe to. Use <code>["*"]</code> to listen to all.</li>
 </ul>
 </em><br>
 <b>Example:</b>
@@ -343,11 +340,6 @@ const unsubscribe = store.nexusSubscribe(
 
 // Unsubscribe
 unsubscribe();
-
-// Dependency options:
-// ["key1", "key2"] - listen to specific state changes
-// ["*"] - listen to all state changes
-// [] - no subscription
 ```
 
 </div></ul></details>
@@ -429,6 +421,42 @@ declare global {
 
 <h2></h2>
 
+<details><summary><b><code>nexusAction</code></b></summary><br><ul><div>
+
+<b>Description:</b><em><br>
+object containing custom actions.<br>
+</em><br>
+<b>Usage Example:</b>
+
+```tsx
+import store from "your-nexus-config";
+
+store.nexusAction.increment();
+store.nexusAction.consoleCalling("Some text");
+```
+
+<br>
+<b>Important:</b><em><br>
+arrow functions can be used for actions, but they don’t support calling other actions via <code>this</code>:
+</em><br>
+
+```js
+// regular function
+increment() {
+  this.consoleCalling("Increment called"); // working
+}
+
+// arrow function
+increment: () => this.consoleCalling("Increment called") // not working
+// but syntax is compacter
+```
+
+More info: [Arrow Functions](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions)
+
+</div></ul></details>
+
+<h2></h2>
+
 <h6><mark>react</mark></h6>
 
 <details><summary><b><code>useNexus()</code></b></summary><br><ul><div>
@@ -465,7 +493,7 @@ const specificValue = store.useNexus("key");
 <b>Arguments:</b><em><br>
 <ul>
   <li><code>observer</code>: function that returns any derived value from the state.</li>
-  <li><code>dependencies</code>: array of keys for subscription.</li>
+  <li><code>dependencies</code>: keys to subscribe to. Use <code>["*"]</code> to listen to all.</li>
 </ul>
 </em><br>
 <b>Example:</b>
@@ -479,11 +507,6 @@ const total = store.useNexusSelector(
   // dependencies:
   ["count1", "count2"]
 );
-
-// Dependency options:
-// ["key1", "key2"] - listen to specific state changes
-// ["*"] - listen to all state changes
-// [] - no subscription
 ```
 
 <br>
@@ -520,43 +543,6 @@ updater(); // force re-render
 ```
 
 </div></ul></details>
-
-<h2></h2>
-
-<details><summary><b><code>nexusAction</code></b></summary><br><ul><div>
-
-<b>Description:</b><em><br>
-object containing custom actions.<br>
-</em><br>
-<b>Usage Example:</b>
-
-```tsx
-import store from "your-nexus-config";
-
-store.nexusAction.increment();
-store.nexusAction.consoleCalling("Some text");
-```
-
-<br>
-<b>Important:</b><em><br>
-arrow functions can be used for actions, but they don’t support calling other actions via <code>this</code>:
-</em><br>
-
-```js
-// regular function
-increment() {
-  this.consoleCalling("Increment called"); // "this" is working
-}
-
-// arrow function
-increment: () => this.consoleCalling("Increment called") // "this" is't working
-// but syntax is compacter
-```
-
-More info: [Arrow Functions](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions)
-
-</div></ul>
-</details>
 
 </div></ul>
 

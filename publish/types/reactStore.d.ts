@@ -54,26 +54,16 @@ interface ReactStore<S, A> extends Store<S, A> {
    * ### *`useNexusSelector:`*
    * `react` hook for creating derived values from the state.
    * @param observer callback function to be called when the state changes.
-   * @param dependencies array of keys for subscription.
+   * @param dependencies keys to subscribe to. Use `["*"]` to listen to all.
    * @returns the derived value.
    * @example
    * const derivedValue = store.useNexusSelector(
-   *   // observer:
    *   (state) => state.key + 1,
-   *   // dependencies:
    *   ["key"]
    * );
    *
-   * // ! If the component re-renders often, wrap the observer function in useCallback
-   * const derivedValue = store.useNexusSelector(
-   *   useCallback((state) => state.key + 1, []),
-   *   ["key"]
-   * );
-   *
-   * // Dependency options:
-   * // ["key1", "key2"] - listen to specific state changes
-   * // ["*"] - listen to all state changes
-   * // [] - no subscription
+   * // ! If the component re-renders often, wrap the observer in useCallback
+   * useCallback((state) => state.key + 1, [])
    * @see [nexus-state](https://www.npmjs.com/package/nexus-state)
    */
   useNexusSelector: <R>(

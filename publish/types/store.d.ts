@@ -60,23 +60,16 @@ interface Store<S, A> {
    * ### *`nexusSubscribe:`*
    * subscribes to changes of specific keys or entire state.
    * @param observer callback function to be called when the state changes.
-   * @param dependencies array of keys for subscription.
+   * @param dependencies keys to subscribe to. Use `["*"]` to listen to all.
    * @returns an unsubscribe function.
    * @example
    * const unsubscribe = store.nexusSubscribe(
-   *   // observer:
    *   (state) => { console.log("key changed:", state.key); },
-   *   // dependencies:
    *   ["key"]
    * );
    *
    * // Unsubscribe
    * unsubscribe();
-   *
-   * // Dependency options:
-   * // ["key1", "key2"] - listen to specific state changes
-   * // ["*"] - listen to all state changes
-   * // [] - no subscription
    * @see [nexus-state](https://www.npmjs.com/package/nexus-state)
    */
   nexusSubscribe(
