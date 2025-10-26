@@ -3,67 +3,67 @@ import type { Setter, Getter } from "./core";
 /**---
  * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
  * ### *`Store`*:
- * represents a store instance with core methods and user-defined actions.
+ * represents a store instance with core methods and user-defined acts.
  *
  * Methods:
- * - `getNexus` — returns the entire state or a specific state value
- * - `setNexus` — updates the state with a partial object or functional updater
- * - `nexusReset` — reset the entire state
- * - `nexusSubscribe` — subscribes to changes of specific keys or entire state
- * - `nexusGate` — register middleware to intercept state changes before updates
- * - `nexusAction` — contains all custom actions
+ * - `get` — returns the entire state or a specific state value
+ * - `set` — updates the state with a partial object or functional updater
+ * - `reset` — reset the entire state
+ * - `subscribe` — subscribes to changes of specific keys or entire state
+ * - `middleware` — register middleware to intercept state changes before updates
+ * - `acts` — contains all custom actions
  *
  * @template S Type of initial state
- * @template A Type of actions
+ * @template A Type of acts
  */
 interface Store<S, A> {
   /**---
    * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
-   * ### *`getNexus:`*
+   * ### *`get:`*
    * returns the entire state or a specific state value.
    * @param key optional state name.
    * @example
-   * const entireState = store.getNexus();
-   * const specificValue = store.getNexus("key");
+   * const entireState = store.get();
+   * const specificValue = store.get("key");
    * @see [nexus-state](https://www.npmjs.com/package/nexus-state)
    */
-  getNexus: Getter<S>;
+  get: Getter<S>;
 
   /**---
    * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
-   * ### *`setNexus:`*
+   * ### *`set:`*
    * updates the state with a partial object or functional updater.
    * @param update partial object or function with access to all states.
    * @example
    * // Direct state update
-   * store.setNexus({ key: newValue });
-   * store.setNexus({ key: newValue, anotherKey: newValue }); // multiple
+   * store.set({ key: newValue });
+   * store.set({ key: newValue, anotherKey: newValue }); // multiple
    *
    * // Functional state update
-   * store.setNexus((state) => ({ key: state.key + 1 }));
+   * store.set((state) => ({ key: state.key + 1 }));
    * @see [nexus-state](https://www.npmjs.com/package/nexus-state)
    */
-  setNexus: Setter<S>;
+  set: Setter<S>;
 
   /**---
    * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
-   * ### *`nexusReset:`*
+   * ### *`reset:`*
    * reset the entire state.
    * @example
-   * store.nexusReset();
+   * store.reset();
    * @see [nexus-state](https://www.npmjs.com/package/nexus-state)
    */
-  nexusReset(): void;
+  reset(): void;
 
   /**---
    * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
-   * ### *`nexusSubscribe:`*
+   * ### *`subscribe:`*
    * subscribes to changes of specific keys or entire state.
    * @param observer callback function to be called when the state changes.
    * @param dependencies keys to subscribe to. Use `["*"]` to listen to all.
    * @returns an unsubscribe function.
    * @example
-   * const unsubscribe = store.nexusSubscribe(
+   * const unsubscribe = store.subscribe(
    *   (state) => { console.log("key changed:", state.key); },
    *   ["key"]
    * );
@@ -72,34 +72,34 @@ interface Store<S, A> {
    * unsubscribe();
    * @see [nexus-state](https://www.npmjs.com/package/nexus-state)
    */
-  nexusSubscribe(
+  subscribe(
     observer: (state: S) => void,
     dependencies: ["*"] | (keyof S)[]
   ): () => void;
 
   /**---
    * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
-   * ### *`nexusGate:`*
+   * ### *`middleware:`*
    * register middleware to intercept state changes before updates.
    * @param middleware function receiving previous and next state.
    * @example
-   * store.nexusGate((state, nextState) => {
+   * store.middleware((state, nextState) => {
    *   // You can modify nextState, perform side effects or return modified state
    *   return nextState;
    * });
    * @see [nexus-state](https://www.npmjs.com/package/nexus-state)
    */
-  nexusGate(middleware: (state: S, nextState: S) => void | S): void;
+  middleware(middleware: (state: S, nextState: S) => void | S): void;
 
   /**---
    * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
-   * ### *`nexusAction:`*
+   * ### *`acts:`*
    * contains all custom actions.
    * @example
-   * store.nexusAction.actionName();
+   * store.acts.actionName();
    * @see [nexus-state](https://www.npmjs.com/package/nexus-state)
    */
-  nexusAction: A;
+  acts: A;
 }
 
 export type { Store };

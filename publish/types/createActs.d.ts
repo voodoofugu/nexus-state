@@ -2,29 +2,29 @@ import type { RecordAny, Setter, Getter, ActionCreate } from "./core";
 
 /**---
  * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
- * ### *`createActions`*:
- * defines a group of actions.
- * @param create function that receives `getNexus` and `setNexus` with `this` bound to the actions object.
+ * ### *`createActs`*:
+ * defines a group of acts.
+ * @param create function that receives `get` and `set` with `this` bound to the acts object.
  * @returns actions object.
  * @example
- * const myActions = createActions((getNexus, setNexus) => ({
+ * const myActions = createActs((get, set) => ({
  *   actionName() {
- *     setNexus({ key: "newValue" }); // direct state update
+ *     set({ key: "newValue" }); // direct state update
  *     this.anotherAction(); // ! calling another action
  *   },
  *   anotherAction() {
- *     setNexus((state) => ({ key: state.key + "!" })); // functional state update
+ *     set((state) => ({ key: state.key + "!" })); // functional state update
  *   }
  * }));
  *
  * // Usage:
- * const { store, actionStore } = ✦store({ // ✦ createStore or createReactStore
+ * const { store, actionStore } = ✦store({ // ✦ createNexus or createReactNexus
  *   state: {...},
- *   actions: myActions, // ! supports multiple: [myActions, myAnotherActions]
+ *   acts: myActions, // ! supports multiple: [myActions, myAnotherActions]
  * });
  * @see [nexus-state](https://www.npmjs.com/package/nexus-state)
  */
-declare function createActions<
+declare function createActs<
   S extends RecordAny,
   A extends RecordAny = RecordAny
 >(
@@ -32,35 +32,35 @@ declare function createActions<
 ): (
   /**---
    * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
-   * ### *`getNexus`*:
+   * ### *`get`*:
    * returns the entire state or a specific state value.
    * @param key optional state name.
    * @example
-   * const myActions = createActions((getNexus) => ({
+   * const myActions = createActs((get) => ({
    *   actionName() {
-   *    const specificValue = getNexus("key");
+   *    const specificValue = get("key");
    *    console.log("specificValue:", specificValue);
    *   }
    * }));
    * @see [nexus-state](https://www.npmjs.com/package/nexus-state)
    */
-  getNexus: Getter<S>,
+  get: Getter<S>,
   /**---
    * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
-   * ### *`setNexus`*:
+   * ### *`set`*:
    * updates the state with a partial object or functional updater.
    * @param update partial object or function with access to all states.
    * @example
-   * const myActions = createActions((_, setNexus) => ({
+   * const myActions = createActs((_, set) => ({
    *   actionName() {
    *     // Direct state update
-   *     setNexus({ key: "newValue" });
+   *     set({ key: "newValue" });
    *
    *     // Functional state update
-   *     setNexus((state) => ({ key: state.key + "!" }));
+   *     set((state) => ({ key: state.key + "!" }));
    *   }
    * }));
    * @see [nexus-state](https://www.npmjs.com/package/nexus-state)
    */
-  setNexus: Setter<S>
+  set: Setter<S>
 ) => A | Partial<A>;

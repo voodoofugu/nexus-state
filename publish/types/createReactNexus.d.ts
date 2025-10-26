@@ -3,24 +3,24 @@ import type { ReactStore } from "./reactStore";
 
 /**---
  * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
- * ### *`createReactStore`*:
+ * ### *`createReactNexus`*:
  * creates an extended store with React bindings and hooks.
- * @param options Store configuration including entire initial `state` and optional `actions`.
+ * @param options Store configuration including entire initial `state` and optional `acts`.
  * @returns `store` instance with core methods plus React Hooks and `actionStore`.
  * @example
- * const { store, actionStore } = createReactStore({
+ * const { store, actionStore } = createReactNexus({
  *   state: {
  *     key: "initialValue"
  *   },
  *
- *   actions: (getNexus, setNexus) => ({
- *     actionName() { setNexus({ key: "newValue" }); }
- *     actionGetKey() { console.log("Key value:", getNexus("key")); }
+ *   acts: (get, set) => ({
+ *     actionName() { set({ key: "newValue" }); }
+ *     actionGetKey() { console.log("Key value:", get("key")); }
  *   })
  * })
  * @see [nexus-state](https://www.npmjs.com/package/nexus-state)
  */
-declare function createReactStore<
+declare function createReactNexus<
   S extends RecordAny = RecordAny,
   A extends RecordAny = RecordAny
->(options: { state: S; actions?: ActionCreateUnion<A, S> }): ReactStore<S, A>;
+>(options: { state: S; acts?: ActionCreateUnion<A, S> }): ReactStore<S, A>;

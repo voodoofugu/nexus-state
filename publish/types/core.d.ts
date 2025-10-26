@@ -12,7 +12,7 @@ interface ActionCreate<A, S> {
     /**---
      * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
      * ### *`this`*:
-     * refers to the actions object or a partial of it.
+     * refers to the acts object or a partial of it.
      * @example
      * {
      *   actionA() { this.actionB(); }
@@ -22,30 +22,30 @@ interface ActionCreate<A, S> {
     this: A | Partial<A>,
     /**---
      * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
-     * ### *`getNexus`*:
+     * ### *`get`*:
      * returns the entire state or a specific state value.
      * @param key optional state name.
      * @example
-     * const entireState = getNexus();
-     * const specificValue = getNexus("key");
+     * const entireState = get();
+     * const specificValue = get("key");
      * @see [nexus-state](https://www.npmjs.com/package/nexus-state)
      */
-    getNexus: Getter<S>,
+    get: Getter<S>,
     /**---
      * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
-     * ### *`setNexus`*:
+     * ### *`set`*:
      * updates the state with a partial object or functional updater.
      * @param update partial object or function with access to all states.
      * @example
      * // Direct state update
-     * setNexus({ key: newValue });
-     * setNexus({ key: newValue, anotherKey: newValue }); // multiple
+     * set({ key: newValue });
+     * set({ key: newValue, anotherKey: newValue }); // multiple
      *
      * // Functional state update
-     * setNexus((state) => ({ key: state.key + 1 }));
+     * set((state) => ({ key: state.key + 1 }));
      * @see [nexus-state](https://www.npmjs.com/package/nexus-state)
      */
-    setNexus: Setter<S>
+    set: Setter<S>
   ): A | Partial<A>;
 }
 

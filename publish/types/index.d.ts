@@ -1,7 +1,7 @@
-import { createStore } from "./createStore";
-import { createReactStore } from "./createReactStore";
-import { createActions } from "./createActions";
-import { nexus } from "./nexus";
+import { createNexus } from "./createNexus";
+import { createReactNexus } from "./createReactNexus";
+import { createActs } from "./createActs";
+import { NXS } from "./NXS";
 
-export { createStore, createReactStore, createActions };
-export default nexus;
+export { createNexus, createReactNexus, createActs };
+export default NXS;

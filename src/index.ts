@@ -1,8 +1,8 @@
-import createStore from "./store-core";
-import createReactStore from "./store-react";
-import createActions from "./createActions";
+import createNexus from "./nexus-core";
+import createReactNexus from "./nexus-react";
+import createActs from "./createActs";
 
-const nexus = { createStore, createReactStore, createActions };
+const nexus = { createNexus, createReactNexus, createActs };
 
-export { createStore, createReactStore, createActions };
+export { createNexus, createReactNexus, createActs };
 export default nexus;

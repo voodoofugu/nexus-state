@@ -3,61 +3,61 @@ import type { Store } from "./store";
 /**---
  * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
  * ### *`ReactStore`*:
- * represents a store instance with core methods, user-defined actions, and React Hooks.
+ * represents a store instance with core methods, user-defined acts, and React Hooks.
  *
  * Methods:
  *
  * **core**
- * - `getNexus` — returns the entire state or a specific state value
- * - `setNexus` — updates the state with a partial object or functional updater
- * - `nexusReset` — reset the entire state
- * - `nexusSubscribe` — subscribes to changes of specific keys or entire state
- * - `nexusGate` — register middleware to intercept state changes before updates
- * - `nexusAction` — contains all custom actions
+ * - `get` — returns the entire state or a specific state value
+ * - `set` — updates the state with a partial object or functional updater
+ * - `reset` — reset the entire state
+ * - `subscribe` — subscribes to changes of specific keys or entire state
+ * - `middleware` — register middleware to intercept state changes before updates
+ * - `acts` — contains all custom actions
  *
  * **react** ( hooks for rendering and UI updates )
- * - `useNexus` — returns the entire state or a specific state value
- * - `useNexusUpdate` — force re-render
- * - `useNexusSelector` — subscribe to changes of specific keys or entire state
+ * - `use` — returns the entire state or a specific state value
+ * - `useRerender` — force re-render
+ * - `useSelector` — subscribe to changes of specific keys or entire state
  *
  * @template S Type of initial state
- * @template A Type of actions
+ * @template A Type of acts
  */
 interface ReactStore<S, A> extends Store<S, A> {
   /**---
    * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
-   * ### *`useNexus:`*
+   * ### *`use:`*
    * `react` hook to subscribe to entire state or a state value.
    * @param key optional state name.
    * @example
-   * const entireState = store.useNexus();
-   * const specificValue = store.useNexus("key");
+   * const entireState = store.use();
+   * const specificValue = store.use("key");
    * @see [nexus-state](https://www.npmjs.com/package/nexus-state)
    */
-  useNexus: {
+  use: {
     (): S;
     <K extends keyof S>(key: K): S[K];
   };
 
   /**---
    * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
-   * ### *`useNexusUpdate:`*
+   * ### *`useRerender:`*
    * `react` hook for forcing a component re-render.
    * @example
-   * const update = store.useNexusUpdate();
+   * const update = store.useRerender();
    * // call update() to force re-render
    */
-  useNexusUpdate: () => React.DispatchWithoutAction;
+  useRerender: () => React.DispatchWithoutAction;
 
   /**---
    * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
-   * ### *`useNexusSelector:`*
+   * ### *`useSelector:`*
    * `react` hook for creating derived values from the state.
    * @param observer callback function to be called when the state changes.
    * @param dependencies keys to subscribe to. Use `["*"]` to listen to all.
    * @returns the derived value.
    * @example
-   * const derivedValue = store.useNexusSelector(
+   * const derivedValue = store.useSelector(
    *   (state) => state.key + 1,
    *   ["key"]
    * );
@@ -66,20 +66,20 @@ interface ReactStore<S, A> extends Store<S, A> {
    * useCallback((state) => state.key + 1, [])
    * @see [nexus-state](https://www.npmjs.com/package/nexus-state)
    */
-  useNexusSelector: <R>(
+  useSelector: <R>(
     observer: (state: S) => R,
     dependencies: ["*"] | (keyof S)[]
   ) => R;
 
   /**---
    * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
-   * ### *`nexusAction:`*
-   * contains all custom actions
+   * ### *`acts:`*
+   * contains all custom actions.
    * @example
-   * store.nexusAction.actionName();
+   * store.acts.actionName();
    * @see [nexus-state](https://www.npmjs.com/package/nexus-state)
    */
-  nexusAction: A;
+  acts: A;
 }
 
 export type { ReactStore };

@@ -3,24 +3,24 @@ import type { Store } from "./store";
 
 /**---
  * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
- * ### *`createStore`*:
+ * ### *`createNexus`*:
  * creates a new framework-agnostic store instance.
- * @param options store configuration including entire initial `state` and optional `actions`.
+ * @param options store configuration including entire initial `state` and optional `acts`.
  * @returns `store` instance with methods and `actionStore`.
  * @example
- * const { store, actionStore } = createStore({
+ * const { store, actionStore } = createNexus({
  *   state: {
  *     key: "initialValue"
  *   },
  *
- *   actions: (getNexus, setNexus) => ({
- *     actionName() { setNexus({ key: "newValue" }); }
- *     actionGetKey() { console.log("Key value:", getNexus("key")); }
+ *   acts: (get, set) => ({
+ *     actionName() { set({ key: "newValue" }); }
+ *     actionGetKey() { console.log("Key value:", get("key")); }
  *   })
  * })
  * @see [nexus-state](https://www.npmjs.com/package/nexus-state)
  */
-export declare function createStore<
+export declare function createNexus<
   S extends RecordAny = RecordAny,
   A extends RecordAny = RecordAny
->(options: { state: S; actions?: ActionCreateUnion<A, S> }): Store<S, A>;
+>(options: { state: S; acts?: ActionCreateUnion<A, S> }): Store<S, A>;

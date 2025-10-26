@@ -9,34 +9,34 @@ type Getter<S> = {
 
 type ActionCreate<A, S> = (
   this: A | Partial<A>,
-  getNexus: Getter<S>,
-  setNexus: Setter<S>
+  get: Getter<S>,
+  set: Setter<S>
 ) => A | Partial<A>;
 type ActionCreateUnion<A, S> = ActionCreate<A, S> | Array<ActionCreate<A, S>>;
 
 interface Store<S, A> {
-  getNexus: Getter<S>;
-  setNexus: Setter<S>;
-  nexusReset(): void;
-  nexusSubscribe(
+  get: Getter<S>;
+  set: Setter<S>;
+  reset(): void;
+  subscribe(
     observer: (state: S) => void,
     dependencies: ["*"] | (keyof S)[]
   ): () => void;
-  nexusGate(middleware: (state: S, nextState: S) => void | S): void;
-  nexusAction: A;
+  middleware(middleware: (state: S, nextState: S) => void | S): void;
+  acts: A;
 }
 
 interface ReactStore<S, A> extends Store<S, A> {
-  useNexus: {
+  use: {
     (): S;
     <K extends keyof S>(key: K): S[K];
   };
-  useNexusSelector: <R>(
+  useSelector: <R>(
     observer: (state: S) => R,
     dependencies: ["*"] | (keyof S)[]
   ) => R;
-  useNexusUpdate: () => React.DispatchWithoutAction;
-  nexusAction: A;
+  useRerender: () => React.DispatchWithoutAction;
+  acts: A;
 }
 
 export type {
