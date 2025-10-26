@@ -51,7 +51,7 @@ import { createStore, createReactStore, createActions } from "nexus-state";
 <ul><div>
 <details><summary><b><code>createStore</code></b></summary><br><ul><div>
 <b>Description:</b><em><br>
-Creates a new framework-agnostic store instance.<br>
+creates a new framework-agnostic store instance.<br>
 </em><br>
 <b>Arguments:</b><em><br>
 <ul>
@@ -63,7 +63,7 @@ Creates a new framework-agnostic store instance.<br>
 ```js
 import { createStore } from "nexus-state";
 
-const { store, actions } = createStore({
+const store = createStore({
   state: {
     count1: 0,
     count2: 0,
@@ -80,7 +80,7 @@ const { store, actions } = createStore({
   }),
 });
 
-export { store, actions };
+export default store;
 
 // more about "setNexus" in API/Store/state/setNexus
 ```
@@ -98,7 +98,7 @@ type MyActionsT = {
   consoleCalling: (text: string) => void;
 };
 
-const { store, actions } = createStore<MyStateT, MyActionsT>({...});
+const store = createStore<MyStateT, MyActionsT>({...});
 ```
 
 </details>
@@ -109,7 +109,7 @@ const { store, actions } = createStore<MyStateT, MyActionsT>({...});
 
 <details><summary><b><code>createReactStore</code></b></summary><br><ul><div>
 <b>Description:</b><em><br>
-Extends <code>createStore</code> with React-specific hooks.<br>
+extends <code>createStore</code> with React-specific hooks.<br>
 </em><br>
 <b>Arguments:</b><em><br>
 <ul>
@@ -121,7 +121,7 @@ Extends <code>createStore</code> with React-specific hooks.<br>
 ```js
 import { createReactStore } from "nexus-state";
 
-const { store, actions } = createReactStore({
+const store = createReactStore({
   state: {
     count1: 0,
     count2: 0,
@@ -138,7 +138,7 @@ const { store, actions } = createReactStore({
   }),
 });
 
-export { store, actions };
+export default store;
 
 // more about "setNexus" in API/Store/state/setNexus
 ```
@@ -156,7 +156,7 @@ type MyActionsT = {
   consoleCalling: (text: string) => void;
 };
 
-const { store, actions } = createReactStore<MyStateT, MyActionsT>({...});
+const store = createReactStore<MyStateT, MyActionsT>({...});
 ```
 
 </details>
@@ -167,7 +167,7 @@ const { store, actions } = createReactStore<MyStateT, MyActionsT>({...});
 
 <details><summary><b><code>createActions</code></b></summary><br><ul><div>
 <b>Description:</b><em><br>
-Creates a monolithic action factory that is useful for code splitting.<br>
+creates a monolithic action factory that is useful for code splitting.<br>
 </em><br>
 <b>Arguments:</b><em><br>
 <ul>
@@ -177,7 +177,7 @@ Creates a monolithic action factory that is useful for code splitting.<br>
 <b>Example:</b>
 
 ```js
-import { ✦store, createActions } from "nexus-state";
+import { ✦create, createActions } from "nexus-state";
 
 const customActions = createActions((setNexus) => ({
   increment() {
@@ -190,14 +190,14 @@ const customActions = createActions((setNexus) => ({
 }));
 
 // Usage:
-const { store, actions } = ✦store({
+const store = ✦create({
   state: {...},
   actions: customActions, // ! supports multiple: [myActions, myAnotherActions]
 });
 
-export { store, actions };
+export default store;
 
-// ✦store - createStore or createReactStore
+// ✦create - createStore or createReactStore
 // more about "setNexus" in API/Store/state/setNexus
 ```
 
@@ -228,17 +228,17 @@ const incrementAction = createActions<MyStateT, MyActionsT>(() => ({
 <h2></h2>
 
 <details><summary>Recommendations:</summary><br><ul><div>
-For multiple stores or renaming a store, use:
+The store name is arbitrary, which can be helpful when working with multiple store instances:
 </em><br>
 
 ```js
-import { ✦store } from "nexus-state";
+import { ✦create } from "nexus-state";
 
-const { store: myStore1, actions: myActions1 } = ✦store({...});
+const myPerfectStore = ✦create({...});
 
-export { myStore1, myActions1 }; // ! renamed
+export default myPerfectStore; // ! renamed
 
-// ✦store - createStore or createReactStore
+// ✦create - createStore or createReactStore
 ```
 
 </div></ul></details>
@@ -249,18 +249,11 @@ export { myStore1, myActions1 }; // ! renamed
 
 <ul><div>
 
-<details><summary><b><code>state</code></b></summary><br><ul><div>
-
-<b>Description:</b><em><br>
-Required state object.<br>
-</em><br>
-<b>Usage Example:</b>
-
 <h6><mark>core</mark></h6>
 
 <details><summary><b><code>getNexus()</code></b></summary><br><ul><div>
 <b>Description:</b><em><br>
-Returns the entire state or a specific state value.<br>
+returns the entire state or a specific state value.<br>
 </em><br>
 <b>Arguments:</b><em><br>
 <ul>
@@ -270,7 +263,7 @@ Returns the entire state or a specific state value.<br>
 <b>Example:</b>
 
 ```tsx
-import { store } from "your-nexus-config";
+import store from "your-nexus-config";
 
 const entireState = store.getNexus();
 const specificValue = store.getNexus("key");
@@ -282,7 +275,7 @@ const specificValue = store.getNexus("key");
 
 <details><summary><b><code>setNexus()</code></b></summary><br><ul><div>
 <b>Description:</b><em><br>
-Updates the state with either a partial object or a functional updater.<br>
+updates the state with either a partial object or a functional updater.<br>
 </em><br>
 <b>Arguments:</b><em><br>
 <ul>
@@ -292,7 +285,7 @@ Updates the state with either a partial object or a functional updater.<br>
 <b>Example:</b>
 
 ```tsx
-import { store } from "your-nexus-config";
+import store from "your-nexus-config";
 
 // Direct update:
 store.setNexus({ count1: 5 });
@@ -310,12 +303,12 @@ store.setNexus((state) => ({
 
 <details><summary><b><code>nexusReset()</code></b></summary><br><ul><div>
 <b>Description:</b><em><br>
-Resets state to its initial values.<br>
+resets state to its initial values.<br>
 </em><br>
 <b>Example:</b>
 
 ```tsx
-import { store } from "your-nexus-config";
+import store from "your-nexus-config";
 
 store.nexusReset();
 ```
@@ -326,7 +319,7 @@ store.nexusReset();
 
 <details><summary><b><code>nexusSubscribe()</code></b></summary><br><ul><div>
 <b>Description:</b><em><br>
-Subscribes to changes of specific keys or entire state and returns an unsubscribe function.<br>
+subscribes to changes of specific keys or entire state and returns an unsubscribe function.<br>
 </em><br>
 <b>Arguments:</b><em><br>
 <ul>
@@ -337,7 +330,7 @@ Subscribes to changes of specific keys or entire state and returns an unsubscrib
 <b>Example:</b>
 
 ```tsx
-import { store } from "your-nexus-config";
+import store from "your-nexus-config";
 
 const unsubscribe = store.nexusSubscribe(
   // observer:
@@ -363,7 +356,7 @@ unsubscribe();
 
 <details><summary><b><code>nexusGate()</code></b></summary><br><ul><div>
 <b>Description:</b><em><br>
-Adds a middleware to intercept state changes before updates.<br>
+adds a middleware to intercept state changes before updates.<br>
 Useful for logging, debugging, or integrating with developer tools.<br>
 </em><br>
 <b>Arguments:</b><em><br>
@@ -374,7 +367,7 @@ Useful for logging, debugging, or integrating with developer tools.<br>
 <b>Example:</b><br>
 
 ```jsx
-import { store } from "your-nexus-config";
+import store from "your-nexus-config";
 
 // Example: logging state changes
 store.nexusGate((state, next) => {
@@ -389,12 +382,12 @@ store.nexusGate((state, next) => {
 
 <details><summary><b>Redux DevTools Integration</b></summary><br><ul><div>
 <b>Description:</b><em><br>
-You can connect your Nexus store to Redux DevTools for time-travel debugging and state inspection.<br>
+you can connect your store to Redux DevTools for time-travel debugging and state inspection.<br>
 </em><br>
 <b>Example:</b><br>
 
 ```tsx
-import { store } from "your-nexus-config";
+import store from "your-nexus-config";
 
 // Setup Redux DevTools connection
 const devtools = window.__REDUX_DEVTOOLS_EXTENSION__?.connect({
@@ -440,7 +433,7 @@ declare global {
 
 <details><summary><b><code>useNexus()</code></b></summary><br><ul><div>
 <b>Description:</b><em><br>
-<code>React</code> hook to subscribe to entire state or a state value.<br>
+<code>react</code> hook to subscribe to entire state or a state value.<br>
 </em><br>
 <b>Arguments:</b><em><br>
 <ul>
@@ -450,7 +443,7 @@ declare global {
 <b>Example:</b>
 
 ```tsx
-import { store } from "your-nexus-config";
+import store from "your-nexus-config";
 
 const entireState = store.useNexus();
 const specificValue = store.useNexus("key");
@@ -467,7 +460,7 @@ const specificValue = store.useNexus("key");
 
 <details><summary><b><code>useNexusSelector()</code></b></summary><br><ul><div>
 <b>Description:</b><em><br>
-<code>React</code> hook for creating derived values from the state.<br>
+<code>react</code> hook for creating derived values from the state.<br>
 </em><br>
 <b>Arguments:</b><em><br>
 <ul>
@@ -478,7 +471,7 @@ const specificValue = store.useNexus("key");
 <b>Example:</b>
 
 ```tsx
-import { store } from "your-nexus-config";
+import store from "your-nexus-config";
 
 const total = store.useNexusSelector(
   // observer:
@@ -495,12 +488,12 @@ const total = store.useNexusSelector(
 
 <br>
 <b>Optimization:</b><em><br>
-Use <code>useCallback</code> in frequently re-rendered components to avoid unnecessary subscriptions:
+use <code>useCallback</code> in frequently re-rendered components to avoid unnecessary subscriptions:
 </em><br>
 
 ```tsx
 import { useCallback } from "react";
-import { store } from "your-nexus-config";
+import store from "your-nexus-config";
 
 const total = store.useNexusSelector(
   useCallback((state) => state.count1 + state.count2, []),
@@ -514,13 +507,13 @@ const total = store.useNexusSelector(
 
 <details><summary><b><code>useNexusUpdate()</code></b></summary><br><ul><div>
 <b>Description:</b><em><br>
-<code>React</code> hook for forcing a component re-render.<br>
+<code>react</code> hook for forcing a component re-render.<br>
 Useful for updating refs or non-reactive values.<br>
 </em><br>
 <b>Example:</b>
 
 ```tsx
-import { store } from "your-nexus-config";
+import store from "your-nexus-config";
 
 const updater = store.useNexusUpdate();
 updater(); // force re-render
@@ -528,28 +521,25 @@ updater(); // force re-render
 
 </div></ul></details>
 
-</div></ul>
-</details>
-
 <h2></h2>
 
-<details><summary><b><code>actions</code></b></summary><br><ul><div>
+<details><summary><b><code>nexusAction</code></b></summary><br><ul><div>
 
 <b>Description:</b><em><br>
-Optional actions object defined during store creation.<br>
+object containing custom actions.<br>
 </em><br>
 <b>Usage Example:</b>
 
 ```tsx
-import { actions } from "your-nexus-config";
+import store from "your-nexus-config";
 
-actions.increment();
-actions.consoleCalling("Some text");
+store.nexusAction.increment();
+store.nexusAction.consoleCalling("Some text");
 ```
 
 <br>
 <b>Important:</b><em><br>
-Arrow functions can be used for actions, but they don’t support calling other actions via <code>this</code>:
+arrow functions can be used for actions, but they don’t support calling other actions via <code>this</code>:
 </em><br>
 
 ```js

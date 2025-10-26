@@ -1,36 +1,11 @@
-type RecordAny = Record<string, any>;
+import type { Setter, ActionCreateUnion, RecordAny, Store } from "./types/core";
 
 type Middleware<S> = (prevState: S, nextState: S) => void | S;
-
-// Тип функции для обновления состояния
-type SetState<S> = (update: Partial<S> | ((state: S) => Partial<S>)) => void;
-
-type Action<A, S> = (
-  this: A | Partial<A>,
-  setNexus: SetState<S>
-) => A | Partial<A>;
-
-type ActionCreate<A, S> = Action<A, S> | Array<Action<A, S>>;
-
-type Store<S> = {
-  getNexus(): S;
-  getNexus<K extends keyof S>(key: K): S[K];
-  setNexus: SetState<S>;
-  nexusReset(): void;
-  nexusSubscribe(
-    observer: (state: S) => void,
-    dependencies: ["*"] | (keyof S)[]
-  ): () => void;
-  nexusGate(middleware: Middleware<S>): void;
-};
 
 function createStore<
   S extends RecordAny = RecordAny,
   A extends RecordAny = RecordAny
->(options: {
-  state: S;
-  actions?: ActionCreate<A, S>;
-}): { store: Store<S>; actions: A } {
+>(options: { state: S; actions?: ActionCreateUnion<A, S> }): Store<S, A> {
   const { state: initialState, actions: actionsCreator } = options;
 
   let state: S = { ...initialState };
@@ -52,7 +27,7 @@ function createStore<
     return key !== undefined ? state[key] : state;
   }
 
-  const setNexus: SetState<S> = (partial) => {
+  const setNexus: Setter<S> = (partial) => {
     const prevState = { ...state };
     const nextPartial =
       typeof partial === "function" ? partial(prevState) : partial;
@@ -81,7 +56,7 @@ function createStore<
     notify("*");
   };
 
-  const nexusSubscribe: Store<S>["nexusSubscribe"] = (
+  const nexusSubscribe: Store<S, A>["nexusSubscribe"] = (
     observer,
     dependencies
   ) => {
@@ -109,40 +84,40 @@ function createStore<
     };
   };
 
-  const nexusGate: Store<S>["nexusGate"] = (middleware) => {
+  const nexusGate: Store<S, A>["nexusGate"] = (middleware) => {
     localMiddleware.push(middleware);
   };
 
-  const store: Store<S> = {
+  // --- собираем actions ---
+  const nexusAction = {} as A;
+
+  if (Array.isArray(actionsCreator)) {
+    for (const factory of actionsCreator) {
+      const partial = factory.call(nexusAction, getNexus, setNexus);
+      if (partial && typeof partial === "object")
+        Object.assign(nexusAction, partial);
+    }
+  } else if (typeof actionsCreator === "function") {
+    const partial = actionsCreator.call(nexusAction, getNexus, setNexus);
+    if (partial && typeof partial === "object")
+      Object.assign(nexusAction, partial);
+  }
+
+  // привязываем все функции к итоговому объекту (bind this)
+  for (const key of Object.keys(nexusAction)) {
+    const val = (nexusAction as any)[key];
+    if (typeof val === "function")
+      (nexusAction as any)[key] = val.bind(nexusAction);
+  }
+
+  return {
     getNexus,
     setNexus,
     nexusReset,
     nexusSubscribe,
     nexusGate,
+    nexusAction,
   };
-
-  // --- собираем actions ---
-  const actions = {} as A;
-
-  if (Array.isArray(actionsCreator)) {
-    for (const factory of actionsCreator) {
-      const partial = factory.call(actions, setNexus);
-      if (partial && typeof partial === "object")
-        Object.assign(actions, partial);
-    }
-  } else if (typeof actionsCreator === "function") {
-    const partial = actionsCreator.call(actions, setNexus);
-    if (partial && typeof partial === "object") Object.assign(actions, partial);
-  }
-
-  // привязываем все функции к итоговому объекту (bind this)
-  for (const key of Object.keys(actions)) {
-    const val = (actions as any)[key];
-    if (typeof val === "function") (actions as any)[key] = val.bind(actions);
-  }
-
-  return { store, actions };
 }
 
 export default createStore;
-export type { SetState, Store, Action, ActionCreate, RecordAny };

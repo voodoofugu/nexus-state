@@ -1,34 +1,19 @@
 import { useSyncExternalStore, useEffect, useRef, useReducer } from "react";
 import createStore from "./store-core";
 
-import type { Store, ActionCreate, RecordAny } from "./store-core";
-
-type ReactStore<S> = Store<S> & {
-  useNexus: {
-    (): S;
-    <K extends keyof S>(key: K): S[K];
-  };
-  useNexusSelector: <R>(
-    observer: (state: S) => R,
-    dependencies: ["*"] | (keyof S)[]
-  ) => R;
-  useNexusUpdate: () => React.DispatchWithoutAction;
-};
+import type { ActionCreateUnion, RecordAny, ReactStore } from "./types/core";
 
 function createReactStore<
   S extends RecordAny = RecordAny,
   A extends RecordAny = RecordAny
->(options: {
-  state: S;
-  actions?: ActionCreate<A, S>;
-}): { store: ReactStore<S>; actions: A } {
+>(options: { state: S; actions?: ActionCreateUnion<A, S> }): ReactStore<S, A> {
   // для принудительного обновления
   const useNexusUpdate = () => {
     const [, forceUpdate] = useReducer(() => ({}), {});
     return forceUpdate;
   };
 
-  const { store, actions: actionsLocal } = createStore<S, A>(options);
+  const store = createStore<S, A>(options);
 
   function useNexus(): S;
   function useNexus<K extends keyof S>(key: K): S[K];
@@ -68,13 +53,10 @@ function createReactStore<
   }
 
   return {
-    store: {
-      ...store,
-      useNexus,
-      useNexusUpdate,
-      useNexusSelector,
-    },
-    actions: actionsLocal,
+    ...store,
+    useNexus,
+    useNexusUpdate,
+    useNexusSelector,
   };
 }
 
