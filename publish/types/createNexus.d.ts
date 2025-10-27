@@ -1,5 +1,5 @@
-import type { RecordAny, ActionCreateUnion } from "./core";
-import type { Store } from "./store";
+import type { RecordAny, ActsCreateUnion } from "./core";
+import type { Nexus } from "./nexusCore";
 
 /**---
  * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
@@ -23,4 +23,4 @@ import type { Store } from "./store";
 export declare function createNexus<
   S extends RecordAny = RecordAny,
   A extends RecordAny = RecordAny
->(options: { state: S; acts?: ActionCreateUnion<A, S> }): Store<S, A>;
+>(options: { state: S; acts?: ActsCreateUnion<A, S> }): Nexus<S, A>;

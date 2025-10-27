@@ -7,26 +7,26 @@ type Getter<S> = {
   <K extends keyof S>(key: K): S[K];
 };
 
-type ActionCreate<A, S> = (
+type ActsCreate<A, S> = (
   this: A | Partial<A>,
   get: Getter<S>,
   set: Setter<S>
 ) => A | Partial<A>;
-type ActionCreateUnion<A, S> = ActionCreate<A, S> | Array<ActionCreate<A, S>>;
+type ActsCreateUnion<A, S> = ActsCreate<A, S> | Array<ActsCreate<A, S>>;
 
-interface Store<S, A> {
+interface Nexus<S, A> {
   get: Getter<S>;
   set: Setter<S>;
-  reset(): void;
+  reset(...keys: (keyof S)[]): void;
   subscribe(
     observer: (state: S) => void,
     dependencies: ["*"] | (keyof S)[]
   ): () => void;
-  middleware(middleware: (state: S, nextState: S) => void | S): void;
+  middleware(middleware: (prev: S, next: S) => void | S): void;
   acts: A;
 }
 
-interface ReactStore<S, A> extends Store<S, A> {
+interface ReactNexus<S, A> extends Nexus<S, A> {
   use: {
     (): S;
     <K extends keyof S>(key: K): S[K];
@@ -43,8 +43,8 @@ export type {
   RecordAny,
   Setter,
   Getter,
-  ActionCreate,
-  ActionCreateUnion,
-  Store,
-  ReactStore,
+  ActsCreate,
+  ActsCreateUnion,
+  Nexus,
+  ReactNexus,
 };

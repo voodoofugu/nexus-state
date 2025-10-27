@@ -53,11 +53,11 @@ import { createNexus, createReactNexus, createActs } from "nexus-state";
 <ul><div>
 <details><summary><b><code>createNexus</code></b></summary><br><ul><div>
 <b>Description:</b><em><br>
-creates a new framework-agnostic store instance.<br>
+creates a new framework-agnostic store (**nexus**) instance.<br>
 </em><br>
 <b>Arguments:</b><em><br>
 <ul>
-  <li><code>options</code>: object with <code>state</code> and <code>actions</code>.</li>
+  <li><code>options</code>: object with <code>state</code> and <code>acts</code>.</li>
 </ul>
 </em><br>
 <b>Example:</b>
@@ -71,7 +71,7 @@ const nexus = createNexus({
     count2: 0,
   },
 
-  actions: (get, set) => ({
+  acts: (get, set) => ({
     increment() {
       set((state) => ({ count1: state.count1 + 1 }));
       this.getState("count1"); // ! calling another action
@@ -113,7 +113,7 @@ extends <code>createNexus</code> with React-specific hooks.<br>
 </em><br>
 <b>Arguments:</b><em><br>
 <ul>
-  <li><code>options</code>: object with <code>state</code> and <code>actions</code>.</li>
+  <li><code>options</code>: object with <code>state</code> and <code>acts</code>.</li>
 </ul>
 </em><br>
 <b>Example:</b>
@@ -127,7 +127,7 @@ const nexus = createReactNexus({
     count2: 0,
   },
 
-  actions: (get, set) => ({
+  acts: (get, set) => ({
     increment() {
       set((state) => ({ count1: state.count1 + 1 }));
       this.getState("count1"); // ! calling another action
@@ -169,7 +169,7 @@ creates a monolithic action factory that is useful for code splitting.<br>
 </em><br>
 <b>Arguments:</b><em><br>
 <ul>
-  <li><code>create</code>: function that receives <code>set</code> and has <code>this</code> bound to the actions object.</li>
+  <li><code>create</code>: function that receives <code>set</code> and has <code>this</code> bound to the acts object.</li>
 </ul>
 </em><br>
 <b>Example:</b>
@@ -247,7 +247,7 @@ export default nexus1; // ! renamed
 
 <h6><mark>core</mark></h6>
 
-<details><summary><b><code>get()</code></b></summary><br><ul><div>
+<details><summary><b><code>get</code></b></summary><br><ul><div>
 <b>Description:</b><em><br>
 returns the entire state or a specific state value.<br>
 </em><br>
@@ -269,7 +269,7 @@ const specificValue = nexus.get("key");
 
 <h2></h2>
 
-<details><summary><b><code>set()</code></b></summary><br><ul><div>
+<details><summary><b><code>set</code></b></summary><br><ul><div>
 <b>Description:</b><em><br>
 updates the state with a partial object or functional updater.<br>
 </em><br>
@@ -297,23 +297,24 @@ nexus.set((state) => ({
 
 <h2></h2>
 
-<details><summary><b><code>reset()</code></b></summary><br><ul><div>
+<details><summary><b><code>reset</code></b></summary><br><ul><div>
 <b>Description:</b><em><br>
-resets state to its initial values.<br>
+resets entire state or a specific state key to its initial values.<br>
 </em><br>
 <b>Example:</b>
 
 ```tsx
 import nexus from "your-nexus-config";
 
-nexus.reset();
+nexus.reset(); // reset entire state
+nexus.reset("count1", "count2");
 ```
 
 </div></ul></details>
 
 <h2></h2>
 
-<details><summary><b><code>subscribe()</code></b></summary><br><ul><div>
+<details><summary><b><code>subscribe</code></b></summary><br><ul><div>
 <b>Description:</b><em><br>
 subscribes to changes of specific keys or entire state and returns an unsubscribe function.<br>
 </em><br>
@@ -345,14 +346,14 @@ unsubscribe();
 
 <h2></h2>
 
-<details><summary><b><code>middleware()</code></b></summary><br><ul><div>
+<details><summary><b><code>middleware</code></b></summary><br><ul><div>
 <b>Description:</b><em><br>
 adds a middleware to intercept state changes before updates.<br>
 Useful for logging, debugging, or integrating with developer tools.<br>
 </em><br>
 <b>Arguments:</b><em><br>
 <ul>
-  <li><code>middleware</code>: function with previous and next state.</li>
+  <li><code>middleware</code>: function with prev and next state.</li>
 </ul>
 </em><br>
 <b>Example:</b><br>
@@ -361,12 +362,12 @@ Useful for logging, debugging, or integrating with developer tools.<br>
 import nexus from "your-nexus-config";
 
 // Example: logging state changes
-nexus.middleware((state, next) => {
-  console.log("State changing from", state, "to", next);
+nexus.middleware((prev, next) => {
+  console.log("State changing from", prev, "to", next);
 });
 
 // Example: modifying next state before applying
-nexus.middleware((state, next) => {
+nexus.middleware((prev, next) => {
   return { ...next, forced: true };
 });
 ```
@@ -436,7 +437,7 @@ nexus.acts.consoleCalling("Some text");
 
 <br>
 <b>Important:</b><em><br>
-arrow functions can be used for actions, but they don’t support calling other actions via <code>this</code>:
+arrow functions can be used for acts when creating a nexus, but they don’t support calling other actions via <code>this</code>:
 </em><br>
 
 ```js
@@ -458,7 +459,7 @@ More info: [Arrow Functions](https://developer.mozilla.org/en-US/docs/Web/JavaSc
 
 <h6><mark>react</mark></h6>
 
-<details><summary><b><code>use()</code></b></summary><br><ul><div>
+<details><summary><b><code>use</code></b></summary><br><ul><div>
 <b>Description:</b><em><br>
 <code>react</code> hook to subscribe to entire state or a state value.<br>
 </em><br>
@@ -485,7 +486,7 @@ const specificValue = nexus.use("key");
 
 <h2></h2>
 
-<details><summary><b><code>useSelector()</code></b></summary><br><ul><div>
+<details><summary><b><code>useSelector</code></b></summary><br><ul><div>
 <b>Description:</b><em><br>
 <code>react</code> hook for creating derived values from the state.<br>
 </em><br>
@@ -527,7 +528,7 @@ const total = nexus.useSelector(
 
 <h2></h2>
 
-<details><summary><b><code>useRerender()</code></b></summary><br><ul><div>
+<details><summary><b><code>useRerender</code></b></summary><br><ul><div>
 <b>Description:</b><em><br>
 <code>react</code> hook for forcing a component re-render.<br>
 Useful for updating refs or non-reactive values.<br>

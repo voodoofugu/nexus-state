@@ -7,7 +7,7 @@ type Getter<S> = {
   <K extends keyof S>(key: K): S[K];
 };
 
-interface ActionCreate<A, S> {
+interface ActsCreate<A, S> {
   (
     /**---
      * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
@@ -49,6 +49,6 @@ interface ActionCreate<A, S> {
   ): A | Partial<A>;
 }
 
-type ActionCreateUnion<A, S> = ActionCreate<A, S> | Array<ActionCreate<A, S>>;
+type ActsCreateUnion<A, S> = ActsCreate<A, S> | Array<ActsCreate<A, S>>;
 
-export type { RecordAny, Setter, Getter, ActionCreate, ActionCreateUnion };
+export type { RecordAny, Setter, Getter, ActsCreate, ActsCreateUnion };

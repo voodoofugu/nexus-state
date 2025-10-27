@@ -1,11 +1,11 @@
-import type { Setter, ActionCreateUnion, RecordAny, Store } from "./types/core";
+import type { Setter, ActsCreateUnion, RecordAny, Nexus } from "./types/core";
 
 type Middleware<S> = (prevState: S, nextState: S) => void | S;
 
 function createNexus<
   S extends RecordAny = RecordAny,
   A extends RecordAny = RecordAny
->(options: { state: S; acts?: ActionCreateUnion<A, S> }): Store<S, A> {
+>(options: { state: S; acts?: ActsCreateUnion<A, S> }): Nexus<S, A> {
   const { state: initialState, acts: actionsCreator } = options;
 
   let state: S = { ...initialState };
@@ -51,12 +51,23 @@ function createNexus<
     }
   };
 
-  const reset = () => {
-    state = { ...initialState };
-    notify("*");
-  };
+  function reset(...keys: (keyof S)[]) {
+    if (keys.length === 0) {
+      state = { ...initialState };
+      notify("*");
+    } else {
+      const nextPartial = {} as Partial<S>;
+      for (const key of keys) {
+        if (key in initialState) {
+          nextPartial[key] = initialState[key];
+        }
+      }
+      state = { ...state, ...nextPartial };
+      notify(keys);
+    }
+  }
 
-  const subscribe: Store<S, A>["subscribe"] = (observer, dependencies) => {
+  const subscribe: Nexus<S, A>["subscribe"] = (observer, dependencies) => {
     if (dependencies.length === 0) {
       return () => {};
     }
@@ -81,7 +92,7 @@ function createNexus<
     };
   };
 
-  const middleware: Store<S, A>["middleware"] = (middleware) => {
+  const middleware: Nexus<S, A>["middleware"] = (middleware) => {
     localMiddleware.push(middleware);
   };
 

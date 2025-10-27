@@ -1,4 +1,4 @@
-import type { RecordAny, Setter, Getter, ActionCreate } from "./core";
+import type { RecordAny, Setter, Getter, ActsCreate } from "./core";
 
 /**---
  * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
@@ -28,7 +28,7 @@ declare function createActs<
   S extends RecordAny,
   A extends RecordAny = RecordAny
 >(
-  create: ActionCreate<A, S>
+  create: ActsCreate<A, S>
 ): (
   /**---
    * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)

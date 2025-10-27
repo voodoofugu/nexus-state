@@ -1,11 +1,11 @@
-import type { RecordAny, ActionCreateUnion } from "./core";
-import type { ReactStore } from "./reactStore";
+import type { RecordAny, ActsCreateUnion } from "./core";
+import type { ReactNexus } from "./reactNexus";
 
 /**---
  * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
  * ### *`createReactNexus`*:
  * creates an extended store with React bindings and hooks.
- * @param options Store configuration including entire initial `state` and optional `acts`.
+ * @param options nexus configuration including entire initial `state` and optional `acts`.
  * @returns `store` instance with core methods plus React Hooks and `actionStore`.
  * @example
  * const { store, actionStore } = createReactNexus({
@@ -23,4 +23,4 @@ import type { ReactStore } from "./reactStore";
 declare function createReactNexus<
   S extends RecordAny = RecordAny,
   A extends RecordAny = RecordAny
->(options: { state: S; acts?: ActionCreateUnion<A, S> }): ReactStore<S, A>;
+>(options: { state: S; acts?: ActsCreateUnion<A, S> }): ReactNexus<S, A>;

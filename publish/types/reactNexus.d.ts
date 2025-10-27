@@ -1,8 +1,8 @@
-import type { Store } from "./store";
+import type { Nexus } from "./nexusCore";
 
 /**---
  * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
- * ### *`ReactStore`*:
+ * ### *`ReactNexus`*:
  * represents a store instance with core methods, user-defined acts, and React Hooks.
  *
  * Methods:
@@ -10,7 +10,7 @@ import type { Store } from "./store";
  * **core**
  * - `get` — returns the entire state or a specific state value
  * - `set` — updates the state with a partial object or functional updater
- * - `reset` — reset the entire state
+ * - `reset` — reset the entire state or specific keys
  * - `subscribe` — subscribes to changes of specific keys or entire state
  * - `middleware` — register middleware to intercept state changes before updates
  * - `acts` — contains all custom actions
@@ -23,10 +23,10 @@ import type { Store } from "./store";
  * @template S Type of initial state
  * @template A Type of acts
  */
-interface ReactStore<S, A> extends Store<S, A> {
+interface ReactNexus<S, A> extends Nexus<S, A> {
   /**---
    * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
-   * ### *`use:`*
+   * ### *`use`*:
    * `react` hook to subscribe to entire state or a state value.
    * @param key optional state name.
    * @example
@@ -41,7 +41,7 @@ interface ReactStore<S, A> extends Store<S, A> {
 
   /**---
    * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
-   * ### *`useRerender:`*
+   * ### *`useRerender`*:
    * `react` hook for forcing a component re-render.
    * @example
    * const update = store.useRerender();
@@ -51,7 +51,7 @@ interface ReactStore<S, A> extends Store<S, A> {
 
   /**---
    * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
-   * ### *`useSelector:`*
+   * ### *`useSelector`*:
    * `react` hook for creating derived values from the state.
    * @param observer callback function to be called when the state changes.
    * @param dependencies keys to subscribe to. Use `["*"]` to listen to all.
@@ -73,7 +73,7 @@ interface ReactStore<S, A> extends Store<S, A> {
 
   /**---
    * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
-   * ### *`acts:`*
+   * ### *`acts`*:
    * contains all custom actions.
    * @example
    * store.acts.actionName();
@@ -82,4 +82,4 @@ interface ReactStore<S, A> extends Store<S, A> {
   acts: A;
 }
 
-export type { ReactStore };
+export type { ReactNexus };

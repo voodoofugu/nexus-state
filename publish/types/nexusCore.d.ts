@@ -2,13 +2,13 @@ import type { Setter, Getter } from "./core";
 
 /**---
  * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
- * ### *`Store`*:
+ * ### *`Nexus`*:
  * represents a store instance with core methods and user-defined acts.
  *
  * Methods:
  * - `get` — returns the entire state or a specific state value
  * - `set` — updates the state with a partial object or functional updater
- * - `reset` — reset the entire state
+ * - `reset` — reset the entire state or specific keys
  * - `subscribe` — subscribes to changes of specific keys or entire state
  * - `middleware` — register middleware to intercept state changes before updates
  * - `acts` — contains all custom actions
@@ -16,10 +16,10 @@ import type { Setter, Getter } from "./core";
  * @template S Type of initial state
  * @template A Type of acts
  */
-interface Store<S, A> {
+interface Nexus<S, A> {
   /**---
    * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
-   * ### *`get:`*
+   * ### *`get`*:
    * returns the entire state or a specific state value.
    * @param key optional state name.
    * @example
@@ -31,7 +31,7 @@ interface Store<S, A> {
 
   /**---
    * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
-   * ### *`set:`*
+   * ### *`set`*:
    * updates the state with a partial object or functional updater.
    * @param update partial object or function with access to all states.
    * @example
@@ -47,17 +47,18 @@ interface Store<S, A> {
 
   /**---
    * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
-   * ### *`reset:`*
-   * reset the entire state.
+   * ### *`reset`*:
+   * reset the entire state or specific keys.
    * @example
-   * store.reset();
+   * store.reset(); // reset entire state
+   * store.reset("key", "anotherKey");
    * @see [nexus-state](https://www.npmjs.com/package/nexus-state)
    */
-  reset(): void;
+  reset(...keys: (keyof S)[]): void;
 
   /**---
    * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
-   * ### *`subscribe:`*
+   * ### *`subscribe`*:
    * subscribes to changes of specific keys or entire state.
    * @param observer callback function to be called when the state changes.
    * @param dependencies keys to subscribe to. Use `["*"]` to listen to all.
@@ -79,21 +80,21 @@ interface Store<S, A> {
 
   /**---
    * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
-   * ### *`middleware:`*
+   * ### *`middleware`*:
    * register middleware to intercept state changes before updates.
-   * @param middleware function receiving previous and next state.
+   * @param middleware function receiving prev and next state.
    * @example
-   * store.middleware((state, nextState) => {
+   * store.middleware((prev, next) => {
    *   // You can modify nextState, perform side effects or return modified state
-   *   return nextState;
+   *   return next;
    * });
    * @see [nexus-state](https://www.npmjs.com/package/nexus-state)
    */
-  middleware(middleware: (state: S, nextState: S) => void | S): void;
+  middleware(middleware: (prev: S, next: S) => void | S): void;
 
   /**---
    * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
-   * ### *`acts:`*
+   * ### *`acts`*:
    * contains all custom actions.
    * @example
    * store.acts.actionName();
@@ -102,4 +103,4 @@ interface Store<S, A> {
   acts: A;
 }
 
-export type { Store };
+export type { Nexus };
