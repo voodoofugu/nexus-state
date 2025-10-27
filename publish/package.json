@@ -1,9 +1,9 @@
 {
   "name": "nexus-state",
-  "version": "3.0.3",
+  "version": "3.0.5",
   "author": "Georg Schilin",
   "license": "MIT",
-  "description": "Global state manager",
+  "description": "Lightweight global state manager for React and JavaScript.",
   "main": "./cjs/index.js",
   "exports": {
     ".": {
