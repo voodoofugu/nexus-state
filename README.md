@@ -231,8 +231,7 @@ The nexus name is arbitrary, which can be helpful when working with multiple nex
 import { ✦create } from "nexus-state";
 
 const nexus1 = ✦create({...});
-
-export default nexus1; // ! renamed
+const nexus2 = ✦create({...});
 
 // ✦create - createNexus or createReactNexus
 ```
