@@ -1,8 +1,8 @@
-import type { RecordAny, Setter, Getter, ActsCreate } from "./core";
+import type { RecordAny, Setter, Getter, CreateActs } from "./core";
 
 /**---
  * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
- * ### *`createActs`*:
+ * ### ***createActs***:
  * defines a group of acts.
  * @param create function that receives `get` and `set` with `this` bound to the acts object.
  * @returns actions object.
@@ -18,21 +18,23 @@ import type { RecordAny, Setter, Getter, ActsCreate } from "./core";
  * }));
  *
  * // Usage:
- * const { store, actionStore } = ✦store({ // ✦ createNexus or createReactNexus
+ * const nexus = ✦store({ // ✦ createNexus or createReactNexus
  *   state: {...},
  *   acts: myActions, // ! supports multiple: [myActions, myAnotherActions]
  * });
+ * @template S Type of initial state
+ * @template A Optional type of acts
  * @see [nexus-state](https://www.npmjs.com/package/nexus-state)
  */
 declare function createActs<
   S extends RecordAny,
   A extends RecordAny = RecordAny
 >(
-  create: ActsCreate<A, S>
+  create: CreateActs<A, S>
 ): (
   /**---
    * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
-   * ### *`get`*:
+   * ### ***get***:
    * returns the entire state or a specific state value.
    * @param key optional state name.
    * @example
@@ -47,7 +49,7 @@ declare function createActs<
   get: Getter<S>,
   /**---
    * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
-   * ### *`set`*:
+   * ### ***set***:
    * updates the state with a partial object or functional updater.
    * @param update partial object or function with access to all states.
    * @example

@@ -4,7 +4,7 @@ import type { createActs } from "./createActs";
 
 /**---
  * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
- * ### *`nexus`*:
+ * ### ***NXS***:
  * the entire library exported as a single default object.
  *
  * Provides access to the main API functions:

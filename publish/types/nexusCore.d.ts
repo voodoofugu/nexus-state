@@ -2,8 +2,8 @@ import type { Setter, Getter } from "./core";
 
 /**---
  * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
- * ### *`Nexus`*:
- * represents a store instance with core methods and user-defined acts.
+ * ### ***Nexus***:
+ * represents a store instance with core methods.
  *
  * Methods:
  * - `get` — returns the entire state or a specific state value
@@ -14,57 +14,58 @@ import type { Setter, Getter } from "./core";
  * - `acts` — contains all custom actions
  *
  * @template S Type of initial state
- * @template A Type of acts
+ * @template A Optional type of actsType of acts
+ * @see [nexus-state](https://www.npmjs.com/package/nexus-state)
  */
 interface Nexus<S, A> {
   /**---
    * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
-   * ### *`get`*:
+   * ### ***get***:
    * returns the entire state or a specific state value.
    * @param key optional state name.
    * @example
-   * const entireState = store.get();
-   * const specificValue = store.get("key");
+   * const entireState = nexus.get();
+   * const specificValue = nexus.get("key");
    * @see [nexus-state](https://www.npmjs.com/package/nexus-state)
    */
   get: Getter<S>;
 
   /**---
    * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
-   * ### *`set`*:
+   * ### ***set***:
    * updates the state with a partial object or functional updater.
    * @param update partial object or function with access to all states.
    * @example
    * // Direct state update
-   * store.set({ key: newValue });
-   * store.set({ key: newValue, anotherKey: newValue }); // multiple
+   * nexus.set({ key: newValue });
+   * nexus.set({ key: newValue, anotherKey: newValue }); // multiple
    *
    * // Functional state update
-   * store.set((state) => ({ key: state.key + 1 }));
+   * nexus.set((state) => ({ key: state.key + 1 }));
    * @see [nexus-state](https://www.npmjs.com/package/nexus-state)
    */
   set: Setter<S>;
 
   /**---
    * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
-   * ### *`reset`*:
+   * ### ***reset***:
    * reset the entire state or specific keys.
    * @example
-   * store.reset(); // reset entire state
-   * store.reset("key", "anotherKey");
+   * nexus.reset(); // reset entire state
+   * nexus.reset("key", "anotherKey");
    * @see [nexus-state](https://www.npmjs.com/package/nexus-state)
    */
   reset(...keys: (keyof S)[]): void;
 
   /**---
    * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
-   * ### *`subscribe`*:
+   * ### ***subscribe***:
    * subscribes to changes of specific keys or entire state.
    * @param observer callback function to be called when the state changes.
    * @param dependencies keys to subscribe to. Use `["*"]` to listen to all.
    * @returns an unsubscribe function.
    * @example
-   * const unsubscribe = store.subscribe(
+   * const unsubscribe = nexus.subscribe(
    *   (state) => { console.log("key changed:", state.key); },
    *   ["key"]
    * );
@@ -80,11 +81,11 @@ interface Nexus<S, A> {
 
   /**---
    * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
-   * ### *`middleware`*:
+   * ### ***middleware***:
    * register middleware to intercept state changes before updates.
    * @param middleware function receiving prev and next state.
    * @example
-   * store.middleware((prev, next) => {
+   * nexus.middleware((prev, next) => {
    *   // You can modify nextState, perform side effects or return modified state
    *   return next;
    * });
@@ -94,10 +95,10 @@ interface Nexus<S, A> {
 
   /**---
    * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
-   * ### *`acts`*:
+   * ### ***acts***:
    * contains all custom actions.
    * @example
-   * store.acts.actionName();
+   * nexus.acts.actionName();
    * @see [nexus-state](https://www.npmjs.com/package/nexus-state)
    */
   acts: A;

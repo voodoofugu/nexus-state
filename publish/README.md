@@ -33,8 +33,8 @@ npm install nexus-state
 
 The library provides two separate builds:
 
-> - **Modern bundlers** use the **ESM** (`import`) build
-> - **Node.js** use the **CommonJS** (`require`) build
+> - **Modern bundlers** use the **ESM** (import) build
+> - **Node.js** use the **CommonJS** (require) build
 
 Import the entire API via the default export or as individual named imports:
 
