@@ -6,7 +6,7 @@ import type { Nexus } from "./nexusCore";
  * ### ***createNexus***:
  * creates a new framework-agnostic nexus store instance.
  * @param options store configuration including entire initial `state` and optional `acts`.
- * @returns "{@link Nexus}" instance with core methods.
+ * @returns instance with core methods.
  * @example
  * const nexus = createNexus({
  *   state: {
@@ -35,7 +35,6 @@ export declare function createNexus<
    *   key: "initialValue"
    * }
    * @template S Type of initial state
-   * @see [nexus-state](https://www.npmjs.com/package/nexus-state)
    */
   state: S;
   /**---
@@ -48,7 +47,6 @@ export declare function createNexus<
    *   actionGetKey() { console.log("Key value:", get("key")); }
    * })
    * @template A Type of acts
-   * @see [nexus-state](https://www.npmjs.com/package/nexus-state)
    */
   acts?: CreateActsUnion<A, S>;
 }): Nexus<S, A>;

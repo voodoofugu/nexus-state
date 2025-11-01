@@ -6,7 +6,7 @@ import type { ReactNexus } from "./reactNexus";
  * ### ***createReactNexus***:
  * creates an extended nexus store with React bindings and hooks.
  * @param options store configuration including entire initial `state` and optional `acts`.
- * @returns "{@link ReactNexus}" instance with core methods and React Hooks.
+ * @returns instance with core methods and React Hooks.
  * @example
  * const nexus = createReactNexus({
  *   state: {
@@ -35,7 +35,6 @@ declare function createReactNexus<
    *   key: "initialValue"
    * }
    * @template S Type of initial state
-   * @see [nexus-state](https://www.npmjs.com/package/nexus-state)
    */
   state: S;
   /**---
@@ -48,7 +47,6 @@ declare function createReactNexus<
    *   actionGetKey() { console.log("Key value:", get("key")); }
    * })
    * @template A Type of acts
-   * @see [nexus-state](https://www.npmjs.com/package/nexus-state)
    */
   acts?: CreateActsUnion<A, S>;
 }): ReactNexus<S, A>;

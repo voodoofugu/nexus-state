@@ -33,8 +33,8 @@ npm install nexus-state
 
 The library provides two separate builds:
 
-> - **Modern bundlers** use the **ESM** (import) build
-> - **Node.js** use the **CommonJS** (require) build
+> - **Modern bundlers\*use the **ESM\*(import) build
+> - **Node.js\*use the **CommonJS\*(require) build
 
 Import the entire API via the default export or as individual named imports:
 
@@ -55,7 +55,7 @@ import { createNexus, createReactNexus, createActs } from "nexus-state";
 <b>Description:</b><em><br>
 creates a new framework-agnostic store (**nexus**) instance.<br>
 </em><br>
-<b>Arguments:</b><em><br>
+<b>Parameters:</b><em><br>
 <ul>
   <li><code>options</code>: object with <code>state</code> and <code>acts</code>.</li>
 </ul>
@@ -111,7 +111,7 @@ const nexus = createNexus<MyStateT, MyActionsT>({...});
 <b>Description:</b><em><br>
 extends <code>createNexus</code> with React-specific hooks.<br>
 </em><br>
-<b>Arguments:</b><em><br>
+<b>Parameters:</b><em><br>
 <ul>
   <li><code>options</code>: object with <code>state</code> and <code>acts</code>.</li>
 </ul>
@@ -167,7 +167,7 @@ const nexus = createReactNexus<MyStateT, MyActionsT>({...});
 <b>Description:</b><em><br>
 creates a monolithic action factory that is useful for code splitting.<br>
 </em><br>
-<b>Arguments:</b><em><br>
+<b>Parameters:</b><em><br>
 <ul>
   <li><code>create</code>: function that receives <code>set</code> and has <code>this</code> bound to the acts object.</li>
 </ul>
@@ -250,7 +250,7 @@ const nexus2 = ✦create({...});
 <b>Description:</b><em><br>
 returns the entire state or a specific state value.<br>
 </em><br>
-<b>Arguments:</b><em><br>
+<b>Parameters:</b><em><br>
 <ul>
   <li><code>key</code>: optional state name.</li>
 </ul>
@@ -272,9 +272,10 @@ const specificValue = nexus.get("key");
 <b>Description:</b><em><br>
 updates the state with a partial object or functional updater.<br>
 </em><br>
-<b>Arguments:</b><em><br>
+<b>Parameters:</b><em><br>
 <ul>
   <li><code>update</code>: partial object or function with access to all states.</li>
+  <li><code>context</code>: optional string or context object with <code>source</code> and optional <code>meta</code></li>
 </ul>
 </em><br>
 <b>Example:</b>
@@ -290,6 +291,12 @@ nexus.set({ count1: 5, count2: 10 }); // multiple
 nexus.set((state) => ({
   count1: state.count1 + 1,
 }));
+
+// With context for `middleware`
+set({ key: newValue }, { source: "server", meta: { ... } });
+
+// Shortcut equivalent to { source: "server" }
+set({ key: newValue }, "server");
 ```
 
 </div></ul></details>
@@ -317,7 +324,7 @@ nexus.reset("count1", "count2");
 <b>Description:</b><em><br>
 subscribes to changes of specific keys or entire state and returns an unsubscribe function.<br>
 </em><br>
-<b>Arguments:</b><em><br>
+<b>Parameters:</b><em><br>
 <ul>
   <li><code>observer</code>: function to be called when state changes.</li>
   <li><code>dependencies</code>: keys to subscribe to. Use <code>["*"]</code> to listen to all.</li>
@@ -347,12 +354,11 @@ unsubscribe();
 
 <details><summary><b><code>middleware</code></b></summary><br><ul><div>
 <b>Description:</b><em><br>
-adds a middleware to intercept state changes before updates.<br>
-Useful for logging, debugging, or integrating with developer tools.<br>
+register a middleware to intercept and modify state updates.<br>
 </em><br>
-<b>Arguments:</b><em><br>
+<b>Parameters:</b><em><br>
 <ul>
-  <li><code>middleware</code>: function with prev and next state.</li>
+  <li><code>fn</code>: middleware function receiving prev state, next state and context.</li>
 </ul>
 </em><br>
 <b>Example:</b><br>
@@ -360,14 +366,12 @@ Useful for logging, debugging, or integrating with developer tools.<br>
 ```jsx
 import nexus from "your-nexus-config";
 
-// Example: logging state changes
-nexus.middleware((prev, next) => {
-  console.log("State changing from", prev, "to", next);
-});
-
-// Example: modifying next state before applying
-nexus.middleware((prev, next) => {
-  return { ...next, forced: true };
+nexus.middleware((prev, next, context) => {
+  if (context.source === "storage") {
+    console.log("Loaded from storage:", next);
+  }
+  // You can return a modified state or perform side effects
+  return next;
 });
 ```
 
@@ -462,7 +466,7 @@ More info: [Arrow Functions](https://developer.mozilla.org/en-US/docs/Web/JavaSc
 <b>Description:</b><em><br>
 <code>react</code> hook to subscribe to entire state or a state value.<br>
 </em><br>
-<b>Arguments:</b><em><br>
+<b>Parameters:</b><em><br>
 <ul>
   <li><code>key</code>: optional state name.</li>
 </ul>
@@ -479,7 +483,7 @@ const specificValue = nexus.use("key");
 <br>
 
 > ✦ Note:<br>
-> Unlike **get**, **use** triggers a re-render when the state changes.
+> Unlike **get**, \**use*triggers a re-render when the state changes.
 
 </div></ul></details>
 
@@ -489,7 +493,7 @@ const specificValue = nexus.use("key");
 <b>Description:</b><em><br>
 <code>react</code> hook for creating derived values from the state.<br>
 </em><br>
-<b>Arguments:</b><em><br>
+<b>Parameters:</b><em><br>
 <ul>
   <li><code>observer</code>: function that returns any derived value from the state.</li>
   <li><code>dependencies</code>: keys to subscribe to. Use <code>["*"]</code> to listen to all.</li>

@@ -35,13 +35,20 @@ interface Nexus<S, A> {
    * ### ***set***:
    * updates the state with a partial object or functional updater.
    * @param update partial object or function with access to all states.
+   * @param context optional string or context object with `source` and optional `meta`.
    * @example
    * // Direct state update
-   * nexus.set({ key: newValue });
-   * nexus.set({ key: newValue, anotherKey: newValue }); // multiple
+   * set({ key: newValue });
+   * set({ key: newValue, anotherKey: newValue }); // multiple
    *
    * // Functional state update
-   * nexus.set((state) => ({ key: state.key + 1 }));
+   * set((state) => ({ key: state.key + 1 }));
+   *
+   * // With context for `middleware`
+   * set({ key: newValue }, { source: "server", meta: { ... } });
+   *
+   * // Shortcut equivalent to { source: "server" }
+   * set({ key: newValue }, "server");
    * @see [nexus-state](https://www.npmjs.com/package/nexus-state)
    */
   set: Setter<S>;
@@ -82,16 +89,58 @@ interface Nexus<S, A> {
   /**---
    * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
    * ### ***middleware***:
-   * register middleware to intercept state changes before updates.
-   * @param middleware function receiving prev and next state.
+   * register a middleware to intercept and modify state updates.
+   * @param fn middleware function receiving prev state, next state and context.
    * @example
-   * nexus.middleware((prev, next) => {
-   *   // You can modify nextState, perform side effects or return modified state
+   * nexus.middleware((prev, next, context) => {
+   *   if (context.source === "storage") {
+   *     console.log("Loaded from storage:", next);
+   *   }
+   *   // You can return a modified state or perform side effects
    *   return next;
    * });
    * @see [nexus-state](https://www.npmjs.com/package/nexus-state)
    */
-  middleware(middleware: (prev: S, next: S) => void | S): void;
+  middleware(
+    fn: (
+      /**---
+       * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
+       * ### ***prev***:
+       * previous state before the update.
+       */
+      prev: S,
+      /**---
+       * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
+       * ### ***next***:
+       * next state after the update.
+       */
+      next: S,
+      /**---
+       * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
+       * ### ***context***:
+       * context of the update, including its source and optional meta info.
+       * @example
+       * if (context.source === "server") {
+       *   // do something
+       * }
+       */
+      context?: {
+        /**---
+         * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
+         * ### ***source***:
+         * name of the update source (e.g., "manual", "server", "server").
+         * @default "manual"
+         */
+        source: string;
+        /**---
+         * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
+         * ### ***meta***:
+         * optional additional metadata.
+         */
+        meta?: Record<string, any>;
+      }
+    ) => void | S
+  ): void;
 
   /**---
    * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)

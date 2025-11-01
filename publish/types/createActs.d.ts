@@ -38,13 +38,8 @@ declare function createActs<
    * returns the entire state or a specific state value.
    * @param key optional state name.
    * @example
-   * const myActions = createActs((get) => ({
-   *   actionName() {
-   *    const specificValue = get("key");
-   *    console.log("specificValue:", specificValue);
-   *   }
-   * }));
-   * @see [nexus-state](https://www.npmjs.com/package/nexus-state)
+   * const entireState = nexus.get();
+   * const specificValue = nexus.get("key");
    */
   get: Getter<S>,
   /**---
@@ -52,17 +47,20 @@ declare function createActs<
    * ### ***set***:
    * updates the state with a partial object or functional updater.
    * @param update partial object or function with access to all states.
+   * @param context optional string or context object with `source` and optional `meta`.
    * @example
-   * const myActions = createActs((_, set) => ({
-   *   actionName() {
-   *     // Direct state update
-   *     set({ key: "newValue" });
+   * // Direct state update
+   * set({ key: newValue });
+   * set({ key: newValue, anotherKey: newValue }); // multiple
    *
-   *     // Functional state update
-   *     set((state) => ({ key: state.key + "!" }));
-   *   }
-   * }));
-   * @see [nexus-state](https://www.npmjs.com/package/nexus-state)
+   * // Functional state update
+   * set((state) => ({ key: state.key + 1 }));
+   *
+   * // With context for `middleware`
+   * set({ key: newValue }, { source: "server", meta: { ... } });
+   *
+   * // Shortcut equivalent to { source: "server" }
+   * set({ key: newValue }, "server");
    */
   set: Setter<S>
 ) => A | Partial<A>;

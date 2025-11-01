@@ -1,6 +1,10 @@
-import type { Setter, ActsCreateUnion, RecordAny, Nexus } from "./types/core";
-
-type Middleware<S> = (prevState: S, nextState: S) => void | S;
+import type {
+  Setter,
+  ActsCreateUnion,
+  RecordAny,
+  Nexus,
+  Middleware,
+} from "./types/core";
 
 function createNexus<
   S extends RecordAny = RecordAny,
@@ -27,17 +31,27 @@ function createNexus<
     return key !== undefined ? state[key] : state;
   }
 
-  const set: Setter<S> = (partial) => {
+  const set: Setter<S> = (update, context) => {
     const prevState = { ...state };
+    const normalizedContext =
+      typeof context === "object"
+        ? context
+        : context
+        ? { source: context }
+        : undefined;
+
     const nextPartial =
-      typeof partial === "function" ? partial(prevState) : partial;
+      typeof update === "function" ? update(prevState) : update;
+
     let nextState = { ...state, ...nextPartial };
 
+    // --- прогоняем через middleware ---
     for (const middleware of localMiddleware) {
-      const result = middleware(prevState, nextState);
+      const result = middleware(prevState, nextState, normalizedContext);
       if (result !== undefined) nextState = result as S;
     }
 
+    // --- вычисляем изменённые ключи ---
     const changedKeys: (keyof S)[] = [];
     for (const key in nextState) {
       if (Object.prototype.hasOwnProperty.call(nextState, key)) {
@@ -45,6 +59,7 @@ function createNexus<
       }
     }
 
+    // --- обновляем и уведомляем ---
     if (changedKeys.length) {
       state = nextState;
       notify(changedKeys);

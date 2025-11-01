@@ -1,6 +1,14 @@
 type RecordAny = Record<string, any>;
 
-type Setter<S> = (update: Partial<S> | ((state: S) => Partial<S>)) => void;
+type Source = "manual" | "server" | "server" | "external";
+type Setter<S> = {
+  (
+    update: Partial<S> | ((state: S) => Partial<S>),
+    context?: { source: string; meta?: Record<string, any> }
+  ): void;
+  (update: Partial<S> | ((state: S) => Partial<S>), context?: Source): void;
+  (update: Partial<S> | ((state: S) => Partial<S>), context?: string): void;
+};
 
 type Getter<S> = {
   (): S;
@@ -15,7 +23,6 @@ type CreateActs<A, S> = {
      * refers to the acts object or a partial of it.
      * @example
      * actionA() { this.actionB(); }
-     * @see [nexus-state](https://www.npmjs.com/package/nexus-state)
      */
     this: A | Partial<A>,
     /**---
@@ -26,7 +33,6 @@ type CreateActs<A, S> = {
      * @example
      * const entireState = get();
      * const specificValue = get("key");
-     * @see [nexus-state](https://www.npmjs.com/package/nexus-state)
      */
     get: Getter<S>,
     /**---
@@ -34,6 +40,7 @@ type CreateActs<A, S> = {
      * ### ***set***:
      * updates the state with a partial object or functional updater.
      * @param update partial object or function with access to all states.
+     * @param context optional string or context object with `source` and optional `meta`.
      * @example
      * // Direct state update
      * set({ key: newValue });
@@ -41,7 +48,12 @@ type CreateActs<A, S> = {
      *
      * // Functional state update
      * set((state) => ({ key: state.key + 1 }));
-     * @see [nexus-state](https://www.npmjs.com/package/nexus-state)
+     *
+     * // With context for `middleware`
+     * set({ key: newValue }, { source: "server", meta: { ... } });
+     *
+     * // Shortcut equivalent to { source: "server" }
+     * set({ key: newValue }, "server");
      */
     set: Setter<S>
   ): A | Partial<A>;

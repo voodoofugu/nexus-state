@@ -1,6 +1,16 @@
 type RecordAny = Record<string, any>;
 
-type Setter<S> = (update: Partial<S> | ((state: S) => Partial<S>)) => void;
+type Source = "manual" | "storage" | "server" | "external";
+type MiddlewareSource = { source: string; meta?: Record<string, any> };
+
+type Setter<S> = {
+  (
+    update: Partial<S> | ((state: S) => Partial<S>),
+    context?: MiddlewareSource
+  ): void;
+  (update: Partial<S> | ((state: S) => Partial<S>), source?: Source): void;
+  (update: Partial<S> | ((state: S) => Partial<S>), source?: string): void;
+};
 
 type Getter<S> = {
   (): S;
@@ -14,6 +24,12 @@ type ActsCreate<A, S> = (
 ) => A | Partial<A>;
 type ActsCreateUnion<A, S> = ActsCreate<A, S> | Array<ActsCreate<A, S>>;
 
+type Middleware<S> = (
+  prevState: S,
+  nextState: S,
+  context?: MiddlewareSource
+) => void | S;
+
 interface Nexus<S, A> {
   get: Getter<S>;
   set: Setter<S>;
@@ -22,7 +38,7 @@ interface Nexus<S, A> {
     observer: (state: S) => void,
     dependencies: ["*"] | (keyof S)[]
   ): () => void;
-  middleware(middleware: (prev: S, next: S) => void | S): void;
+  middleware(middleware: Middleware<S>): void;
   acts: A;
 }
 
@@ -47,4 +63,5 @@ export type {
   ActsCreateUnion,
   Nexus,
   ReactNexus,
+  Middleware,
 };
