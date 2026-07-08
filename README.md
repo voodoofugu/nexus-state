@@ -5,14 +5,11 @@
 ### Table of contents
 
 - [About](#about)
-- [What makes it different](#what-makes-it-different)
 - [Installation](#installation)
-- [Entry points](#entry-points)
 - [Quick start](#quick-start)
 - [API](#api)
   - [main](#main)
   - [nexus](#nexus)
-  - [persist](#persist)
 - [License](#license)
 
 <h2></h2>
@@ -23,9 +20,7 @@ Lightweight, framework-agnostic state management with optional actions, React
 bindings, and traceable updates. Designed for simplicity and performance, with
 first-class TypeScript inference.
 
-<h2></h2>
-
-### What makes it different
+What makes it different
 
 - **Traceable state.** Every update carries a `context` describing where it came
   from (`"server"`, `"storage"`, `"reset"`, or your own). That context flows
@@ -51,19 +46,14 @@ npm install nexus-state
 React is an **optional** peer dependency — only needed if you import
 `nexus-state/react`.
 
-<h2></h2>
-
-### Entry points
-
-| Import                | Contents                               | Needs React |
-| --------------------- | -------------------------------------- | ----------- |
-| `nexus-state`         | `createNexus`, `createActs`, `persist` | no          |
-| `nexus-state/react`   | `createReactNexus` (+ core re-exports) | yes         |
-| `nexus-state/persist` | direct `persist` entry                 | no          |
+| Import              | Contents                               | Needs React |
+| ------------------- | -------------------------------------- | ----------- |
+| `nexus-state`       | `createNexus`, `createActs`, `persist` | no          |
+| `nexus-state/react` | `createReactNexus` (+ core re-exports) | yes         |
 
 ```js
 import { createNexus, createActs, persist } from "nexus-state";
-import { createReactNexus } from "nexus-state/react";
+import { createReactNexus } from "nexus-state/react"; // ! with /react
 ```
 
 <h2></h2>
@@ -71,10 +61,10 @@ import { createReactNexus } from "nexus-state/react";
 ### Quick start
 
 ```tsx
-import { createReactNexus } from "nexus-state";
-// ✦ note: createReactNexus is served from "nexus-state/react"
+import { createNexus } from "nexus-state";
+// ✦ note: this example is also suitable for createReactNexus
 
-const nexus = createReactNexus({
+const nexus = createNexus({
   state: { count: 0 },
   acts: (get, set) => ({
     increment() {
@@ -91,6 +81,15 @@ function Counter() {
 
 No generics required — `count` is `number` and `nexus.acts.increment` is fully
 typed, inferred from the config.
+
+The nexus name is arbitrary, which can be helpful when working with multiple nexus instances:<br>
+
+```js
+import { createNexus } from "nexus-state";
+
+const nexus1 = createNexus({...});
+const nexus2 = createNexus({...});
+```
 
 <h2></h2>
 
@@ -270,17 +269,42 @@ const counterActs = createActs<MyState, MyActions>(function (get, set) {
 
 <h2></h2>
 
-<details><summary>Recommendations:</summary><br><ul><div>
-The nexus name is arbitrary, which can be helpful when working with multiple nexus instances:<br>
+<details><summary><b><code>persist</code></b></summary><br><ul><div>
+<b>Description:</b><em><br>
+syncs a nexus with persistent storage. Hydration is tagged with
+<code>source: "storage"</code>, and the write-back skips updates carrying that
+source — so loading from disk never echoes back to disk. Returns a function that
+stops persisting.<br>
+</em><br>
+<b>Parameters:</b><em><br>
+<ul>
+  <li><code>nexus</code>: the store to persist.</li>
+  <li><code>options.key</code>: storage key.</li>
+  <li><code>options.storage</code>: storage backend (defaults to <code>localStorage</code>; no-op when unavailable).</li>
+  <li><code>options.include</code> / <code>options.exclude</code>: choose which keys to persist.</li>
+  <li><code>options.version</code> + <code>options.migrate</code>: migrate older snapshots.</li>
+  <li><code>options.onError</code>: handle storage / parse errors instead of throwing.</li>
+</ul>
+</em><br>
+<b>Example:</b>
 
-```js
-import { createNexus } from "nexus-state";
+```tsx
+import { createNexus, persist } from "nexus-state";
 
-const nexus1 = createNexus({...});
-const nexus2 = createNexus({...});
+const nexus = createNexus({ state: { theme: "light", count: 0 } });
+
+const stop = persist(nexus, {
+  key: "my-app",
+  include: ["theme"], // persist only the theme
+  version: 1,
+  migrate: (old) => ({ theme: old.theme ?? "light" }),
+});
+
+// later: stop() to disable persistence
 ```
 
 </div></ul></details>
+</div></ul>
 
 <h2></h2>
 
@@ -609,48 +633,6 @@ rerender(); // force re-render
 
 </div></ul></details>
 
-</div></ul>
-
-<h2></h2>
-
-#### persist:
-
-<ul><div>
-<details><summary><b><code>persist</code></b></summary><br><ul><div>
-<b>Description:</b><em><br>
-syncs a nexus with persistent storage. Hydration is tagged with
-<code>source: "storage"</code>, and the write-back skips updates carrying that
-source — so loading from disk never echoes back to disk. Returns a function that
-stops persisting.<br>
-</em><br>
-<b>Parameters:</b><em><br>
-<ul>
-  <li><code>nexus</code>: the store to persist.</li>
-  <li><code>options.key</code>: storage key.</li>
-  <li><code>options.storage</code>: storage backend (defaults to <code>localStorage</code>; no-op when unavailable).</li>
-  <li><code>options.include</code> / <code>options.exclude</code>: choose which keys to persist.</li>
-  <li><code>options.version</code> + <code>options.migrate</code>: migrate older snapshots.</li>
-  <li><code>options.onError</code>: handle storage / parse errors instead of throwing.</li>
-</ul>
-</em><br>
-<b>Example:</b>
-
-```tsx
-import { createNexus, persist } from "nexus-state";
-
-const nexus = createNexus({ state: { theme: "light", count: 0 } });
-
-const stop = persist(nexus, {
-  key: "my-app",
-  include: ["theme"], // persist only the theme
-  version: 1,
-  migrate: (old) => ({ theme: old.theme ?? "light" }),
-});
-
-// later: stop() to disable persistence
-```
-
-</div></ul></details>
 </div></ul>
 
 <h2></h2>
