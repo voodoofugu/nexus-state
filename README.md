@@ -98,6 +98,9 @@ const nexus2 = createNexus({...});
 #### main:
 
 <ul><div>
+
+###### **— CORE —**
+
 <details><summary><b><code>createNexus</code></b></summary><br><ul><div>
 <b>Description:</b><em><br>
 creates a new framework-agnostic store (**nexus**) instance.<br>
@@ -155,56 +158,6 @@ Pass generics explicitly only when you want to declare the shape up front:
 
 ```ts
 createNexus<MyState, MyActions>({ ... });
-```
-
-</details>
-
-</div></ul></details>
-
-<h2></h2>
-
-<details><summary><b><code>createReactNexus</code></b></summary><br><ul><div>
-<b>Description:</b><em><br>
-extends <code>createNexus</code> with React-specific hooks.<br>
-</em><br>
-<b>Parameters:</b><em><br>
-<ul>
-  <li><code>options</code>: object with <code>state</code> and optional <code>acts</code>.</li>
-</ul>
-</em><br>
-<b>Example:</b>
-
-```js
-import { createReactNexus } from "nexus-state/react"; // import with /react
-
-const nexus = createReactNexus({
-  state: {
-    count1: 0,
-    count2: 0,
-  },
-
-  acts: (get, set) => ({
-    increment() {
-      set((state) => ({ count1: state.count1 + 1 }));
-      this.getState("count1"); // ! calling another action
-    },
-    getState(value) {
-      console.log(`${value}:`, get(value));
-    },
-  }),
-});
-
-export default nexus;
-```
-
-<details><summary><b>TypeScript Snippet:</b></summary>
-
-```ts
-// The acts generic is optional — omitting it no longer causes an error.
-const nexus = createReactNexus({ state: {...}, acts: (get, set) => ({...}) });
-
-// Explicit form, if you prefer to declare shapes:
-const typed = createReactNexus<MyState, MyActions>({...});
 ```
 
 </details>
@@ -304,6 +257,59 @@ const stop = persist(nexus, {
 ```
 
 </div></ul></details>
+
+<h2></h2>
+
+###### **— REACT —**
+
+<details><summary><b><code>createReactNexus</code></b></summary><br><ul><div>
+<b>Description:</b><em><br>
+extends <code>createNexus</code> with React-specific hooks.<br>
+</em><br>
+<b>Parameters:</b><em><br>
+<ul>
+  <li><code>options</code>: object with <code>state</code> and optional <code>acts</code>.</li>
+</ul>
+</em><br>
+<b>Example:</b>
+
+```js
+import { createReactNexus } from "nexus-state/react"; // import with /react
+
+const nexus = createReactNexus({
+  state: {
+    count1: 0,
+    count2: 0,
+  },
+
+  acts: (get, set) => ({
+    increment() {
+      set((state) => ({ count1: state.count1 + 1 }));
+      this.getState("count1"); // ! calling another action
+    },
+    getState(value) {
+      console.log(`${value}:`, get(value));
+    },
+  }),
+});
+
+export default nexus;
+```
+
+<details><summary><b>TypeScript Snippet:</b></summary>
+
+```ts
+// The acts generic is optional — omitting it no longer causes an error.
+const nexus = createReactNexus({ state: {...}, acts: (get, set) => ({...}) });
+
+// Explicit form, if you prefer to declare shapes:
+const typed = createReactNexus<MyState, MyActions>({...});
+```
+
+</details>
+
+</div></ul></details>
+
 </div></ul>
 
 <h2></h2>
@@ -312,7 +318,7 @@ const stop = persist(nexus, {
 
 <ul><div>
 
-<h6><mark>core</mark></h6>
+###### **— CORE —**
 
 <details><summary><b><code>get</code></b></summary><br><ul><div>
 <b>Description:</b><em><br>
@@ -460,7 +466,7 @@ const remove = nexus.middleware((prev, next, context) => {
   return next;
 });
 
-remove(); // detach the middleware
+// later: remove() to detach middleware
 ```
 
 <details><summary><b>Redux DevTools Integration</b></summary><br><ul><div>
@@ -524,13 +530,9 @@ nexus.acts.increment();
 nexus.acts.getState("count1");
 ```
 
-<br>
 <b>Important:</b><em><br>
-regular functions support calling other actions via <code>this</code>; arrow
-functions are more compact but don't:
+regular functions support calling other actions via <code>this</code>, arrow functions are more compact but don't:
 </em><br>
-
-<br>
 
 ```js
 // regular function
@@ -539,7 +541,7 @@ increment() {
 }
 
 // arrow function
-increment: () => this.getState("count1"); // `this` is not the acts object
+increment: () => this.getState("count1"); // not works
 ```
 
 More info: [Arrow Functions](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions)
@@ -548,7 +550,7 @@ More info: [Arrow Functions](https://developer.mozilla.org/en-US/docs/Web/JavaSc
 
 <h2></h2>
 
-<h6><mark>react</mark></h6>
+###### **— REACT —**
 
 <details><summary><b><code>use</code></b></summary><br><ul><div>
 <b>Description:</b><em><br>
