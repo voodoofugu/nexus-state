@@ -8,7 +8,6 @@ import dts from "rollup-plugin-dts";
 const entries = {
   index: "./src/index.ts",
   react: "./src/react.ts",
-  persist: "./src/persist.ts",
 };
 
 const external = (id) => /^react/.test(id);
@@ -46,7 +45,7 @@ const dtsBuilds = (dir, entryFileNames = "[name].d.ts") =>
   }));
 
 export default [
-  // ESM builds (index / react / persist)
+  // ESM builds (index / react)
   {
     input: entries,
     output: {
@@ -58,7 +57,7 @@ export default [
     plugins: makePlugins(true),
     external,
   },
-  // CJS builds (index / react / persist)
+  // CJS builds (index / react)
   {
     input: entries,
     output: {

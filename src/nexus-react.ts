@@ -1,11 +1,13 @@
 import { useSyncExternalStore, useCallback, useReducer, useRef } from "react";
 import createNexus from "./nexus-core";
+import { sameValue } from "./shallow";
 
 import type {
   RecordAny,
   ReactNexus,
   NexusOptions,
   Dependencies,
+  EqualityFn,
   ActsCreate,
   ActsPart,
 } from "./types/core";
@@ -83,27 +85,24 @@ function createReactNexus<
   function useSelector<R>(
     selector: (state: S) => R,
     dependencies: Dependencies<S> = ["*"],
-    isEqual?: (a: R, b: R) => boolean
+    isEqual: EqualityFn<R> = sameValue
   ): R {
-    // Read the latest selector / comparator through refs so the caller never
-    // has to wrap them in `useCallback` to keep the subscription stable.
+    // Read the latest selector / comparator through refs so the caller never has
+    // to wrap them in `useCallback` to keep the subscription stable.
     const selectorRef = useRef(selector);
     selectorRef.current = selector;
     const isEqualRef = useRef(isEqual);
     isEqualRef.current = isEqual;
 
     // Cache the derived value so `getSnapshot` stays referentially stable
-    // when the selection is unchanged (required by useSyncExternalStore).
+    // when the comparator says the selection is unchanged.
     const cache = useRef<{ value: R } | null>(null);
 
     const getSnapshot = () => {
       const next = selectorRef.current(nexus.get());
       const prev = cache.current;
-      if (prev !== null) {
-        const equal = isEqualRef.current
-          ? isEqualRef.current(prev.value, next)
-          : Object.is(prev.value, next);
-        if (equal) return prev.value;
+      if (prev !== null && isEqualRef.current(prev.value, next)) {
+        return prev.value;
       }
       cache.current = { value: next };
       return next;

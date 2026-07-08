@@ -101,6 +101,9 @@ function createNexus<
     return key !== undefined ? state[key] : state;
   }
 
+  // Batching: one `set` with several keys notifies subscribers once — that is
+  // the primary way to batch. Actions add automatic batching on top (see the
+  // acts wrapper below) for the synchronous `set` calls made inside them.
   const set: Setter<S> = (update, context) => {
     const prevState = state;
     const normalizedContext = normalizeContext(context);
@@ -223,7 +226,8 @@ function createNexus<
 
   // Bind every action to the final acts object so cross-action `this` calls
   // work even when actions are destructured. Each action is internally batched,
-  // so multiple `set` calls notify subscribers once after the action finishes.
+  // so the synchronous `set` calls it makes notify subscribers once. Calls made
+  // after an `await` run as separate updates (the batch already flushed).
   for (const key of Object.keys(acts)) {
     const val = (acts as RecordAny)[key];
     if (typeof val === "function") {

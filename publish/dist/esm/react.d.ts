@@ -150,6 +150,21 @@ type Observer<S> = (state: S, context?: UpdateContext) => void;
 type Dependencies<S> = ["*"] | (keyof S)[];
 /**---
  * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
+ * ### ***EqualityFn***:
+ * compares the previous and next result of a `useSelector` selector.
+ * @description
+ * Returns `true` to keep the previous value (skip the re-render). Defaults to
+ * `Object.is` semantics. Pass the exported `shallow` helper for one-level
+ * object/array equality, or a custom function for anything else.
+ * @example
+ * ```ts
+ * const isEqual: EqualityFn<number[]> = (a, b) =>
+ *   a.length === b.length && a.every((v, i) => v === b[i]);
+ * ```
+ */
+type EqualityFn<T> = (a: T, b: T) => boolean;
+/**---
+ * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
  * ### ***ActsCreate***:
  * function that creates the action object for a nexus.
  * @description
@@ -260,8 +275,9 @@ interface Nexus<S, A = Record<string, never>> {
      * updates the state with a partial object or functional updater.
      * @description
      * A single `set` call notifies subscribers once, even when several keys
-     * change. Multiple `set` calls inside one action are also batched and notify
-     * once after the action finishes.
+     * change — this is the primary way to batch. `set` calls made synchronously
+     * inside an action are also batched into a single notification; calls made
+     * after an `await` run as separate updates.
      * @param update partial object or function with access to all state.
      * @param context optional string or context object with `source` and optional `meta`.
      * @example
@@ -374,18 +390,32 @@ interface ReactNexus<S, A = Record<string, never>> extends Nexus<S, A> {
      * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
      * ### ***useSelector***:
      * React hook that subscribes to selected keys and returns derived state.
+     * @description
+     * The **result** of the selector is compared to decide whether to re-render —
+     * `Object.is` by default. Primitive results work out of the box; when the
+     * selector returns a new object or array each run (e.g. `.map`, `.filter`, an
+     * object literal), pass the `shallow` helper or a custom `isEqual` so an equal
+     * result does not re-render.
      * @param selector derives a value from the full state.
-     * @param dependencies keys that should trigger selector re-checks, or `["*"]`.
-     * @param isEqual optional comparator for keeping the previous selected value.
+     * @param dependencies keys that trigger a selector re-check, or `["*"]`.
+     * @param isEqual optional result comparator. Defaults to `Object.is`; pass
+     * `shallow` for one-level object/array equality.
      * @example
      * ```tsx
      * const fullName = nexus.useSelector(
      *   (state) => `${state.firstName} ${state.lastName}`,
      *   ["firstName", "lastName"],
      * );
+     *
+     * // import { shallow } from "nexus-state";
+     * const ids = nexus.useSelector(
+     *   (state) => state.items.map((item) => item.id),
+     *   ["items"],
+     *   shallow,
+     * );
      * ```
      */
-    useSelector<R>(selector: (state: S) => R, dependencies?: Dependencies<S>, isEqual?: (a: R, b: R) => boolean): R;
+    useSelector<R>(selector: (state: S) => R, dependencies?: Dependencies<S>, isEqual?: EqualityFn<R>): R;
     /**---
      * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
      * ### ***useRerender***:
@@ -444,260 +474,5 @@ declare function createReactNexus<S extends RecordAny>(options: {
 }): ReactNexus<S, Record<string, never>>;
 declare function createReactNexus<S extends RecordAny = RecordAny, A extends RecordAny = Record<string, never>>(options: NexusOptions<S, A>): ReactNexus<S, A>;
 
-/**---
- * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
- * ### ***createNexus***:
- * creates a framework-agnostic nexus store.
- * @description
- * `createNexus` owns state, actions, middleware and key-level subscriptions
- * without depending on React. State and actions are inferred from the config.
- * @param options initial state and optional action creator, action slice or action slices.
- * @returns a `Nexus` instance with `get`, `set`, `reset`, `subscribe`,
- * `middleware` and `acts`.
- * @example
- * ```ts
- * import { createNexus } from "nexus-state";
- *
- * const nexus = createNexus({
- *   state: { count: 0 },
- *   acts: (get, set) => ({
- *     increment() {
- *       set({ count: get("count") + 1 }, "manual");
- *     },
- *   }),
- * });
- *
- * nexus.acts.increment();
- * nexus.get("count"); // number
- * ```
- */
-declare function createNexus<S extends RecordAny, A extends RecordAny>(options: {
-    state: S;
-    acts: ActsCreate<S, A>;
-}): Nexus<S, A>;
-declare function createNexus<S extends RecordAny, A extends RecordAny>(options: {
-    state: S;
-    acts: ActsPart<S, A> | ActsPart<S, A>[];
-}): Nexus<S, A>;
-declare function createNexus<S extends RecordAny>(options: {
-    state: S;
-}): Nexus<S, Record<string, never>>;
-declare function createNexus<S extends RecordAny = RecordAny, A extends RecordAny = Record<string, never>>(options: NexusOptions<S, A>): Nexus<S, A>;
-
-/**
- * Wraps an acts slice for code-splitting. `this` is typed as the *complete*
- * acts object, so cross-slice calls don't need optional chaining.
- * Pass one slice to `acts: slice`, or several slices to
- * `acts: [sliceA, sliceB]` when creating a nexus.
- */
-/**---
- * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
- * ### ***createActs***:
- * creates a reusable action slice for `createNexus` or `createReactNexus`.
- * @description
- * Use `createActs` to split actions across files. Inside each slice, `this` is
- * typed as the complete acts object, so actions can call other actions from the
- * same or another slice.
- * @param create slice factory that receives `get` and `set`.
- * @returns an action slice accepted by `acts: slice` or `acts: [sliceA, sliceB]`.
- * @example
- * ```ts
- * import { createActs, createNexus } from "nexus-state";
- *
- * type State = { count: number };
- * type Actions = {
- *   increment(): void;
- *   logCount(): void;
- * };
- *
- * const counterActs = createActs<State, Actions>(function (get, set) {
- *   return {
- *     increment() {
- *       set({ count: get("count") + 1 });
- *       this.logCount();
- *     },
- *     logCount() {
- *       console.log(get("count"));
- *     },
- *   };
- * });
- *
- * const nexus = createNexus<State, Actions>({
- *   state: { count: 0 },
- *   acts: counterActs,
- * });
- * ```
- */
-declare function createActs<S extends RecordAny, A extends RecordAny = RecordAny>(create: (this: A, get: Getter<S>, set: Setter<S>) => Partial<A> & ThisType<A>): ActsPart<S, A>;
-
-/**---
- * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
- * ### ***PersistStorage***:
- * minimal synchronous storage contract used by `persist`.
- * @description
- * `localStorage` satisfies this interface. Custom storage is useful for tests,
- * memory adapters, encrypted storage or platform-specific persistence.
- * @example
- * ```ts
- * const cache: Record<string, string> = {};
- *
- * const memoryStorage: PersistStorage = {
- *   getItem: (key) => cache[key] ?? null,
- *   setItem: (key, value) => {
- *     cache[key] = value;
- *   },
- *   removeItem: (key) => {
- *     delete cache[key];
- *   },
- * };
- * ```
- */
-interface PersistStorage {
-    /**---
-     * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
-     * ### ***getItem***:
-     * reads a persisted string value by key.
-     * @returns persisted value, or `null` when no value exists.
-     */
-    getItem(key: string): string | null;
-    /**---
-     * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
-     * ### ***setItem***:
-     * writes a serialized string value by key.
-     */
-    setItem(key: string, value: string): void;
-    /**---
-     * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
-     * ### ***removeItem***:
-     * removes a persisted value by key.
-     */
-    removeItem(key: string): void;
-}
-/**---
- * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
- * ### ***PersistOptions***:
- * configuration object accepted by `persist`.
- * @description
- * Controls where state is stored, which keys are persisted and how older
- * snapshots are migrated.
- * @example
- * ```ts
- * persist(nexus, {
- *   key: "counter",
- *   include: ["count"],
- *   version: 2,
- *   migrate: (state, from) => from === 1 ? { count: state.value } : state,
- * });
- * ```
- */
-interface PersistOptions<S> {
-    /**---
-     * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
-     * ### ***key***:
-     * storage key used for the persisted snapshot.
-     */
-    key: string;
-    /**---
-     * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
-     * ### ***storage***:
-     * storage backend used by `persist`.
-     * @description
-     * Defaults to `localStorage` when it is available. If no storage is available,
-     * `persist` becomes a no-op and returns an empty cleanup function.
-     */
-    storage?: PersistStorage;
-    /**---
-     * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
-     * ### ***include***:
-     * state keys that should be persisted.
-     * @description
-     * Omit `include` to persist the whole state, except keys listed in `exclude`.
-     */
-    include?: (keyof S)[];
-    /**---
-     * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
-     * ### ***exclude***:
-     * state keys that should never be persisted.
-     */
-    exclude?: (keyof S)[];
-    /**---
-     * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
-     * ### ***version***:
-     * persisted schema version.
-     * @description
-     * Bump this number when the persisted shape changes so `migrate` can transform
-     * older snapshots.
-     */
-    version?: number;
-    /**---
-     * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
-     * ### ***migrate***:
-     * transforms an older persisted snapshot into the current state shape.
-     * @param persisted raw persisted state object.
-     * @param from version stored in the persisted snapshot.
-     * @returns partial state to hydrate into the nexus.
-     */
-    migrate?: (persisted: RecordAny, from: number) => Partial<S>;
-    /**---
-     * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
-     * ### ***onError***:
-     * receives storage, JSON parse or serialization errors.
-     * @description
-     * Errors are reported here instead of being thrown from `persist`.
-     */
-    onError?: (error: unknown) => void;
-}
-/**---
- * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
- * ### ***persist***:
- * syncs a nexus with persistent storage.
- * @description
- * Hydration is tagged with `source: "storage"`, and the write-back subscriber
- * skips updates carrying that source, so loading from disk never echoes back to
- * disk. Returns a cleanup function that stops persisting future updates.
- * @param nexus nexus instance created by `createNexus` or `createReactNexus`.
- * @param options persistence configuration.
- * @returns cleanup function that unsubscribes the persistence listener.
- * @example
- * ```ts
- * import { createNexus, persist } from "nexus-state";
- *
- * const nexus = createNexus({ state: { count: 0 } });
- *
- * const stopPersisting = persist(nexus, {
- *   key: "counter",
- *   include: ["count"],
- * });
- *
- * stopPersisting();
- * ```
- */
-declare function persist<S extends RecordAny, A extends RecordAny>(nexus: Nexus<S, A>, options: PersistOptions<S>): () => void;
-
-/**---
- * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
- * ### ***nexusReact***:
- * default namespace-style export for the React entry point.
- * @description
- * Prefer named imports for tree-shaking and readability. The default export is
- * provided for users who like `nexus.createReactNexus(...)` style access.
- * @example
- * ```tsx
- * import nexus from "nexus-state/react";
- *
- * const store = nexus.createReactNexus({
- *   state: { count: 0 },
- * });
- *
- * nexus.persist(store, { key: "counter" });
- * ```
- */
-declare const nexus: {
-    createReactNexus: typeof createReactNexus;
-    createNexus: typeof createNexus;
-    createActs: typeof createActs;
-    persist: typeof persist;
-};
-
-export { createActs, createNexus, createReactNexus, nexus as default, persist };
-export type { ActsCreate, ActsCreateUnion, ActsPart, Dependencies, Getter, Middleware, Nexus, NexusOptions, Observer, PersistOptions, PersistStorage, ReactNexus, SetContext, Setter, Source, UpdateContext };
+export { createReactNexus };
+export type { ReactNexus };

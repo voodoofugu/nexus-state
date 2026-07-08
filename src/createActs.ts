@@ -1,11 +1,5 @@
 import type { Setter, Getter, RecordAny, ActsPart } from "./types/core";
 
-/**
- * Wraps an acts slice for code-splitting. `this` is typed as the *complete*
- * acts object, so cross-slice calls don't need optional chaining.
- * Pass one slice to `acts: slice`, or several slices to
- * `acts: [sliceA, sliceB]` when creating a nexus.
- */
 /**---
  * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
  * ### ***createActs***:

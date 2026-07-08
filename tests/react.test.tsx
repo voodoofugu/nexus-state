@@ -1,6 +1,7 @@
 import { describe, it, expect, afterEach, vi } from "vitest";
 import { render, screen, act, cleanup, fireEvent } from "@testing-library/react";
 import { createReactNexus } from "../src/react";
+import { shallow } from "../src";
 
 afterEach(cleanup);
 
@@ -60,24 +61,70 @@ describe("useSelector", () => {
     expect(renders).not.toHaveBeenCalled();
   });
 
-  it("respects a custom isEqual comparator", () => {
+  it("treats new object and array references as changed values", () => {
     const nx = createReactNexus({ state: { list: [1, 2] as number[] } });
-    const shallow = (a: number[], b: number[]) =>
-      a.length === b.length && a.every((v, i) => v === b[i]);
     const renders = vi.fn();
     function View() {
       renders();
-      const list = nx.useSelector((s) => s.list, ["list"], shallow);
+      const list = nx.useSelector((s) => s.list, ["list"]);
       return <span>{list.join(",")}</span>;
     }
     render(<View />);
     renders.mockClear();
-    // new array, same contents -> no re-render thanks to comparator
+    // New array, same contents: Object.is sees a new reference.
     act(() => nx.set({ list: [1, 2] }));
-    expect(renders).not.toHaveBeenCalled();
-    // different contents -> re-render
-    act(() => nx.set({ list: [1, 2, 3] }));
     expect(renders).toHaveBeenCalledTimes(1);
+    act(() => nx.set({ list: [1, 2, 3] }));
+    expect(renders).toHaveBeenCalledTimes(2);
+  });
+
+  it("with shallow, a new array of equal contents does not re-render", () => {
+    const nx = createReactNexus({ state: { items: [{ id: 1 }, { id: 2 }] } });
+    const renders = vi.fn();
+    function View() {
+      renders();
+      const ids = nx.useSelector(
+        (s) => s.items.map((i) => i.id),
+        ["items"],
+        shallow
+      );
+      return <span>{ids.join(",")}</span>;
+    }
+    render(<View />);
+    renders.mockClear();
+    // New array from map(), same numeric ids -> shallow equal -> no re-render.
+    act(() => nx.set({ items: [{ id: 1 }, { id: 2 }] }));
+    expect(renders).not.toHaveBeenCalled();
+    // Different ids -> shallow sees a change -> re-render.
+    act(() => nx.set({ items: [{ id: 1 }, { id: 9 }] }));
+    expect(renders).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe("shallow helper", () => {
+  it("compares primitives with Object.is semantics", () => {
+    expect(shallow(1, 1)).toBe(true);
+    expect(shallow(NaN, NaN)).toBe(true);
+    expect(shallow(0, -0)).toBe(false);
+    expect(shallow("a", "b")).toBe(false);
+  });
+
+  it("compares arrays one level deep", () => {
+    expect(shallow([1, 2, 3], [1, 2, 3])).toBe(true);
+    expect(shallow([1, 2], [1, 2, 3])).toBe(false);
+    expect(shallow([{ id: 1 }], [{ id: 1 }])).toBe(false); // nested refs differ
+  });
+
+  it("compares plain objects one level deep", () => {
+    expect(shallow({ a: 1, b: 2 }, { a: 1, b: 2 })).toBe(true);
+    expect(shallow({ a: 1 }, { a: 1, b: 2 })).toBe(false);
+    expect(shallow({ a: 1 }, { a: 2 })).toBe(false);
+  });
+
+  it("treats null and non-objects safely", () => {
+    expect(shallow(null, null)).toBe(true);
+    expect(shallow(null, {})).toBe(false);
+    expect(shallow({}, null)).toBe(false);
   });
 });
 

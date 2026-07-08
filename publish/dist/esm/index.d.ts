@@ -150,6 +150,21 @@ type Observer<S> = (state: S, context?: UpdateContext) => void;
 type Dependencies<S> = ["*"] | (keyof S)[];
 /**---
  * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
+ * ### ***EqualityFn***:
+ * compares the previous and next result of a `useSelector` selector.
+ * @description
+ * Returns `true` to keep the previous value (skip the re-render). Defaults to
+ * `Object.is` semantics. Pass the exported `shallow` helper for one-level
+ * object/array equality, or a custom function for anything else.
+ * @example
+ * ```ts
+ * const isEqual: EqualityFn<number[]> = (a, b) =>
+ *   a.length === b.length && a.every((v, i) => v === b[i]);
+ * ```
+ */
+type EqualityFn<T> = (a: T, b: T) => boolean;
+/**---
+ * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
  * ### ***ActsCreate***:
  * function that creates the action object for a nexus.
  * @description
@@ -260,8 +275,9 @@ interface Nexus<S, A = Record<string, never>> {
      * updates the state with a partial object or functional updater.
      * @description
      * A single `set` call notifies subscribers once, even when several keys
-     * change. Multiple `set` calls inside one action are also batched and notify
-     * once after the action finishes.
+     * change — this is the primary way to batch. `set` calls made synchronously
+     * inside an action are also batched into a single notification; calls made
+     * after an `await` run as separate updates.
      * @param update partial object or function with access to all state.
      * @param context optional string or context object with `source` and optional `meta`.
      * @example
@@ -379,12 +395,6 @@ declare function createNexus<S extends RecordAny>(options: {
 }): Nexus<S, Record<string, never>>;
 declare function createNexus<S extends RecordAny = RecordAny, A extends RecordAny = Record<string, never>>(options: NexusOptions<S, A>): Nexus<S, A>;
 
-/**
- * Wraps an acts slice for code-splitting. `this` is typed as the *complete*
- * acts object, so cross-slice calls don't need optional chaining.
- * Pass one slice to `acts: slice`, or several slices to
- * `acts: [sliceA, sliceB]` when creating a nexus.
- */
 /**---
  * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
  * ### ***createActs***:
@@ -430,8 +440,9 @@ declare function createActs<S extends RecordAny, A extends RecordAny = RecordAny
  * ### ***PersistStorage***:
  * minimal synchronous storage contract used by `persist`.
  * @description
- * `localStorage` satisfies this interface. Custom storage is useful for tests,
- * memory adapters, encrypted storage or platform-specific persistence.
+ * `localStorage` and `sessionStorage` satisfy this interface. Custom storage is
+ * useful for tests, memory adapters, encrypted storage or platform-specific
+ * persistence.
  * @example
  * ```ts
  * const cache: Record<string, string> = {};
@@ -474,7 +485,8 @@ interface PersistStorage {
  * configuration object accepted by `persist`.
  * @description
  * Controls where state is stored, which keys are persisted and how older
- * snapshots are migrated.
+ * snapshots are migrated. The storage backend is synchronous and string-based,
+ * matching `localStorage`, `sessionStorage` and small custom adapters.
  * @example
  * ```ts
  * persist(nexus, {
@@ -571,27 +583,24 @@ declare function persist<S extends RecordAny, A extends RecordAny>(nexus: Nexus<
 
 /**---
  * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
- * ### ***nexus***:
- * default namespace-style export for the core entry point.
+ * ### ***shallow***:
+ * one-level equality helper.
  * @description
- * Prefer named imports for tree-shaking and readability. The default export is
- * provided for users who like `nexus.createNexus(...)` style access.
+ * A plain function (not a hook, no React dependency). Returns `true` when two
+ * values are equal at the first level: `Object.is` for primitives, and same keys
+ * with `Object.is` values for objects and arrays. Pass it as the third argument
+ * to `useSelector` when the selector returns a freshly built object or array so
+ * an equal result does not re-render — or use it anywhere you need a cheap
+ * one-level comparison.
  * @example
  * ```ts
- * import nexus from "nexus-state";
+ * import { shallow } from "nexus-state";
  *
- * const store = nexus.createNexus({
- *   state: { count: 0 },
- * });
- *
- * nexus.persist(store, { key: "counter" });
+ * shallow([1, 2], [1, 2]); // true
+ * shallow({ a: 1 }, { a: 2 }); // false
  * ```
  */
-declare const nexus: {
-    createNexus: typeof createNexus;
-    createActs: typeof createActs;
-    persist: typeof persist;
-};
+declare function shallow<T>(a: T, b: T): boolean;
 
-export { createActs, createNexus, nexus as default, persist };
-export type { ActsCreate, ActsCreateUnion, ActsPart, Dependencies, Getter, Middleware, Nexus, NexusOptions, Observer, PersistOptions, PersistStorage, SetContext, Setter, Source, UpdateContext };
+export { createActs, createNexus, persist, shallow };
+export type { ActsCreate, ActsCreateUnion, ActsPart, Dependencies, EqualityFn, Getter, Middleware, Nexus, NexusOptions, Observer, PersistOptions, PersistStorage, SetContext, Setter, Source, UpdateContext };

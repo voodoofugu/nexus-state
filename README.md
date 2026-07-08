@@ -5,6 +5,7 @@
 ### Table of contents
 
 - [About](#about)
+- [What makes it different](#what-makes-it-different)
 - [Installation](#installation)
 - [Quick start](#quick-start)
 - [API](#api)
@@ -20,7 +21,9 @@ Lightweight, framework-agnostic state management with optional actions, React
 bindings, and traceable updates. Designed for simplicity and performance, with
 first-class TypeScript inference.
 
-What makes it different
+<h2></h2>
+
+### What makes it different
 
 - **Traceable state.** Every update carries a `context` describing where it came
   from (`"server"`, `"storage"`, `"reset"`, or your own). That context flows
@@ -46,13 +49,13 @@ npm install nexus-state
 React is an **optional** peer dependency — only needed if you import
 `nexus-state/react`.
 
-| Import              | Contents                               | Needs React |
-| ------------------- | -------------------------------------- | ----------- |
-| `nexus-state`       | `createNexus`, `createActs`, `persist` | no          |
-| `nexus-state/react` | `createReactNexus` (+ core re-exports) | yes         |
+| Import              | Contents                                          | Needs React |
+| ------------------- | ------------------------------------------------- | ----------- |
+| `nexus-state`       | `createNexus`, `createActs`, `persist`, `shallow` | no          |
+| `nexus-state/react` | `createReactNexus`                                | yes         |
 
 ```js
-import { createNexus, createActs, persist } from "nexus-state";
+import { createNexus, createActs, persist, shallow } from "nexus-state";
 import { createReactNexus } from "nexus-state/react"; // ! with /react
 ```
 
@@ -61,10 +64,9 @@ import { createReactNexus } from "nexus-state/react"; // ! with /react
 ### Quick start
 
 ```tsx
-import { createNexus } from "nexus-state";
-// ✦ note: this example is also suitable for createReactNexus
+import { createReactNexus } from "nexus-state/react";
 
-const nexus = createNexus({
+const nexus = createReactNexus({
   state: { count: 0 },
   acts: (get, set) => ({
     increment() {
@@ -113,6 +115,7 @@ creates a new framework-agnostic store (**nexus**) instance.<br>
 <b>Example:</b>
 
 ```js
+// your-nexus-config
 import { createNexus } from "nexus-state";
 
 const nexus = createNexus({
@@ -179,6 +182,7 @@ directly to <code>acts</code>, or pass several slices as an array.<br>
 <b>Example:</b>
 
 ```js
+// your-nexus-config
 import { createNexus, createActs } from "nexus-state";
 
 const counterActs = createActs((get, set) => ({
@@ -228,6 +232,11 @@ syncs a nexus with persistent storage. Hydration is tagged with
 <code>source: "storage"</code>, and the write-back skips updates carrying that
 source — so loading from disk never echoes back to disk. Returns a function that
 stops persisting.<br>
+The helper is named <code>persist</code> because that is the user intent. The
+storage adapter itself is synchronous and string-based: it works with
+<code>localStorage</code>, <code>sessionStorage</code>, or a custom object that
+implements <code>getItem</code>, <code>setItem</code> and
+<code>removeItem</code>.<br>
 </em><br>
 <b>Parameters:</b><em><br>
 <ul>
@@ -256,6 +265,43 @@ const stop = persist(nexus, {
 // later: stop() to disable persistence
 ```
 
+```ts
+// sessionStorage works through the same storage interface
+persist(nexus, {
+  key: "my-app-session",
+  storage: sessionStorage,
+});
+```
+
+For async loading (server, IndexedDB wrappers, files, etc.), load the data
+outside of <code>persist</code> and write it with context:
+
+```ts
+const profile = await loadProfile();
+nexus.set({ profile }, { source: "server" });
+```
+
+</div></ul></details>
+
+<h2></h2>
+
+<details><summary><b><code>shallow</code></b></summary><br><ul><div>
+<b>Description:</b><em><br>
+a plain one-level equality helper (not a hook, no React dependency). Compares
+primitives with <code>Object.is</code>, and objects/arrays by their first-level
+entries. Mainly used as the <code>isEqual</code> argument of <code>useSelector</code>,
+but usable anywhere you need a cheap shallow comparison.<br>
+</em><br>
+<b>Example:</b>
+
+```ts
+import { shallow } from "nexus-state";
+
+shallow([1, 2], [1, 2]); // true
+shallow({ a: 1 }, { a: 2 }); // false
+shallow([{ id: 1 }], [{ id: 1 }]); // false (nested refs differ)
+```
+
 </div></ul></details>
 
 <h2></h2>
@@ -274,6 +320,7 @@ extends <code>createNexus</code> with React-specific hooks.<br>
 <b>Example:</b>
 
 ```js
+// your-nexus-config
 import { createReactNexus } from "nexus-state/react"; // import with /react
 
 const nexus = createReactNexus({
@@ -383,9 +430,11 @@ nexus.set({ key: newValue }, "server");
 <br>
 
 > ✦ Batching:<br>
-> A single <code>set</code> call notifies subscribers once, even when several
-> keys change. Multiple <code>set</code> calls inside one action are also
-> batched and notify once after the action finishes.
+> A single <code>set</code> with several keys notifies subscribers once — this
+> is the primary, most explicit way to batch (you can see it in the call). On
+> top of that, <code>set</code> calls made <b>synchronously</b> inside an action
+> are batched into a single notification; calls made after an <code>await</code>
+> run as separate updates.
 
 </div></ul></details>
 
@@ -581,14 +630,15 @@ const specificValue = nexus.use("key");
 
 <details><summary><b><code>useSelector</code></b></summary><br><ul><div>
 <b>Description:</b><em><br>
-<code>react</code> hook for deriving a value from the state. The component
-re-renders only when the derived value changes.<br>
+<code>react</code> hook for deriving a value from the state. It compares the
+<b>result</b> of the selector to decide whether to re-render — <code>Object.is</code>
+by default.<br>
 </em><br>
 <b>Parameters:</b><em><br>
 <ul>
   <li><code>selector</code>: function returning any derived value from the state.</li>
-  <li><code>dependencies</code>: keys to watch. Use <code>["*"]</code> for all. Defaults to <code>["*"]</code>.</li>
-  <li><code>isEqual</code>: optional comparator for the derived value (e.g. shallow equality). Defaults to <code>Object.is</code>.</li>
+  <li><code>dependencies</code>: keys to watch (they trigger a selector re-check). Use <code>["*"]</code> for all. Defaults to <code>["*"]</code>.</li>
+  <li><code>isEqual</code>: optional comparator for the selector result. Defaults to <code>Object.is</code>; pass the <code>shallow</code> helper for one-level object/array equality.</li>
 </ul>
 </em><br>
 <b>Example:</b>
@@ -596,24 +646,44 @@ re-renders only when the derived value changes.<br>
 ```tsx
 import nexus from "your-nexus-config";
 
+// Primitive result — Object.is is all you need.
 const total = nexus.useSelector(
   (state) => state.count1 + state.count2,
   ["count1", "count2"],
 );
+```
 
-// Custom equality for object/array results:
-const items = nexus.useSelector(
-  (state) => state.items,
+When the selector <b>returns a new object or array each run</b> (e.g. <code>.map</code>,
+<code>.filter</code>, an object literal), <code>Object.is</code> always sees a new
+reference and re-renders every time. Pass <code>shallow</code> to compare contents
+instead:
+
+```tsx
+import { shallow } from "nexus-state";
+import nexus from "your-nexus-config";
+
+const ids = nexus.useSelector(
+  (state) => state.items.map((item) => item.id),
   ["items"],
-  (a, b) => a.length === b.length && a.every((v, i) => v === b[i]),
+  shallow, // re-render only when the ids actually differ
+);
+
+// For anything shallow can't express (e.g. arrays of objects), pass your own:
+const rows = nexus.useSelector(
+  (state) => state.users.map((u) => ({ id: u.id, name: u.name })),
+  ["users"],
+  (a, b) => a.length === b.length && a.every((x, i) => x.id === b[i].id),
 );
 ```
 
 <br>
 
 > ✦ Note:<br>
-> The selector is read from a ref internally, so you **don't** need
-> `useCallback` to keep the subscription stable.
+> <code>shallow</code> is a plain helper, not a hook.<br>
+> The selector and comparator are read from refs internally, so you **don't**
+> need <code>useCallback</code> to keep the subscription stable.<br>
+> The comparison is on the selector's <b>result</b>, not on the watched keys — a
+> watched key changing re-runs the selector, but an equal result won't re-render.
 
 </div></ul></details>
 

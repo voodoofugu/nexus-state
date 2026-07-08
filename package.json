@@ -30,25 +30,12 @@
         "default": "./dist/cjs/react.js"
       }
     },
-    "./persist": {
-      "import": {
-        "types": "./dist/esm/persist.d.ts",
-        "default": "./dist/esm/persist.js"
-      },
-      "require": {
-        "types": "./dist/cjs/persist.d.cts",
-        "default": "./dist/cjs/persist.js"
-      }
-    },
     "./package.json": "./package.json"
   },
   "typesVersions": {
     "*": {
       "react": [
         "./dist/esm/react.d.ts"
-      ],
-      "persist": [
-        "./dist/esm/persist.d.ts"
       ]
     }
   },

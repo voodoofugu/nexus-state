@@ -1,7 +1,7 @@
 /* Compile-only sanity checks for public-API type inference. Not shipped. */
-import { createNexus, createActs, persist } from "../src";
+import { createNexus, createActs, persist, shallow } from "../src";
 import { createReactNexus } from "../src/react";
-import type { PersistOptions } from "../src";
+import type { PersistOptions, EqualityFn } from "../src";
 
 // --- 1. No generics at all: S and A are both inferred ---
 const a = createNexus({
@@ -36,6 +36,26 @@ const r = createReactNexus({
 r.acts.inc();
 // @ts-expect-error still type-safe without explicit A
 r.acts.missing();
+
+// useSelector: result type inferred, optional isEqual typed against it.
+const doubled: number = r.useSelector((s) => s.count * 2, ["count"]);
+void doubled;
+const ids: number[] = r.useSelector(
+  (s) => [s.count],
+  ["count"],
+  shallow
+);
+void ids;
+r.useSelector(
+  (s) => [s.count],
+  ["count"],
+  // isEqual is (a: number[], b: number[]) => boolean here
+  (prev, next) => prev.length === next.length && prev[0] === next[0]
+);
+// @ts-expect-error comparator must match the selector result type
+r.useSelector((s) => s.count, ["count"], (a: string, b: string) => a === b);
+const numberEq: EqualityFn<number> = (a, b) => a === b;
+void numberEq;
 
 // --- 3. No acts at all: acts is empty, not `any` ---
 const b = createNexus({ state: { ok: true } });

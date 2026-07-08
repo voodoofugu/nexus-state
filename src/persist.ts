@@ -5,8 +5,9 @@ import type { Nexus, RecordAny, Dependencies } from "./types/core";
  * ### ***PersistStorage***:
  * minimal synchronous storage contract used by `persist`.
  * @description
- * `localStorage` satisfies this interface. Custom storage is useful for tests,
- * memory adapters, encrypted storage or platform-specific persistence.
+ * `localStorage` and `sessionStorage` satisfy this interface. Custom storage is
+ * useful for tests, memory adapters, encrypted storage or platform-specific
+ * persistence.
  * @example
  * ```ts
  * const cache: Record<string, string> = {};
@@ -52,7 +53,8 @@ interface PersistStorage {
  * configuration object accepted by `persist`.
  * @description
  * Controls where state is stored, which keys are persisted and how older
- * snapshots are migrated.
+ * snapshots are migrated. The storage backend is synchronous and string-based,
+ * matching `localStorage`, `sessionStorage` and small custom adapters.
  * @example
  * ```ts
  * persist(nexus, {
@@ -172,7 +174,7 @@ function persist<S extends RecordAny, A extends RecordAny>(
   const pick = (state: S): Partial<S> => {
     const out: Partial<S> = {};
     const keys = (include ?? (Object.keys(state) as (keyof S)[])).filter(
-      (k) => !exclude?.includes(k)
+      (k) => !exclude || exclude.indexOf(k) === -1
     );
     for (const k of keys) out[k] = state[k];
     return out;
@@ -209,4 +211,3 @@ function persist<S extends RecordAny, A extends RecordAny>(
 
 export type { PersistStorage, PersistOptions };
 export { persist };
-export default persist;

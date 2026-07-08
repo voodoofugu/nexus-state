@@ -7,12 +7,10 @@
 - [About](#about)
 - [What makes it different](#what-makes-it-different)
 - [Installation](#installation)
-- [Entry points](#entry-points)
 - [Quick start](#quick-start)
 - [API](#api)
   - [main](#main)
   - [nexus](#nexus)
-  - [persist](#persist)
 - [License](#license)
 
 <h2></h2>
@@ -51,19 +49,14 @@ npm install nexus-state
 React is an **optional** peer dependency — only needed if you import
 `nexus-state/react`.
 
-<h2></h2>
-
-### Entry points
-
-| Import                | Contents                               | Needs React |
-| --------------------- | -------------------------------------- | ----------- |
-| `nexus-state`         | `createNexus`, `createActs`, `persist` | no          |
-| `nexus-state/react`   | `createReactNexus` (+ core re-exports) | yes         |
-| `nexus-state/persist` | direct `persist` entry                 | no          |
+| Import              | Contents                                          | Needs React |
+| ------------------- | ------------------------------------------------- | ----------- |
+| `nexus-state`       | `createNexus`, `createActs`, `persist`, `shallow` | no          |
+| `nexus-state/react` | `createReactNexus`                                | yes         |
 
 ```js
-import { createNexus, createActs, persist } from "nexus-state";
-import { createReactNexus } from "nexus-state/react";
+import { createNexus, createActs, persist, shallow } from "nexus-state";
+import { createReactNexus } from "nexus-state/react"; // ! with /react
 ```
 
 <h2></h2>
@@ -71,8 +64,7 @@ import { createReactNexus } from "nexus-state/react";
 ### Quick start
 
 ```tsx
-import { createReactNexus } from "nexus-state";
-// ✦ note: createReactNexus is served from "nexus-state/react"
+import { createReactNexus } from "nexus-state/react";
 
 const nexus = createReactNexus({
   state: { count: 0 },
@@ -92,6 +84,15 @@ function Counter() {
 No generics required — `count` is `number` and `nexus.acts.increment` is fully
 typed, inferred from the config.
 
+The nexus name is arbitrary, which can be helpful when working with multiple nexus instances:<br>
+
+```js
+import { createNexus } from "nexus-state";
+
+const nexus1 = createNexus({...});
+const nexus2 = createNexus({...});
+```
+
 <h2></h2>
 
 ### API
@@ -99,6 +100,9 @@ typed, inferred from the config.
 #### main:
 
 <ul><div>
+
+###### **— CORE —**
+
 <details><summary><b><code>createNexus</code></b></summary><br><ul><div>
 <b>Description:</b><em><br>
 creates a new framework-agnostic store (**nexus**) instance.<br>
@@ -111,6 +115,7 @@ creates a new framework-agnostic store (**nexus**) instance.<br>
 <b>Example:</b>
 
 ```js
+// your-nexus-config
 import { createNexus } from "nexus-state";
 
 const nexus = createNexus({
@@ -164,56 +169,6 @@ createNexus<MyState, MyActions>({ ... });
 
 <h2></h2>
 
-<details><summary><b><code>createReactNexus</code></b></summary><br><ul><div>
-<b>Description:</b><em><br>
-extends <code>createNexus</code> with React-specific hooks.<br>
-</em><br>
-<b>Parameters:</b><em><br>
-<ul>
-  <li><code>options</code>: object with <code>state</code> and optional <code>acts</code>.</li>
-</ul>
-</em><br>
-<b>Example:</b>
-
-```js
-import { createReactNexus } from "nexus-state/react"; // import with /react
-
-const nexus = createReactNexus({
-  state: {
-    count1: 0,
-    count2: 0,
-  },
-
-  acts: (get, set) => ({
-    increment() {
-      set((state) => ({ count1: state.count1 + 1 }));
-      this.getState("count1"); // ! calling another action
-    },
-    getState(value) {
-      console.log(`${value}:`, get(value));
-    },
-  }),
-});
-
-export default nexus;
-```
-
-<details><summary><b>TypeScript Snippet:</b></summary>
-
-```ts
-// The acts generic is optional — omitting it no longer causes an error.
-const nexus = createReactNexus({ state: {...}, acts: (get, set) => ({...}) });
-
-// Explicit form, if you prefer to declare shapes:
-const typed = createReactNexus<MyState, MyActions>({...});
-```
-
-</details>
-
-</div></ul></details>
-
-<h2></h2>
-
 <details><summary><b><code>createActs</code></b></summary><br><ul><div>
 <b>Description:</b><em><br>
 creates a reusable action slice — useful for code splitting. Pass one slice
@@ -227,6 +182,7 @@ directly to <code>acts</code>, or pass several slices as an array.<br>
 <b>Example:</b>
 
 ```js
+// your-nexus-config
 import { createNexus, createActs } from "nexus-state";
 
 const counterActs = createActs((get, set) => ({
@@ -270,17 +226,138 @@ const counterActs = createActs<MyState, MyActions>(function (get, set) {
 
 <h2></h2>
 
-<details><summary>Recommendations:</summary><br><ul><div>
-The nexus name is arbitrary, which can be helpful when working with multiple nexus instances:<br>
+<details><summary><b><code>persist</code></b></summary><br><ul><div>
+<b>Description:</b><em><br>
+syncs a nexus with persistent storage. Hydration is tagged with
+<code>source: "storage"</code>, and the write-back skips updates carrying that
+source — so loading from disk never echoes back to disk. Returns a function that
+stops persisting.<br>
+The helper is named <code>persist</code> because that is the user intent. The
+storage adapter itself is synchronous and string-based: it works with
+<code>localStorage</code>, <code>sessionStorage</code>, or a custom object that
+implements <code>getItem</code>, <code>setItem</code> and
+<code>removeItem</code>.<br>
+</em><br>
+<b>Parameters:</b><em><br>
+<ul>
+  <li><code>nexus</code>: the store to persist.</li>
+  <li><code>options.key</code>: storage key.</li>
+  <li><code>options.storage</code>: storage backend (defaults to <code>localStorage</code>; no-op when unavailable).</li>
+  <li><code>options.include</code> / <code>options.exclude</code>: choose which keys to persist.</li>
+  <li><code>options.version</code> + <code>options.migrate</code>: migrate older snapshots.</li>
+  <li><code>options.onError</code>: handle storage / parse errors instead of throwing.</li>
+</ul>
+</em><br>
+<b>Example:</b>
 
-```js
-import { createNexus } from "nexus-state";
+```tsx
+import { createNexus, persist } from "nexus-state";
 
-const nexus1 = createNexus({...});
-const nexus2 = createNexus({...});
+const nexus = createNexus({ state: { theme: "light", count: 0 } });
+
+const stop = persist(nexus, {
+  key: "my-app",
+  include: ["theme"], // persist only the theme
+  version: 1,
+  migrate: (old) => ({ theme: old.theme ?? "light" }),
+});
+
+// later: stop() to disable persistence
+```
+
+```ts
+// sessionStorage works through the same storage interface
+persist(nexus, {
+  key: "my-app-session",
+  storage: sessionStorage,
+});
+```
+
+For async loading (server, IndexedDB wrappers, files, etc.), load the data
+outside of <code>persist</code> and write it with context:
+
+```ts
+const profile = await loadProfile();
+nexus.set({ profile }, { source: "server" });
 ```
 
 </div></ul></details>
+
+<h2></h2>
+
+<details><summary><b><code>shallow</code></b></summary><br><ul><div>
+<b>Description:</b><em><br>
+a plain one-level equality helper (not a hook, no React dependency). Compares
+primitives with <code>Object.is</code>, and objects/arrays by their first-level
+entries. Mainly used as the <code>isEqual</code> argument of <code>useSelector</code>,
+but usable anywhere you need a cheap shallow comparison.<br>
+</em><br>
+<b>Example:</b>
+
+```ts
+import { shallow } from "nexus-state";
+
+shallow([1, 2], [1, 2]); // true
+shallow({ a: 1 }, { a: 2 }); // false
+shallow([{ id: 1 }], [{ id: 1 }]); // false (nested refs differ)
+```
+
+</div></ul></details>
+
+<h2></h2>
+
+###### **— REACT —**
+
+<details><summary><b><code>createReactNexus</code></b></summary><br><ul><div>
+<b>Description:</b><em><br>
+extends <code>createNexus</code> with React-specific hooks.<br>
+</em><br>
+<b>Parameters:</b><em><br>
+<ul>
+  <li><code>options</code>: object with <code>state</code> and optional <code>acts</code>.</li>
+</ul>
+</em><br>
+<b>Example:</b>
+
+```js
+// your-nexus-config
+import { createReactNexus } from "nexus-state/react"; // import with /react
+
+const nexus = createReactNexus({
+  state: {
+    count1: 0,
+    count2: 0,
+  },
+
+  acts: (get, set) => ({
+    increment() {
+      set((state) => ({ count1: state.count1 + 1 }));
+      this.getState("count1"); // ! calling another action
+    },
+    getState(value) {
+      console.log(`${value}:`, get(value));
+    },
+  }),
+});
+
+export default nexus;
+```
+
+<details><summary><b>TypeScript Snippet:</b></summary>
+
+```ts
+// The acts generic is optional — omitting it no longer causes an error.
+const nexus = createReactNexus({ state: {...}, acts: (get, set) => ({...}) });
+
+// Explicit form, if you prefer to declare shapes:
+const typed = createReactNexus<MyState, MyActions>({...});
+```
+
+</details>
+
+</div></ul></details>
+
+</div></ul>
 
 <h2></h2>
 
@@ -288,7 +365,7 @@ const nexus2 = createNexus({...});
 
 <ul><div>
 
-<h6><mark>core</mark></h6>
+###### **— CORE —**
 
 <details><summary><b><code>get</code></b></summary><br><ul><div>
 <b>Description:</b><em><br>
@@ -353,9 +430,11 @@ nexus.set({ key: newValue }, "server");
 <br>
 
 > ✦ Batching:<br>
-> A single <code>set</code> call notifies subscribers once, even when several
-> keys change. Multiple <code>set</code> calls inside one action are also
-> batched and notify once after the action finishes.
+> A single <code>set</code> with several keys notifies subscribers once — this
+> is the primary, most explicit way to batch (you can see it in the call). On
+> top of that, <code>set</code> calls made <b>synchronously</b> inside an action
+> are batched into a single notification; calls made after an <code>await</code>
+> run as separate updates.
 
 </div></ul></details>
 
@@ -436,7 +515,7 @@ const remove = nexus.middleware((prev, next, context) => {
   return next;
 });
 
-remove(); // detach the middleware
+// later: remove() to detach middleware
 ```
 
 <details><summary><b>Redux DevTools Integration</b></summary><br><ul><div>
@@ -500,13 +579,9 @@ nexus.acts.increment();
 nexus.acts.getState("count1");
 ```
 
-<br>
 <b>Important:</b><em><br>
-regular functions support calling other actions via <code>this</code>; arrow
-functions are more compact but don't:
+regular functions support calling other actions via <code>this</code>, arrow functions are more compact but don't:
 </em><br>
-
-<br>
 
 ```js
 // regular function
@@ -515,7 +590,7 @@ increment() {
 }
 
 // arrow function
-increment: () => this.getState("count1"); // `this` is not the acts object
+increment: () => this.getState("count1"); // not works
 ```
 
 More info: [Arrow Functions](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions)
@@ -524,7 +599,7 @@ More info: [Arrow Functions](https://developer.mozilla.org/en-US/docs/Web/JavaSc
 
 <h2></h2>
 
-<h6><mark>react</mark></h6>
+###### **— REACT —**
 
 <details><summary><b><code>use</code></b></summary><br><ul><div>
 <b>Description:</b><em><br>
@@ -555,14 +630,15 @@ const specificValue = nexus.use("key");
 
 <details><summary><b><code>useSelector</code></b></summary><br><ul><div>
 <b>Description:</b><em><br>
-<code>react</code> hook for deriving a value from the state. The component
-re-renders only when the derived value changes.<br>
+<code>react</code> hook for deriving a value from the state. It compares the
+<b>result</b> of the selector to decide whether to re-render — <code>Object.is</code>
+by default.<br>
 </em><br>
 <b>Parameters:</b><em><br>
 <ul>
   <li><code>selector</code>: function returning any derived value from the state.</li>
-  <li><code>dependencies</code>: keys to watch. Use <code>["*"]</code> for all. Defaults to <code>["*"]</code>.</li>
-  <li><code>isEqual</code>: optional comparator for the derived value (e.g. shallow equality). Defaults to <code>Object.is</code>.</li>
+  <li><code>dependencies</code>: keys to watch (they trigger a selector re-check). Use <code>["*"]</code> for all. Defaults to <code>["*"]</code>.</li>
+  <li><code>isEqual</code>: optional comparator for the selector result. Defaults to <code>Object.is</code>; pass the <code>shallow</code> helper for one-level object/array equality.</li>
 </ul>
 </em><br>
 <b>Example:</b>
@@ -570,24 +646,44 @@ re-renders only when the derived value changes.<br>
 ```tsx
 import nexus from "your-nexus-config";
 
+// Primitive result — Object.is is all you need.
 const total = nexus.useSelector(
   (state) => state.count1 + state.count2,
   ["count1", "count2"],
 );
+```
 
-// Custom equality for object/array results:
-const items = nexus.useSelector(
-  (state) => state.items,
+When the selector <b>returns a new object or array each run</b> (e.g. <code>.map</code>,
+<code>.filter</code>, an object literal), <code>Object.is</code> always sees a new
+reference and re-renders every time. Pass <code>shallow</code> to compare contents
+instead:
+
+```tsx
+import { shallow } from "nexus-state";
+import nexus from "your-nexus-config";
+
+const ids = nexus.useSelector(
+  (state) => state.items.map((item) => item.id),
   ["items"],
-  (a, b) => a.length === b.length && a.every((v, i) => v === b[i]),
+  shallow, // re-render only when the ids actually differ
+);
+
+// For anything shallow can't express (e.g. arrays of objects), pass your own:
+const rows = nexus.useSelector(
+  (state) => state.users.map((u) => ({ id: u.id, name: u.name })),
+  ["users"],
+  (a, b) => a.length === b.length && a.every((x, i) => x.id === b[i].id),
 );
 ```
 
 <br>
 
 > ✦ Note:<br>
-> The selector is read from a ref internally, so you **don't** need
-> `useCallback` to keep the subscription stable.
+> <code>shallow</code> is a plain helper, not a hook.<br>
+> The selector and comparator are read from refs internally, so you **don't**
+> need <code>useCallback</code> to keep the subscription stable.<br>
+> The comparison is on the selector's <b>result</b>, not on the watched keys — a
+> watched key changing re-runs the selector, but an equal result won't re-render.
 
 </div></ul></details>
 
@@ -609,48 +705,6 @@ rerender(); // force re-render
 
 </div></ul></details>
 
-</div></ul>
-
-<h2></h2>
-
-#### persist:
-
-<ul><div>
-<details><summary><b><code>persist</code></b></summary><br><ul><div>
-<b>Description:</b><em><br>
-syncs a nexus with persistent storage. Hydration is tagged with
-<code>source: "storage"</code>, and the write-back skips updates carrying that
-source — so loading from disk never echoes back to disk. Returns a function that
-stops persisting.<br>
-</em><br>
-<b>Parameters:</b><em><br>
-<ul>
-  <li><code>nexus</code>: the store to persist.</li>
-  <li><code>options.key</code>: storage key.</li>
-  <li><code>options.storage</code>: storage backend (defaults to <code>localStorage</code>; no-op when unavailable).</li>
-  <li><code>options.include</code> / <code>options.exclude</code>: choose which keys to persist.</li>
-  <li><code>options.version</code> + <code>options.migrate</code>: migrate older snapshots.</li>
-  <li><code>options.onError</code>: handle storage / parse errors instead of throwing.</li>
-</ul>
-</em><br>
-<b>Example:</b>
-
-```tsx
-import { createNexus, persist } from "nexus-state";
-
-const nexus = createNexus({ state: { theme: "light", count: 0 } });
-
-const stop = persist(nexus, {
-  key: "my-app",
-  include: ["theme"], // persist only the theme
-  version: 1,
-  migrate: (old) => ({ theme: old.theme ?? "light" }),
-});
-
-// later: stop() to disable persistence
-```
-
-</div></ul></details>
 </div></ul>
 
 <h2></h2>

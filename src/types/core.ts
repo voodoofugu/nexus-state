@@ -164,6 +164,22 @@ type Dependencies<S> = ["*"] | (keyof S)[];
 
 /**---
  * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
+ * ### ***EqualityFn***:
+ * compares the previous and next result of a `useSelector` selector.
+ * @description
+ * Returns `true` to keep the previous value (skip the re-render). Defaults to
+ * `Object.is` semantics. Pass the exported `shallow` helper for one-level
+ * object/array equality, or a custom function for anything else.
+ * @example
+ * ```ts
+ * const isEqual: EqualityFn<number[]> = (a, b) =>
+ *   a.length === b.length && a.every((v, i) => v === b[i]);
+ * ```
+ */
+type EqualityFn<T> = (a: T, b: T) => boolean;
+
+/**---
+ * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
  * ### ***ActsCreate***:
  * function that creates the action object for a nexus.
  * @description
@@ -282,8 +298,9 @@ interface Nexus<S, A = Record<string, never>> {
    * updates the state with a partial object or functional updater.
    * @description
    * A single `set` call notifies subscribers once, even when several keys
-   * change. Multiple `set` calls inside one action are also batched and notify
-   * once after the action finishes.
+   * change — this is the primary way to batch. `set` calls made synchronously
+   * inside an action are also batched into a single notification; calls made
+   * after an `await` run as separate updates.
    * @param update partial object or function with access to all state.
    * @param context optional string or context object with `source` and optional `meta`.
    * @example
@@ -402,21 +419,35 @@ interface ReactNexus<S, A = Record<string, never>> extends Nexus<S, A> {
    * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
    * ### ***useSelector***:
    * React hook that subscribes to selected keys and returns derived state.
+   * @description
+   * The **result** of the selector is compared to decide whether to re-render —
+   * `Object.is` by default. Primitive results work out of the box; when the
+   * selector returns a new object or array each run (e.g. `.map`, `.filter`, an
+   * object literal), pass the `shallow` helper or a custom `isEqual` so an equal
+   * result does not re-render.
    * @param selector derives a value from the full state.
-   * @param dependencies keys that should trigger selector re-checks, or `["*"]`.
-   * @param isEqual optional comparator for keeping the previous selected value.
+   * @param dependencies keys that trigger a selector re-check, or `["*"]`.
+   * @param isEqual optional result comparator. Defaults to `Object.is`; pass
+   * `shallow` for one-level object/array equality.
    * @example
    * ```tsx
    * const fullName = nexus.useSelector(
    *   (state) => `${state.firstName} ${state.lastName}`,
    *   ["firstName", "lastName"],
    * );
+   *
+   * // import { shallow } from "nexus-state";
+   * const ids = nexus.useSelector(
+   *   (state) => state.items.map((item) => item.id),
+   *   ["items"],
+   *   shallow,
+   * );
    * ```
    */
   useSelector<R>(
     selector: (state: S) => R,
     dependencies?: Dependencies<S>,
-    isEqual?: (a: R, b: R) => boolean
+    isEqual?: EqualityFn<R>
   ): R;
 
   /**---
@@ -445,6 +476,7 @@ export type {
   Middleware,
   Observer,
   Dependencies,
+  EqualityFn,
   ActsCreate,
   ActsPart,
   ActsCreateUnion,
