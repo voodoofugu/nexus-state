@@ -57,6 +57,12 @@ r.useSelector((s) => s.count, ["count"], (a: string, b: string) => a === b);
 const numberEq: EqualityFn<number> = (a, b) => a === b;
 void numberEq;
 
+// dependencies are required — omitting them is a type error.
+// @ts-expect-error useSelector requires dependencies
+r.useSelector((s) => s.count);
+// @ts-expect-error subscribe requires dependencies
+a.subscribe((state) => void state.count);
+
 // --- 3. No acts at all: acts is empty, not `any` ---
 const b = createNexus({ state: { ok: true } });
 // @ts-expect-error acts is `Record<string, never>`

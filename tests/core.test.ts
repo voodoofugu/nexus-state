@@ -62,10 +62,20 @@ describe("subscribe", () => {
     expect(spy).not.toHaveBeenCalled();
   });
 
-  it("defaults dependencies to the whole state", () => {
+  it("watches every key with ['*']", () => {
     const nx = createNexus({ state: { a: 0, b: 0 } });
     const spy = vi.fn();
-    nx.subscribe(spy);
+    nx.subscribe(spy, ["*"]);
+    nx.set({ b: 9 });
+    expect(spy).toHaveBeenCalledTimes(1);
+  });
+
+  it("falls back to watching all when deps are omitted at runtime (JS safety net)", () => {
+    const nx = createNexus({ state: { a: 0, b: 0 } });
+    const spy = vi.fn();
+    // `dependencies` is required in the types; this guards the runtime default
+    // so plain-JS callers that omit it still subscribe instead of crashing.
+    (nx.subscribe as unknown as (o: () => void) => void)(spy);
     nx.set({ b: 9 });
     expect(spy).toHaveBeenCalledTimes(1);
   });

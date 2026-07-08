@@ -88,16 +88,9 @@ interface PersistOptions<S> {
    * ### ***include***:
    * state keys that should be persisted.
    * @description
-   * Omit `include` to persist the whole state, except keys listed in `exclude`.
+   * Omit `include` to persist the whole state.
    */
   include?: (keyof S)[];
-
-  /**---
-   * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
-   * ### ***exclude***:
-   * state keys that should never be persisted.
-   */
-  exclude?: (keyof S)[];
 
   /**---
    * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
@@ -167,15 +160,13 @@ function persist<S extends RecordAny, A extends RecordAny>(
   nexus: Nexus<S, A>,
   options: PersistOptions<S>
 ): () => void {
-  const { key, version = 0, include, exclude, migrate, onError } = options;
+  const { key, version = 0, include, migrate, onError } = options;
   const storage = options.storage ?? defaultStorage();
   if (!storage) return () => {};
 
   const pick = (state: S): Partial<S> => {
     const out: Partial<S> = {};
-    const keys = (include ?? (Object.keys(state) as (keyof S)[])).filter(
-      (k) => !exclude || exclude.indexOf(k) === -1
-    );
+    const keys = include ?? (Object.keys(state) as (keyof S)[]);
     for (const k of keys) out[k] = state[k];
     return out;
   };

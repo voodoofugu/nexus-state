@@ -57,13 +57,6 @@ describe("persist", () => {
     expect(JSON.parse(storage.data.get("app")!).state).toEqual({ a: 9 });
   });
 
-  it("excludes keys from the snapshot", () => {
-    const nx = createNexus({ state: { a: 1, secret: "x" } });
-    persist(nx, { key: "app", storage, exclude: ["secret"] });
-    nx.set({ a: 2 });
-    expect(JSON.parse(storage.data.get("app")!).state).toEqual({ a: 2 });
-  });
-
   it("runs migrate when the stored version differs", () => {
     storage.data.set(
       "app",

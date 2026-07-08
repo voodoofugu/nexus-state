@@ -60,7 +60,10 @@ import { createReactNexus } from "nexus-state/react"; // ! with /react
 
 ### Quick start
 
-Create a store — framework-agnostic, no generics needed (types are inferred):
+You can create two kinds of store — a framework-agnostic core, or a React store with hooks:
+
+<details><summary><b>Framework-agnostic store</b> — <code>createNexus</code></summary>
+<br>
 
 ```ts
 import { createNexus } from "nexus-state";
@@ -75,22 +78,33 @@ const counter = createNexus({
 });
 
 counter.acts.increment();
-counter.get("count"); // number
+counter.get("count"); // number — no generics needed, types are inferred
 ```
 
-In React, swap `createNexus` for `createReactNexus` (same options, from the
-`/react` entry) and read state with the `use` hook:
+</details>
+
+<details><summary><b>React store</b> — <code>createReactNexus</code> (from <code>nexus-state/react</code>)</summary>
+<br>
 
 ```tsx
 import { createReactNexus } from "nexus-state/react";
 
-const counter = createReactNexus({ state: { count: 0 } /* , acts */ });
+const counter = createReactNexus({
+  state: { count: 0 },
+  acts: (get, set) => ({
+    increment() {
+      set((s) => ({ count: s.count + 1 }));
+    },
+  }),
+});
 
 function Counter() {
   const count = counter.use("count"); // re-renders on change
-  return <button onClick={() => counter.set((s) => ({ count: s.count + 1 }))}>{count}</button>;
+  return <button onClick={counter.acts.increment}>{count}</button>;
 }
 ```
+
+</details>
 
 <h2></h2>
 
@@ -98,6 +112,8 @@ function Counter() {
 
 #### main:
 
+<details><summary><code>createNexus</code> · <code>createActs</code> · <code>persist</code> · <code>shallow</code> · <code>createReactNexus</code></summary>
+<br>
 <ul><div>
 
 ###### **— CORE —**
@@ -242,7 +258,7 @@ implements <code>getItem</code>, <code>setItem</code> and
   <li><code>nexus</code>: the store to persist.</li>
   <li><code>options.key</code>: storage key.</li>
   <li><code>options.storage</code>: storage backend (defaults to <code>localStorage</code>; no-op when unavailable).</li>
-  <li><code>options.include</code> / <code>options.exclude</code>: choose which keys to persist.</li>
+  <li><code>options.include</code>: choose which keys to persist (defaults to all).</li>
   <li><code>options.version</code> + <code>options.migrate</code>: migrate older snapshots.</li>
   <li><code>options.onError</code>: handle storage / parse errors instead of throwing.</li>
 </ul>
@@ -358,10 +374,14 @@ const typed = createReactNexus<MyState, MyActions>({...});
 
 </div></ul>
 
+</details>
+
 <h2></h2>
 
 #### nexus:
 
+<details><summary><code>get</code> · <code>set</code> · <code>reset</code> · <code>subscribe</code> · <code>middleware</code> · <code>acts</code> · <code>use</code> · <code>useSelector</code> · <code>useRerender</code></summary>
+<br>
 <ul><div>
 
 ###### **— CORE —**
@@ -447,7 +467,7 @@ context.<br>
 <b>Parameters:</b><em><br>
 <ul>
   <li><code>observer</code>: <code>(state, context?) =&gt; void</code>, called when a watched key changes.</li>
-  <li><code>dependencies</code>: keys to watch. Use <code>["*"]</code> for all. Defaults to <code>["*"]</code>.</li>
+  <li><code>dependencies</code>: keys to watch (required, so every subscription is explicit). Pass specific keys, or <code>["*"]</code> to watch every key.</li>
 </ul>
 </em><br>
 <b>Example:</b>
@@ -464,6 +484,9 @@ const unsubscribe = nexus.subscribe(
 
 // A subscriber watching several keys is notified once per update, not per key.
 nexus.subscribe((state) => save(state), ["count1", "count2"]);
+
+// Watch every key:
+nexus.subscribe((state) => save(state), ["*"]);
 
 // later: unsubscribe() to disable subscribing
 ```
@@ -616,7 +639,7 @@ the selector's <b>result</b> changes (<code>Object.is</code> by default).<br>
 <b>Parameters:</b><em><br>
 <ul>
   <li><code>selector</code>: derives a value from the state.</li>
-  <li><code>dependencies</code>: keys to watch (they trigger a re-check). <code>["*"]</code> for all; defaults to <code>["*"]</code>.</li>
+  <li><code>dependencies</code>: keys that trigger a re-check (required). Pass specific keys, or <code>["*"]</code> to watch every key.</li>
   <li><code>isEqual</code>: optional result comparator. Defaults to <code>Object.is</code>; pass <code>shallow</code> for one-level object/array equality, or your own.</li>
 </ul>
 </em><br>
@@ -666,6 +689,8 @@ rerender(); // force re-render
 </div></ul></details>
 
 </div></ul>
+
+</details>
 
 <h2></h2>
 

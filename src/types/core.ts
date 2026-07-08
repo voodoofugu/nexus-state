@@ -152,12 +152,13 @@ type Observer<S> = (state: S, context?: UpdateContext) => void;
  * ### ***Dependencies***:
  * keys that control when a subscriber or selector should update.
  * @description
- * Use `["*"]` for every update, or a list of state keys for key-level
- * subscriptions.
+ * Always passed explicitly for `subscribe` and `useSelector`, so every
+ * subscription states what it depends on. Pass a list of state keys for
+ * key-level subscriptions, or `["*"]` to watch every key.
  * @example
  * ```ts
- * nexus.subscribe(observer, ["count", "name"]);
- * nexus.subscribe(observer, ["*"]);
+ * nexus.subscribe(observer, ["count", "name"]); // specific keys
+ * nexus.subscribe(observer, ["*"]); // watch every key
  * ```
  */
 type Dependencies<S> = ["*"] | (keyof S)[];
@@ -333,7 +334,7 @@ interface Nexus<S, A = Record<string, never>> {
    * ### ***subscribe***:
    * listens to all updates or only selected state keys.
    * @param observer callback called with latest state and optional update context.
-   * @param dependencies keys to watch, or `["*"]` for every update.
+   * @param dependencies keys to watch (required, so the subscription is always explicit). Pass `["*"]` to watch every key.
    * @returns unsubscribe function.
    * @example
    * ```ts
@@ -344,7 +345,7 @@ interface Nexus<S, A = Record<string, never>> {
    * stop();
    * ```
    */
-  subscribe(observer: Observer<S>, dependencies?: Dependencies<S>): () => void;
+  subscribe(observer: Observer<S>, dependencies: Dependencies<S>): () => void;
 
   /**---
    * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
@@ -426,7 +427,7 @@ interface ReactNexus<S, A = Record<string, never>> extends Nexus<S, A> {
    * object literal), pass the `shallow` helper or a custom `isEqual` so an equal
    * result does not re-render.
    * @param selector derives a value from the full state.
-   * @param dependencies keys that trigger a selector re-check, or `["*"]`.
+   * @param dependencies keys that trigger a selector re-check (required, so the subscription is always explicit). Pass `["*"]` to watch every key.
    * @param isEqual optional result comparator. Defaults to `Object.is`; pass
    * `shallow` for one-level object/array equality.
    * @example
@@ -446,7 +447,7 @@ interface ReactNexus<S, A = Record<string, never>> extends Nexus<S, A> {
    */
   useSelector<R>(
     selector: (state: S) => R,
-    dependencies?: Dependencies<S>,
+    dependencies: Dependencies<S>,
     isEqual?: EqualityFn<R>
   ): R;
 
