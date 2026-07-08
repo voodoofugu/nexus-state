@@ -1,6 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
-import { createNexus } from "../src";
-import { persist } from "../src/persist";
+import { createNexus, persist } from "../src";
 import type { PersistStorage } from "../src/persist";
 
 function memoryStorage(): PersistStorage & { data: Map<string, string> } {

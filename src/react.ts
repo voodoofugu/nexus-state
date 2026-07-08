@@ -1,8 +1,9 @@
 import createReactNexus from "./nexus-react";
 import createNexus from "./nexus-core";
 import createActs from "./createActs";
+import persist from "./persist";
 
-export { createReactNexus, createNexus, createActs };
+export { createReactNexus, createNexus, createActs, persist };
 export type {
   ReactNexus,
   Nexus,
@@ -19,6 +20,7 @@ export type {
   ActsCreateUnion,
   NexusOptions,
 } from "./types/core";
+export type { PersistStorage, PersistOptions } from "./persist";
 
 /**---
  * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
@@ -34,7 +36,9 @@ export type {
  * const store = nexus.createReactNexus({
  *   state: { count: 0 },
  * });
+ *
+ * nexus.persist(store, { key: "counter" });
  * ```
  */
-const nexus = { createReactNexus, createNexus, createActs };
+const nexus = { createReactNexus, createNexus, createActs, persist };
 export default nexus;

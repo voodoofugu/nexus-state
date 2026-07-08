@@ -13,7 +13,6 @@
   - [main](#main)
   - [nexus](#nexus)
   - [persist](#persist)
-- [TypeScript](#typescript)
 - [License](#license)
 
 <h2></h2>
@@ -35,8 +34,9 @@ first-class TypeScript inference.
 - **Key-level subscriptions.** Subscribers listen to specific keys, so an update
   only notifies what actually depends on it — no selector is re-run for
   components that didn't change.
-- **Optional everything.** The core has zero dependencies and no React. React
-  hooks and persistence live behind separate entry points you opt into.
+- **Optional React.** The core has zero dependencies and no React. Persistence is
+  available from the main entry point; React hooks live behind a separate entry
+  point you opt into.
 - **Inference-first types.** State and actions are inferred from your config —
   you rarely write a generic by hand.
 
@@ -55,16 +55,15 @@ React is an **optional** peer dependency — only needed if you import
 
 ### Entry points
 
-| Import                  | Contents                                    | Needs React |
-| ----------------------- | ------------------------------------------- | ----------- |
-| `nexus-state`           | `createNexus`, `createActs`                 | no          |
-| `nexus-state/react`     | `createReactNexus` (+ core re-exports)      | yes         |
-| `nexus-state/persist`   | `persist`                                   | no          |
+| Import                | Contents                               | Needs React |
+| --------------------- | -------------------------------------- | ----------- |
+| `nexus-state`         | `createNexus`, `createActs`, `persist` | no          |
+| `nexus-state/react`   | `createReactNexus` (+ core re-exports) | yes         |
+| `nexus-state/persist` | direct `persist` entry                 | no          |
 
 ```js
-import { createNexus, createActs } from "nexus-state";
+import { createNexus, createActs, persist } from "nexus-state";
 import { createReactNexus } from "nexus-state/react";
-import { persist } from "nexus-state/persist";
 ```
 
 <h2></h2>
@@ -109,7 +108,6 @@ creates a new framework-agnostic store (**nexus**) instance.<br>
   <li><code>options</code>: object with <code>state</code> and optional <code>acts</code>.</li>
 </ul>
 </em><br>
-<b>Import:</b> <code>nexus-state</code><br><br>
 <b>Example:</b>
 
 ```js
@@ -137,20 +135,27 @@ export default nexus;
 
 <details><summary><b>TypeScript Snippet:</b></summary>
 
+State and action types are inferred from your config, so most stores need no
+generics:
+
 ```ts
-// State and actions are inferred from the config — generics are optional.
-// Pass them explicitly only when you want to declare the shape up front:
-type MyStateT = {
-  count1: number;
-  count2: number;
-};
+const nexus = createNexus({
+  state: { count: 0 },
+  acts: (get, set) => ({
+    inc() {
+      set((s) => ({ count: s.count + 1 }));
+    },
+  }),
+});
 
-type MyActionsT = {
-  increment: () => void;
-  getState: (value: keyof MyStateT) => void;
-};
+nexus.get("count"); // number
+nexus.acts.inc(); // () => void
+```
 
-const nexus = createNexus<MyStateT, MyActionsT>({...});
+Pass generics explicitly only when you want to declare the shape up front:
+
+```ts
+createNexus<MyState, MyActions>({ ... });
 ```
 
 </details>
@@ -168,11 +173,10 @@ extends <code>createNexus</code> with React-specific hooks.<br>
   <li><code>options</code>: object with <code>state</code> and optional <code>acts</code>.</li>
 </ul>
 </em><br>
-<b>Import:</b> <code>nexus-state/react</code><br><br>
 <b>Example:</b>
 
 ```js
-import { createReactNexus } from "nexus-state/react";
+import { createReactNexus } from "nexus-state/react"; // import with /react
 
 const nexus = createReactNexus({
   state: {
@@ -201,7 +205,7 @@ export default nexus;
 const nexus = createReactNexus({ state: {...}, acts: (get, set) => ({...}) });
 
 // Explicit form, if you prefer to declare shapes:
-const typed = createReactNexus<MyStateT, MyActionsT>({...});
+const typed = createReactNexus<MyState, MyActions>({...});
 ```
 
 </details>
@@ -212,15 +216,14 @@ const typed = createReactNexus<MyStateT, MyActionsT>({...});
 
 <details><summary><b><code>createActs</code></b></summary><br><ul><div>
 <b>Description:</b><em><br>
-creates a reusable action slice — useful for code splitting. Pass one or more
-slices as an array to <code>acts</code>.<br>
+creates a reusable action slice — useful for code splitting. Pass one slice
+directly to <code>acts</code>, or pass several slices as an array.<br>
 </em><br>
 <b>Parameters:</b><em><br>
 <ul>
   <li><code>create</code>: function that receives <code>get</code> and <code>set</code>, with <code>this</code> bound to the full acts object.</li>
 </ul>
 </em><br>
-<b>Import:</b> <code>nexus-state</code><br><br>
 <b>Example:</b>
 
 ```js
@@ -229,7 +232,7 @@ import { createNexus, createActs } from "nexus-state";
 const counterActs = createActs((get, set) => ({
   increment() {
     set((state) => ({ count1: state.count1 + 1 }));
-    this.getState("count1"); // ! calling another action
+    this.getState("count1"); // ! calling another action inside
   },
   getState(value) {
     console.log(`${value}:`, get(value));
@@ -238,7 +241,7 @@ const counterActs = createActs((get, set) => ({
 
 const nexus = createNexus({
   state: {...},
-  acts: [counterActs], // ! supports multiple: [counterActs, otherActs]
+  acts: counterActs, // ! supports multiple too: [counterActs, otherActs]
 });
 
 export default nexus;
@@ -247,12 +250,12 @@ export default nexus;
 <details><summary><b>TypeScript Snippet:</b></summary>
 
 ```ts
-type MyStateT = {...};
-type MyActionsT = {...};
+type MyState = {...};
+type MyActions = {...};
 
 // `this` is typed as the complete acts object across every slice,
 // so cross-slice calls are fully typed — no optional chaining needed.
-const counterActs = createActs<MyStateT, MyActionsT>(function (get, set) {
+const counterActs = createActs<MyState, MyActions>(function (get, set) {
   return {
     increment() {
       this.getState("count1"); // typed
@@ -327,7 +330,7 @@ import nexus from "your-nexus-config";
 
 // Direct update:
 nexus.set({ count1: 5 });
-nexus.set({ count1: 5, count2: 10 }); // multiple
+nexus.set({ count1: 5, count2: 10 }); // multiple keys, one notification
 
 // Functional update:
 nexus.set((state) => ({
@@ -346,6 +349,13 @@ nexus.set({ key: newValue }, "server");
 > ✦ Note:<br>
 > Known sources (`"manual" | "storage" | "server" | "external" | "reset"`) are
 > autocompleted, but **any** string is allowed.
+
+<br>
+
+> ✦ Batching:<br>
+> A single <code>set</code> call notifies subscribers once, even when several
+> keys change. Multiple <code>set</code> calls inside one action are also
+> batched and notify once after the action finishes.
 
 </div></ul></details>
 
@@ -390,13 +400,13 @@ const unsubscribe = nexus.subscribe(
   (state, context) => {
     console.log("count1 changed:", state.count1, "from", context?.source);
   },
-  ["count1"]
+  ["count1"],
 );
 
 // A subscriber watching several keys is notified once per update, not per key.
 nexus.subscribe((state) => save(state), ["count1", "count2"]);
 
-unsubscribe();
+// later: unsubscribe() to disable subscribing
 ```
 
 </div></ul></details>
@@ -476,26 +486,6 @@ declare global {
 
 <h2></h2>
 
-<details><summary><b><code>batch</code></b></summary><br><ul><div>
-<b>Description:</b><em><br>
-groups multiple <code>set</code> calls so subscribers are notified once, after
-the whole batch completes. Nesting is supported.<br>
-</em><br>
-<b>Example:</b>
-
-```tsx
-import nexus from "your-nexus-config";
-
-nexus.batch(() => {
-  nexus.set({ count1: 1 });
-  nexus.set({ count2: 2 });
-}); // subscribers run a single time
-```
-
-</div></ul></details>
-
-<h2></h2>
-
 <details><summary><b><code>acts</code></b></summary><br><ul><div>
 
 <b>Description:</b><em><br>
@@ -515,6 +505,8 @@ nexus.acts.getState("count1");
 regular functions support calling other actions via <code>this</code>; arrow
 functions are more compact but don't:
 </em><br>
+
+<br>
 
 ```js
 // regular function
@@ -580,14 +572,14 @@ import nexus from "your-nexus-config";
 
 const total = nexus.useSelector(
   (state) => state.count1 + state.count2,
-  ["count1", "count2"]
+  ["count1", "count2"],
 );
 
 // Custom equality for object/array results:
 const items = nexus.useSelector(
   (state) => state.items,
   ["items"],
-  (a, b) => a.length === b.length && a.every((v, i) => v === b[i])
+  (a, b) => a.length === b.length && a.every((v, i) => v === b[i]),
 );
 ```
 
@@ -641,12 +633,10 @@ stops persisting.<br>
   <li><code>options.onError</code>: handle storage / parse errors instead of throwing.</li>
 </ul>
 </em><br>
-<b>Import:</b> <code>nexus-state/persist</code><br><br>
 <b>Example:</b>
 
 ```tsx
-import { createNexus } from "nexus-state";
-import { persist } from "nexus-state/persist";
+import { createNexus, persist } from "nexus-state";
 
 const nexus = createNexus({ state: { theme: "light", count: 0 } });
 
@@ -665,33 +655,6 @@ const stop = persist(nexus, {
 
 <h2></h2>
 
-### TypeScript
-
-State and action types are inferred from your config, so most stores need no
-generics:
-
-```ts
-const nexus = createNexus({
-  state: { count: 0 },
-  acts: (get, set) => ({
-    inc() {
-      set((s) => ({ count: s.count + 1 }));
-    },
-  }),
-});
-
-nexus.get("count"); // number
-nexus.acts.inc(); // () => void
-```
-
-Pass generics explicitly only when you want to declare the shape up front:
-
-```ts
-createNexus<MyStateT, MyActionsT>({ ... });
-```
-
-<h2></h2>
-
 ### License
 
-[MIT](./publish/LICENSE)
+[MIT](./LICENSE)

@@ -9,6 +9,8 @@ import type {
   Middleware,
   Observer,
   Dependencies,
+  ActsCreate,
+  ActsPart,
 } from "./types/core";
 
 /** Normalize the `set` context: a bare string becomes `{ source }`. */
@@ -24,9 +26,9 @@ function normalizeContext(context?: SetContext): UpdateContext | undefined {
  * @description
  * `createNexus` owns state, actions, middleware and key-level subscriptions
  * without depending on React. State and actions are inferred from the config.
- * @param options initial state and optional action creator or action slices.
+ * @param options initial state and optional action creator, action slice or action slices.
  * @returns a `Nexus` instance with `get`, `set`, `reset`, `subscribe`,
- * `middleware`, `batch` and `acts`.
+ * `middleware` and `acts`.
  * @example
  * ```ts
  * import { createNexus } from "nexus-state";
@@ -44,6 +46,21 @@ function normalizeContext(context?: SetContext): UpdateContext | undefined {
  * nexus.get("count"); // number
  * ```
  */
+function createNexus<S extends RecordAny, A extends RecordAny>(options: {
+  state: S;
+  acts: ActsCreate<S, A>;
+}): Nexus<S, A>;
+function createNexus<S extends RecordAny, A extends RecordAny>(options: {
+  state: S;
+  acts: ActsPart<S, A> | ActsPart<S, A>[];
+}): Nexus<S, A>;
+function createNexus<S extends RecordAny>(options: {
+  state: S;
+}): Nexus<S, Record<string, never>>;
+function createNexus<
+  S extends RecordAny = RecordAny,
+  A extends RecordAny = Record<string, never>
+>(options: NexusOptions<S, A>): Nexus<S, A>;
 function createNexus<
   S extends RecordAny = RecordAny,
   A extends RecordAny = Record<string, never>
@@ -56,7 +73,7 @@ function createNexus<
   const listeners = new Map<keyof S | "*", Set<Observer<S>>>();
   const localMiddleware: Middleware<S>[] = [];
 
-  // --- batching ---
+  // --- internal action batching ---
   let batchDepth = 0;
   const pendingKeys = new Set<keyof S>();
   let pendingContext: UpdateContext | undefined;
@@ -120,20 +137,24 @@ function createNexus<
     notify(changedKeys, normalizedContext);
   };
 
-  function batch(fn: () => void) {
+  function flushBatch() {
+    if (batchDepth !== 0 || !pendingKeys.size) return;
+
+    const keys: (keyof S)[] = [];
+    pendingKeys.forEach((key) => keys.push(key));
+    const context = pendingContext;
+    pendingKeys.clear();
+    pendingContext = undefined;
+    notify(keys, context);
+  }
+
+  function runInBatch<T>(fn: () => T): T {
     batchDepth++;
     try {
-      fn();
+      return fn();
     } finally {
       batchDepth--;
-      if (batchDepth === 0 && pendingKeys.size) {
-        const keys: (keyof S)[] = [];
-        pendingKeys.forEach((key) => keys.push(key));
-        const context = pendingContext;
-        pendingKeys.clear();
-        pendingContext = undefined;
-        notify(keys, context);
-      }
+      flushBatch();
     }
   }
 
@@ -201,10 +222,14 @@ function createNexus<
   }
 
   // Bind every action to the final acts object so cross-action `this` calls
-  // work even when actions are destructured.
+  // work even when actions are destructured. Each action is internally batched,
+  // so multiple `set` calls notify subscribers once after the action finishes.
   for (const key of Object.keys(acts)) {
     const val = (acts as RecordAny)[key];
-    if (typeof val === "function") (acts as RecordAny)[key] = val.bind(acts);
+    if (typeof val === "function") {
+      (acts as RecordAny)[key] = (...args: unknown[]) =>
+        runInBatch(() => val.apply(acts, args));
+    }
   }
 
   return {
@@ -213,7 +238,6 @@ function createNexus<
     reset,
     subscribe,
     middleware,
-    batch,
     acts,
   };
 }

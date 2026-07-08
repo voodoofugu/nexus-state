@@ -149,8 +149,7 @@ function defaultStorage(): PersistStorage | null {
  * @returns cleanup function that unsubscribes the persistence listener.
  * @example
  * ```ts
- * import { createNexus } from "nexus-state";
- * import { persist } from "nexus-state/persist";
+ * import { createNexus, persist } from "nexus-state";
  *
  * const nexus = createNexus({ state: { count: 0 } });
  *

@@ -1,7 +1,8 @@
 import createNexus from "./nexus-core";
 import createActs from "./createActs";
+import persist from "./persist";
 
-export { createNexus, createActs };
+export { createNexus, createActs, persist };
 export type {
   Nexus,
   Setter,
@@ -17,6 +18,7 @@ export type {
   ActsCreateUnion,
   NexusOptions,
 } from "./types/core";
+export type { PersistStorage, PersistOptions } from "./persist";
 
 /**---
  * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
@@ -32,7 +34,9 @@ export type {
  * const store = nexus.createNexus({
  *   state: { count: 0 },
  * });
+ *
+ * nexus.persist(store, { key: "counter" });
  * ```
  */
-const nexus = { createNexus, createActs };
+const nexus = { createNexus, createActs, persist };
 export default nexus;

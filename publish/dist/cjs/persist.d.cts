@@ -181,6 +181,10 @@ interface Nexus<S, A = Record<string, never>> {
      * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
      * ### ***set***:
      * updates the state with a partial object or functional updater.
+     * @description
+     * A single `set` call notifies subscribers once, even when several keys
+     * change. Multiple `set` calls inside one action are also batched and notify
+     * once after the action finishes.
      * @param update partial object or function with access to all state.
      * @param context optional string or context object with `source` and optional `meta`.
      * @example
@@ -241,23 +245,6 @@ interface Nexus<S, A = Record<string, never>> {
      * ```
      */
     middleware(fn: Middleware<S>): () => void;
-    /**---
-     * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
-     * ### ***batch***:
-     * groups several updates into one subscriber notification.
-     * @description
-     * State changes are applied immediately, but listeners are notified once after
-     * the outermost batch finishes.
-     * @param fn synchronous work that calls `set` or actions.
-     * @example
-     * ```ts
-     * nexus.batch(() => {
-     *   nexus.set({ count: 1 });
-     *   nexus.set({ name: "Georg" });
-     * });
-     * ```
-     */
-    batch(fn: () => void): void;
     /**---
      * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
      * ### ***acts***:
@@ -405,8 +392,7 @@ interface PersistOptions<S> {
  * @returns cleanup function that unsubscribes the persistence listener.
  * @example
  * ```ts
- * import { createNexus } from "nexus-state";
- * import { persist } from "nexus-state/persist";
+ * import { createNexus, persist } from "nexus-state";
  *
  * const nexus = createNexus({ state: { count: 0 } });
  *

@@ -136,31 +136,6 @@ describe("middleware", () => {
   });
 });
 
-describe("batch", () => {
-  it("collapses multiple sets into one notification", () => {
-    const nx = createNexus({ state: { a: 0, b: 0 } });
-    const spy = vi.fn();
-    nx.subscribe(spy, ["*"]);
-    nx.batch(() => {
-      nx.set({ a: 1 });
-      nx.set({ b: 2 });
-    });
-    expect(spy).toHaveBeenCalledTimes(1);
-    expect(nx.get()).toEqual({ a: 1, b: 2 });
-  });
-
-  it("supports nesting", () => {
-    const nx = createNexus({ state: { a: 0, b: 0 } });
-    const spy = vi.fn();
-    nx.subscribe(spy, ["*"]);
-    nx.batch(() => {
-      nx.set({ a: 1 });
-      nx.batch(() => nx.set({ b: 2 }));
-    });
-    expect(spy).toHaveBeenCalledTimes(1);
-  });
-});
-
 describe("acts", () => {
   it("exposes actions and supports cross-action `this` calls", () => {
     const log: number[] = [];
@@ -195,6 +170,23 @@ describe("acts", () => {
     expect(nx.get("count")).toBe(1);
   });
 
+  it("batches multiple set calls inside one action", () => {
+    const nx = createNexus({
+      state: { a: 0, b: 0 },
+      acts: (_g, set) => ({
+        updateBoth() {
+          set({ a: 1 });
+          set({ b: 2 });
+        },
+      }),
+    });
+    const spy = vi.fn();
+    nx.subscribe(spy, ["*"]);
+    nx.acts.updateBoth();
+    expect(spy).toHaveBeenCalledTimes(1);
+    expect(nx.get()).toEqual({ a: 1, b: 2 });
+  });
+
   it("merges multiple createActs slices with typed cross-slice calls", () => {
     type S = { count: number };
     type A = { inc(): void; twice(): void };
@@ -212,5 +204,27 @@ describe("acts", () => {
     const nx = createNexus<S, A>({ state: { count: 0 }, acts: [slice] });
     nx.acts.twice();
     expect(nx.get("count")).toBe(2);
+  });
+
+  it("accepts a single createActs slice directly", () => {
+    type S = { count: number };
+    type A = { inc(): void; twice(): void };
+    const slice = createActs<S, A>(function (_get, set) {
+      return {
+        inc() {
+          set((s) => ({ count: s.count + 1 }));
+        },
+        twice() {
+          this.inc();
+          this.inc();
+        },
+      };
+    });
+    const nx = createNexus<S, A>({ state: { count: 0 }, acts: slice });
+    const spy = vi.fn();
+    nx.subscribe(spy, ["count"]);
+    nx.acts.twice();
+    expect(nx.get("count")).toBe(2);
+    expect(spy).toHaveBeenCalledTimes(1);
   });
 });

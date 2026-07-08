@@ -6,6 +6,8 @@ import type {
   ReactNexus,
   NexusOptions,
   Dependencies,
+  ActsCreate,
+  ActsPart,
 } from "./types/core";
 
 /**---
@@ -16,7 +18,7 @@ import type {
  * `createReactNexus` returns the full framework-agnostic nexus API plus
  * `use`, `useSelector` and `useRerender`. React is an optional peer dependency
  * and is only needed when importing `nexus-state/react`.
- * @param options initial state and optional action creator or action slices.
+ * @param options initial state and optional action creator, action slice or action slices.
  * @returns a `ReactNexus` instance.
  * @example
  * ```tsx
@@ -37,6 +39,21 @@ import type {
  * }
  * ```
  */
+function createReactNexus<S extends RecordAny, A extends RecordAny>(options: {
+  state: S;
+  acts: ActsCreate<S, A>;
+}): ReactNexus<S, A>;
+function createReactNexus<S extends RecordAny, A extends RecordAny>(options: {
+  state: S;
+  acts: ActsPart<S, A> | ActsPart<S, A>[];
+}): ReactNexus<S, A>;
+function createReactNexus<S extends RecordAny>(options: {
+  state: S;
+}): ReactNexus<S, Record<string, never>>;
+function createReactNexus<
+  S extends RecordAny = RecordAny,
+  A extends RecordAny = Record<string, never>
+>(options: NexusOptions<S, A>): ReactNexus<S, A>;
 function createReactNexus<
   S extends RecordAny = RecordAny,
   A extends RecordAny = Record<string, never>
