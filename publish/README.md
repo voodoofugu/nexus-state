@@ -5,7 +5,6 @@
 ### Table of contents
 
 - [About](#about)
-- [What makes it different](#what-makes-it-different)
 - [Installation](#installation)
 - [Quick start](#quick-start)
 - [API](#api)
@@ -21,9 +20,7 @@ Lightweight, framework-agnostic state management with optional actions, React
 bindings, and traceable updates. Designed for simplicity and performance, with
 first-class TypeScript inference.
 
-<h2></h2>
-
-### What makes it different
+**What makes it different:**
 
 - **Traceable state.** Every update carries a `context` describing where it came
   from (`"server"`, `"storage"`, `"reset"`, or your own). That context flows
@@ -63,10 +60,12 @@ import { createReactNexus } from "nexus-state/react"; // ! with /react
 
 ### Quick start
 
-```tsx
-import { createReactNexus } from "nexus-state/react";
+Create a store — framework-agnostic, no generics needed (types are inferred):
 
-const nexus = createReactNexus({
+```ts
+import { createNexus } from "nexus-state";
+
+const counter = createNexus({
   state: { count: 0 },
   acts: (get, set) => ({
     increment() {
@@ -75,22 +74,22 @@ const nexus = createReactNexus({
   }),
 });
 
-function Counter() {
-  const count = nexus.use("count");
-  return <button onClick={nexus.acts.increment}>{count}</button>;
-}
+counter.acts.increment();
+counter.get("count"); // number
 ```
 
-No generics required — `count` is `number` and `nexus.acts.increment` is fully
-typed, inferred from the config.
+In React, swap `createNexus` for `createReactNexus` (same options, from the
+`/react` entry) and read state with the `use` hook:
 
-The nexus name is arbitrary, which can be helpful when working with multiple nexus instances:<br>
+```tsx
+import { createReactNexus } from "nexus-state/react";
 
-```js
-import { createNexus } from "nexus-state";
+const counter = createReactNexus({ state: { count: 0 } /* , acts */ });
 
-const nexus1 = createNexus({...});
-const nexus2 = createNexus({...});
+function Counter() {
+  const count = counter.use("count"); // re-renders on change
+  return <button onClick={() => counter.set((s) => ({ count: s.count + 1 }))}>{count}</button>;
+}
 ```
 
 <h2></h2>
@@ -391,13 +390,13 @@ const specificValue = nexus.get("key");
 
 <details><summary><b><code>set</code></b></summary><br><ul><div>
 <b>Description:</b><em><br>
-updates the state with a partial object or functional updater. Only the keys
-that actually change trigger a notification.<br>
+updates the state with a partial object or a functional updater. Only keys that
+actually change notify, and one <code>set</code> notifies once.<br>
 </em><br>
 <b>Parameters:</b><em><br>
 <ul>
-  <li><code>update</code>: partial object or function with access to all states.</li>
-  <li><code>context</code>: optional string, or object with <code>source</code> and optional <code>meta</code>. Travels to middleware and subscribers.</li>
+  <li><code>update</code>: partial state, or <code>(state) =&gt; partial</code>.</li>
+  <li><code>context</code>: optional provenance — a string or <code>{ source, meta }</code>. Travels to middleware and subscribers.</li>
 </ul>
 </em><br>
 <b>Example:</b>
@@ -405,36 +404,17 @@ that actually change trigger a notification.<br>
 ```tsx
 import nexus from "your-nexus-config";
 
-// Direct update:
-nexus.set({ count1: 5 });
-nexus.set({ count1: 5, count2: 10 }); // multiple keys, one notification
+nexus.set({ count1: 5, count2: 10 }); // partial, one notification
+nexus.set((state) => ({ count1: state.count1 + 1 })); // functional
 
-// Functional update:
-nexus.set((state) => ({
-  count1: state.count1 + 1,
-}));
-
-// With context (provenance) — visible to middleware and subscribers:
-nexus.set({ key: newValue }, { source: "server", meta: { requestId: 7 } });
-
-// Shortcut equivalent to { source: "server" }:
-nexus.set({ key: newValue }, "server");
+nexus.set({ user }, "server"); // provenance shortcut for { source: "server" }
+nexus.set({ user }, { source: "server", meta: { requestId: 7 } });
 ```
 
 <br>
 
-> ✦ Note:<br>
-> Known sources (`"manual" | "storage" | "server" | "external" | "reset"`) are
-> autocompleted, but **any** string is allowed.
-
-<br>
-
-> ✦ Batching:<br>
-> A single <code>set</code> with several keys notifies subscribers once — this
-> is the primary, most explicit way to batch (you can see it in the call). On
-> top of that, <code>set</code> calls made <b>synchronously</b> inside an action
-> are batched into a single notification; calls made after an <code>await</code>
-> run as separate updates.
+> ✦ Sources: known values (`"manual" | "storage" | "server" | "external" | "reset"`) autocomplete, but any string works.<br>
+> ✦ Batching: one <code>set</code> with several keys notifies once — the primary way to batch. <code>set</code> calls made synchronously inside an action are collapsed into one too.
 
 </div></ul></details>
 
@@ -630,47 +610,32 @@ const specificValue = nexus.use("key");
 
 <details><summary><b><code>useSelector</code></b></summary><br><ul><div>
 <b>Description:</b><em><br>
-<code>react</code> hook for deriving a value from the state. It compares the
-<b>result</b> of the selector to decide whether to re-render — <code>Object.is</code>
-by default.<br>
+<code>react</code> hook that derives a value from state. It re-renders only when
+the selector's <b>result</b> changes (<code>Object.is</code> by default).<br>
 </em><br>
 <b>Parameters:</b><em><br>
 <ul>
-  <li><code>selector</code>: function returning any derived value from the state.</li>
-  <li><code>dependencies</code>: keys to watch (they trigger a selector re-check). Use <code>["*"]</code> for all. Defaults to <code>["*"]</code>.</li>
-  <li><code>isEqual</code>: optional comparator for the selector result. Defaults to <code>Object.is</code>; pass the <code>shallow</code> helper for one-level object/array equality.</li>
+  <li><code>selector</code>: derives a value from the state.</li>
+  <li><code>dependencies</code>: keys to watch (they trigger a re-check). <code>["*"]</code> for all; defaults to <code>["*"]</code>.</li>
+  <li><code>isEqual</code>: optional result comparator. Defaults to <code>Object.is</code>; pass <code>shallow</code> for one-level object/array equality, or your own.</li>
 </ul>
 </em><br>
 <b>Example:</b>
 
 ```tsx
-import nexus from "your-nexus-config";
-
-// Primitive result — Object.is is all you need.
-const total = nexus.useSelector(
-  (state) => state.count1 + state.count2,
-  ["count1", "count2"],
-);
-```
-
-When the selector <b>returns a new object or array each run</b> (e.g. <code>.map</code>,
-<code>.filter</code>, an object literal), <code>Object.is</code> always sees a new
-reference and re-renders every time. Pass <code>shallow</code> to compare contents
-instead:
-
-```tsx
 import { shallow } from "nexus-state";
 import nexus from "your-nexus-config";
 
-const ids = nexus.useSelector(
-  (state) => state.items.map((item) => item.id),
-  ["items"],
-  shallow, // re-render only when the ids actually differ
-);
+// Primitive result — Object.is is enough:
+const total = nexus.useSelector((s) => s.count1 + s.count2, ["count1", "count2"]);
 
-// For anything shallow can't express (e.g. arrays of objects), pass your own:
+// New array/object each run (.map/.filter/literal) — pass shallow so an
+// equal result doesn't re-render:
+const ids = nexus.useSelector((s) => s.items.map((i) => i.id), ["items"], shallow);
+
+// Escape hatch — custom comparator (e.g. arrays of objects):
 const rows = nexus.useSelector(
-  (state) => state.users.map((u) => ({ id: u.id, name: u.name })),
+  (s) => s.users.map((u) => ({ id: u.id, name: u.name })),
   ["users"],
   (a, b) => a.length === b.length && a.every((x, i) => x.id === b[i].id),
 );
@@ -678,12 +643,7 @@ const rows = nexus.useSelector(
 
 <br>
 
-> ✦ Note:<br>
-> <code>shallow</code> is a plain helper, not a hook.<br>
-> The selector and comparator are read from refs internally, so you **don't**
-> need <code>useCallback</code> to keep the subscription stable.<br>
-> The comparison is on the selector's <b>result</b>, not on the watched keys — a
-> watched key changing re-runs the selector, but an equal result won't re-render.
+> ✦ Note: comparison is on the selector's <b>result</b>, not the watched keys — a watched key re-runs the selector, but an equal result won't re-render. <code>shallow</code> is a plain helper (not a hook), and the selector/comparator are read from refs, so no <code>useCallback</code> is needed.
 
 </div></ul></details>
 
