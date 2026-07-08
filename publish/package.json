@@ -1,27 +1,81 @@
 {
   "name": "nexus-state",
-  "version": "3.1.0",
+  "version": "4.0.0",
+  "description": "Lightweight, traceable global state manager for JavaScript and React.",
   "author": "Georg Schilin",
   "license": "MIT",
-  "description": "Lightweight global state manager for React and JavaScript.",
-  "main": "./cjs/index.js",
+  "type": "module",
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
+  "types": "./dist/esm/index.d.ts",
   "exports": {
     ".": {
-      "import": "./esm/index.js",
-      "require": "./cjs/index.js",
-      "types": "./types/index.d.ts"
+      "import": {
+        "types": "./dist/esm/index.d.ts",
+        "default": "./dist/esm/index.js"
+      },
+      "require": {
+        "types": "./dist/cjs/index.d.cts",
+        "default": "./dist/cjs/index.js"
+      }
+    },
+    "./react": {
+      "import": {
+        "types": "./dist/esm/react.d.ts",
+        "default": "./dist/esm/react.js"
+      },
+      "require": {
+        "types": "./dist/cjs/react.d.cts",
+        "default": "./dist/cjs/react.js"
+      }
+    },
+    "./persist": {
+      "import": {
+        "types": "./dist/esm/persist.d.ts",
+        "default": "./dist/esm/persist.js"
+      },
+      "require": {
+        "types": "./dist/cjs/persist.d.cts",
+        "default": "./dist/cjs/persist.js"
+      }
+    },
+    "./package.json": "./package.json"
+  },
+  "typesVersions": {
+    "*": {
+      "react": [
+        "./dist/esm/react.d.ts"
+      ],
+      "persist": [
+        "./dist/esm/persist.d.ts"
+      ]
     }
   },
-  "types": "./types/index.d.ts",
+  "sideEffects": false,
+  "engines": {
+    "node": ">=12.20"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
   "keywords": [
     "react",
     "action",
     "state manager",
     "global state",
-    "state store"
+    "state store",
+    "middleware",
+    "persist"
   ],
   "peerDependencies": {
     "react": ">=16.8 <20"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    }
   },
   "repository": {
     "type": "git",

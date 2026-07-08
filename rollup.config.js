@@ -3,51 +3,75 @@ import typescript from "@rollup/plugin-typescript";
 import terser from "@rollup/plugin-terser";
 import del from "rollup-plugin-delete";
 import commonjs from "@rollup/plugin-commonjs";
+import dts from "rollup-plugin-dts";
 
-const plugins = [
+const entries = {
+  index: "./src/index.ts",
+  react: "./src/react.ts",
+  persist: "./src/persist.ts",
+};
+
+const external = (id) => /^react/.test(id);
+
+const makePlugins = (clean) => [
+  ...(clean ? [del({ targets: "dist/*" })] : []),
   resolve(),
   commonjs(),
-  typescript(),
+  typescript({ tsconfig: "./tsconfig.json", declaration: false }),
   terser({
+    ecma: 5,
     compress: {
+      ecma: 5,
       passes: 2,
       unsafe: true,
-      unsafe_arrows: true,
       unsafe_comps: true,
       unsafe_math: true,
       drop_console: true,
       pure_funcs: ["console.log"],
     },
-    mangle: {
-      toplevel: true,
-    },
-    output: {
-      comments: false,
-    },
+    mangle: { toplevel: true },
+    output: { comments: false, ecma: 5 },
   }),
 ];
 
-export default [
-  // ESM точка входа
-  {
-    input: "./src/index.ts",
-    output: {
-      file: "dist/esm/index.js",
-      format: "esm",
-    },
-    plugins: [del({ targets: "dist/*" }), ...plugins],
-    external: (id) => /^react/.test(id),
-  },
+// Bundled, self-contained declarations per entry — each entry is built on its
+// own so shared types are inlined (no internal relative imports), which resolves
+// cleanly under both ESM and CJS type resolution.
+const dtsBuilds = (dir, entryFileNames = "[name].d.ts") =>
+  Object.entries(entries).map(([name, input]) => ({
+    input: { [name]: input },
+    output: { dir, format: "es", entryFileNames },
+    plugins: [dts({ tsconfig: "./tsconfig.json" })],
+    external,
+  }));
 
-  // CJS точка входа
+export default [
+  // ESM builds (index / react / persist)
   {
-    input: "./src/index.ts",
+    input: entries,
     output: {
-      file: "dist/cjs/index.js",
-      format: "cjs",
-      exports: "named",
+      dir: "dist/esm",
+      format: "esm",
+      entryFileNames: "[name].js",
+      generatedCode: "es5",
     },
-    plugins,
-    external: (id) => /^react/.test(id),
+    plugins: makePlugins(true),
+    external,
   },
+  // CJS builds (index / react / persist)
+  {
+    input: entries,
+    output: {
+      dir: "dist/cjs",
+      format: "cjs",
+      entryFileNames: "[name].js",
+      exports: "named",
+      generatedCode: "es5",
+    },
+    plugins: makePlugins(false),
+    external,
+  },
+  // Type declarations, bundled for both module systems
+  ...dtsBuilds("dist/esm"),
+  ...dtsBuilds("dist/cjs", "[name].d.cts"),
 ];

@@ -1,17 +1,17 @@
 {
   "compilerOptions": {
     "module": "ESNext",
-    "target": "es6",
+    "target": "es5",
     "lib": ["dom", "es2019"],
-    "declaration": true,
-    "outDir": "./dist/types",
     "esModuleInterop": true,
-    "skipLibCheck": true,
     "moduleResolution": "node",
     "types": ["react", "node"],
     "typeRoots": ["./node_modules/@types"],
     "strict": true,
-    "jsx": "react"
+    "declaration": false,
+    "downlevelIteration": true,
+    "jsx": "react-jsx",
+    "skipLibCheck": true
   },
   "include": ["src"],
   "exclude": ["node_modules", "dist"]

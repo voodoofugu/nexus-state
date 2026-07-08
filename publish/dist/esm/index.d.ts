@@ -14,9 +14,7 @@
  * ```
  */
 type RecordAny = Record<string, any>;
-
 type KnownSource = "manual" | "storage" | "server" | "external" | "reset";
-
 /**---
  * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
  * ### ***Source***:
@@ -31,7 +29,6 @@ type KnownSource = "manual" | "storage" | "server" | "external" | "reset";
  * ```
  */
 type Source = KnownSource | (string & {});
-
 /**---
  * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
  * ### ***UpdateContext***:
@@ -48,8 +45,10 @@ type Source = KnownSource | (string & {});
  * );
  * ```
  */
-type UpdateContext = { source: Source; meta?: RecordAny };
-
+type UpdateContext = {
+    source: Source;
+    meta?: RecordAny;
+};
 /**---
  * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
  * ### ***SetContext***:
@@ -64,7 +63,6 @@ type UpdateContext = { source: Source; meta?: RecordAny };
  * ```
  */
 type SetContext = Source | UpdateContext;
-
 /**---
  * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
  * ### ***Setter***:
@@ -87,11 +85,7 @@ type SetContext = Source | UpdateContext;
  * set({ key: newValue }, "server");
  * ```
  */
-type Setter<S> = (
-  update: Partial<S> | ((state: S) => Partial<S>),
-  context?: SetContext
-) => void;
-
+type Setter<S> = (update: Partial<S> | ((state: S) => Partial<S>), context?: SetContext) => void;
 /**---
  * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
  * ### ***Getter***:
@@ -106,10 +100,9 @@ type Setter<S> = (
  * ```
  */
 type Getter<S> = {
-  (): S;
-  <K extends keyof S>(key: K): S[K];
+    (): S;
+    <K extends keyof S>(key: K): S[K];
 };
-
 /**---
  * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
  * ### ***Middleware***:
@@ -126,12 +119,7 @@ type Getter<S> = {
  * });
  * ```
  */
-type Middleware<S> = (
-  prevState: S,
-  nextState: S,
-  context?: UpdateContext
-) => S | void;
-
+type Middleware<S> = (prevState: S, nextState: S, context?: UpdateContext) => S | void;
 /**---
  * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
  * ### ***Observer***:
@@ -146,7 +134,6 @@ type Middleware<S> = (
  * ```
  */
 type Observer<S> = (state: S, context?: UpdateContext) => void;
-
 /**---
  * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
  * ### ***Dependencies***:
@@ -161,7 +148,6 @@ type Observer<S> = (state: S, context?: UpdateContext) => void;
  * ```
  */
 type Dependencies<S> = ["*"] | (keyof S)[];
-
 /**---
  * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
  * ### ***ActsCreate***:
@@ -179,7 +165,6 @@ type Dependencies<S> = ["*"] | (keyof S)[];
  * ```
  */
 type ActsCreate<S, A> = (get: Getter<S>, set: Setter<S>) => A;
-
 /**---
  * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
  * ### ***ActsPart***:
@@ -203,7 +188,6 @@ type ActsCreate<S, A> = (get: Getter<S>, set: Setter<S>) => A;
  * ```
  */
 type ActsPart<S, A> = (this: A, get: Getter<S>, set: Setter<S>) => Partial<A>;
-
 /**---
  * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
  * ### ***ActsCreateUnion***:
@@ -218,7 +202,6 @@ type ActsPart<S, A> = (this: A, get: Getter<S>, set: Setter<S>) => Partial<A>;
  * ```
  */
 type ActsCreateUnion<S, A> = ActsCreate<S, A> | ActsPart<S, A>[];
-
 /**---
  * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
  * ### ***NexusOptions***:
@@ -238,10 +221,9 @@ type ActsCreateUnion<S, A> = ActsCreate<S, A> | ActsPart<S, A>[];
  * ```
  */
 type NexusOptions<S, A> = {
-  state: S;
-  acts?: ActsCreateUnion<S, A>;
+    state: S;
+    acts?: ActsCreateUnion<S, A>;
 };
-
 /**---
  * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
  * ### ***Nexus***:
@@ -260,205 +242,209 @@ type NexusOptions<S, A> = {
  * ```
  */
 interface Nexus<S, A = Record<string, never>> {
-  /**---
-   * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
-   * ### ***get***:
-   * reads the whole state or one typed state key.
-   * @example
-   * ```ts
-   * const state = nexus.get();
-   * const count = nexus.get("count");
-   * ```
-   */
-  get: Getter<S>;
-
-  /**---
-   * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
-   * ### ***set***:
-   * updates the state with a partial object or functional updater.
-   * @param update partial object or function with access to all state.
-   * @param context optional string or context object with `source` and optional `meta`.
-   * @example
-   * ```ts
-   * nexus.set({ count: 1 });
-   * nexus.set((state) => ({ count: state.count + 1 }), "manual");
-   * nexus.set({ user }, { source: "server", meta: { requestId } });
-   * ```
-   */
-  set: Setter<S>;
-
-  /**---
-   * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
-   * ### ***reset***:
-   * restores all state or selected keys to their initial values.
-   * @description
-   * Reset updates are routed through `set` with source `"reset"`, so middleware
-   * and subscribers observe them like normal updates.
-   * @param keys optional state keys to reset. Omit keys to reset everything.
-   * @example
-   * ```ts
-   * nexus.reset();
-   * nexus.reset("count", "name");
-   * ```
-   */
-  reset(...keys: (keyof S)[]): void;
-
-  /**---
-   * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
-   * ### ***subscribe***:
-   * listens to all updates or only selected state keys.
-   * @param observer callback called with latest state and optional update context.
-   * @param dependencies keys to watch, or `["*"]` for every update.
-   * @returns unsubscribe function.
-   * @example
-   * ```ts
-   * const stop = nexus.subscribe((state, context) => {
-   *   console.log(state.count, context?.source);
-   * }, ["count"]);
-   *
-   * stop();
-   * ```
-   */
-  subscribe(observer: Observer<S>, dependencies?: Dependencies<S>): () => void;
-
-  /**---
-   * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
-   * ### ***middleware***:
-   * adds an update interceptor for this nexus.
-   * @description
-   * Middleware runs before state is committed and before subscribers are
-   * notified. Return a replacement state to override the update.
-   * @param fn middleware callback.
-   * @returns function that removes this middleware.
-   * @example
-   * ```ts
-   * const stop = nexus.middleware((prev, next, context) => {
-   *   if (context?.source === "storage") return next;
-   *   return { ...next, touched: true };
-   * });
-   * ```
-   */
-  middleware(fn: Middleware<S>): () => void;
-
-  /**---
-   * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
-   * ### ***batch***:
-   * groups several updates into one subscriber notification.
-   * @description
-   * State changes are applied immediately, but listeners are notified once after
-   * the outermost batch finishes.
-   * @param fn synchronous work that calls `set` or actions.
-   * @example
-   * ```ts
-   * nexus.batch(() => {
-   *   nexus.set({ count: 1 });
-   *   nexus.set({ name: "Georg" });
-   * });
-   * ```
-   */
-  batch(fn: () => void): void;
-
-  /**---
-   * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
-   * ### ***acts***:
-   * action object created from the `acts` option.
-   * @description
-   * Actions are bound to the final acts object, so destructured methods and
-   * cross-action `this.someAction()` calls keep working.
-   * @example
-   * ```ts
-   * nexus.acts.increment();
-   * const { increment } = nexus.acts;
-   * increment();
-   * ```
-   */
-  acts: A;
+    /**---
+     * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
+     * ### ***get***:
+     * reads the whole state or one typed state key.
+     * @example
+     * ```ts
+     * const state = nexus.get();
+     * const count = nexus.get("count");
+     * ```
+     */
+    get: Getter<S>;
+    /**---
+     * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
+     * ### ***set***:
+     * updates the state with a partial object or functional updater.
+     * @param update partial object or function with access to all state.
+     * @param context optional string or context object with `source` and optional `meta`.
+     * @example
+     * ```ts
+     * nexus.set({ count: 1 });
+     * nexus.set((state) => ({ count: state.count + 1 }), "manual");
+     * nexus.set({ user }, { source: "server", meta: { requestId } });
+     * ```
+     */
+    set: Setter<S>;
+    /**---
+     * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
+     * ### ***reset***:
+     * restores all state or selected keys to their initial values.
+     * @description
+     * Reset updates are routed through `set` with source `"reset"`, so middleware
+     * and subscribers observe them like normal updates.
+     * @param keys optional state keys to reset. Omit keys to reset everything.
+     * @example
+     * ```ts
+     * nexus.reset();
+     * nexus.reset("count", "name");
+     * ```
+     */
+    reset(...keys: (keyof S)[]): void;
+    /**---
+     * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
+     * ### ***subscribe***:
+     * listens to all updates or only selected state keys.
+     * @param observer callback called with latest state and optional update context.
+     * @param dependencies keys to watch, or `["*"]` for every update.
+     * @returns unsubscribe function.
+     * @example
+     * ```ts
+     * const stop = nexus.subscribe((state, context) => {
+     *   console.log(state.count, context?.source);
+     * }, ["count"]);
+     *
+     * stop();
+     * ```
+     */
+    subscribe(observer: Observer<S>, dependencies?: Dependencies<S>): () => void;
+    /**---
+     * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
+     * ### ***middleware***:
+     * adds an update interceptor for this nexus.
+     * @description
+     * Middleware runs before state is committed and before subscribers are
+     * notified. Return a replacement state to override the update.
+     * @param fn middleware callback.
+     * @returns function that removes this middleware.
+     * @example
+     * ```ts
+     * const stop = nexus.middleware((prev, next, context) => {
+     *   if (context?.source === "storage") return next;
+     *   return { ...next, touched: true };
+     * });
+     * ```
+     */
+    middleware(fn: Middleware<S>): () => void;
+    /**---
+     * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
+     * ### ***batch***:
+     * groups several updates into one subscriber notification.
+     * @description
+     * State changes are applied immediately, but listeners are notified once after
+     * the outermost batch finishes.
+     * @param fn synchronous work that calls `set` or actions.
+     * @example
+     * ```ts
+     * nexus.batch(() => {
+     *   nexus.set({ count: 1 });
+     *   nexus.set({ name: "Georg" });
+     * });
+     * ```
+     */
+    batch(fn: () => void): void;
+    /**---
+     * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
+     * ### ***acts***:
+     * action object created from the `acts` option.
+     * @description
+     * Actions are bound to the final acts object, so destructured methods and
+     * cross-action `this.someAction()` calls keep working.
+     * @example
+     * ```ts
+     * nexus.acts.increment();
+     * const { increment } = nexus.acts;
+     * increment();
+     * ```
+     */
+    acts: A;
 }
 
 /**---
  * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
- * ### ***ReactNexus***:
- * nexus store with React hooks added by `createReactNexus`.
+ * ### ***createNexus***:
+ * creates a framework-agnostic nexus store.
  * @description
- * Includes the full framework-agnostic `Nexus` API plus `use`, `useSelector`
- * and `useRerender` hooks.
+ * `createNexus` owns state, actions, middleware and key-level subscriptions
+ * without depending on React. State and actions are inferred from the config.
+ * @param options initial state and optional action creator or action slices.
+ * @returns a `Nexus` instance with `get`, `set`, `reset`, `subscribe`,
+ * `middleware`, `batch` and `acts`.
  * @example
- * ```tsx
- * const count = nexus.use("count");
- * const doubled = nexus.useSelector((state) => state.count * 2, ["count"]);
+ * ```ts
+ * import { createNexus } from "nexus-state";
+ *
+ * const nexus = createNexus({
+ *   state: { count: 0 },
+ *   acts: (get, set) => ({
+ *     increment() {
+ *       set({ count: get("count") + 1 }, "manual");
+ *     },
+ *   }),
+ * });
+ *
+ * nexus.acts.increment();
+ * nexus.get("count"); // number
  * ```
  */
-interface ReactNexus<S, A = Record<string, never>> extends Nexus<S, A> {
-  /**---
-   * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
-   * ### ***use***:
-   * React hook that subscribes a component to the whole state or one key.
-   * @description
-   * Uses `useSyncExternalStore` under the hood. Passing a key creates a
-   * key-level subscription so unrelated state updates do not re-render the
-   * component.
-   * @example
-   * ```tsx
-   * const state = nexus.use();
-   * const count = nexus.use("count");
-   * ```
-   */
-  use: {
-    (): S;
-    <K extends keyof S>(key: K): S[K];
-  };
+declare function createNexus<S extends RecordAny = RecordAny, A extends RecordAny = Record<string, never>>(options: NexusOptions<S, A>): Nexus<S, A>;
 
-  /**---
-   * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
-   * ### ***useSelector***:
-   * React hook that subscribes to selected keys and returns derived state.
-   * @param selector derives a value from the full state.
-   * @param dependencies keys that should trigger selector re-checks, or `["*"]`.
-   * @param isEqual optional comparator for keeping the previous selected value.
-   * @example
-   * ```tsx
-   * const fullName = nexus.useSelector(
-   *   (state) => `${state.firstName} ${state.lastName}`,
-   *   ["firstName", "lastName"],
-   * );
-   * ```
-   */
-  useSelector<R>(
-    selector: (state: S) => R,
-    dependencies?: Dependencies<S>,
-    isEqual?: (a: R, b: R) => boolean
-  ): R;
+/**
+ * Wraps an acts slice for code-splitting. `this` is typed as the *complete*
+ * acts object, so cross-slice calls don't need optional chaining.
+ * Pass one or more slices to `acts: [sliceA, sliceB]` when creating a nexus.
+ */
+/**---
+ * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
+ * ### ***createActs***:
+ * creates a reusable action slice for `createNexus` or `createReactNexus`.
+ * @description
+ * Use `createActs` to split actions across files. Inside each slice, `this` is
+ * typed as the complete acts object, so actions can call other actions from the
+ * same or another slice.
+ * @param create slice factory that receives `get` and `set`.
+ * @returns an action slice accepted by `acts: [sliceA, sliceB]`.
+ * @example
+ * ```ts
+ * import { createActs, createNexus } from "nexus-state";
+ *
+ * type State = { count: number };
+ * type Actions = {
+ *   increment(): void;
+ *   logCount(): void;
+ * };
+ *
+ * const counterActs = createActs<State, Actions>(function (get, set) {
+ *   return {
+ *     increment() {
+ *       set({ count: get("count") + 1 });
+ *       this.logCount();
+ *     },
+ *     logCount() {
+ *       console.log(get("count"));
+ *     },
+ *   };
+ * });
+ *
+ * const nexus = createNexus<State, Actions>({
+ *   state: { count: 0 },
+ *   acts: [counterActs],
+ * });
+ * ```
+ */
+declare function createActs<S extends RecordAny, A extends RecordAny = RecordAny>(create: (this: A, get: Getter<S>, set: Setter<S>) => Partial<A> & ThisType<A>): ActsPart<S, A>;
 
-  /**---
-   * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
-   * ### ***useRerender***:
-   * React hook that returns an imperative local re-render function.
-   * @description
-   * Use it for rare cases where a component needs to redraw because of refs or
-   * other non-reactive values. Prefer state subscriptions for normal data flow.
-   * @example
-   * ```tsx
-   * const rerender = nexus.useRerender();
-   * rerender();
-   * ```
-   */
-  useRerender(): () => void;
-}
-
-export type {
-  RecordAny,
-  Source,
-  UpdateContext,
-  SetContext,
-  Setter,
-  Getter,
-  Middleware,
-  Observer,
-  Dependencies,
-  ActsCreate,
-  ActsPart,
-  ActsCreateUnion,
-  NexusOptions,
-  Nexus,
-  ReactNexus,
+/**---
+ * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
+ * ### ***nexus***:
+ * default namespace-style export for the core entry point.
+ * @description
+ * Prefer named imports for tree-shaking and readability. The default export is
+ * provided for users who like `nexus.createNexus(...)` style access.
+ * @example
+ * ```ts
+ * import nexus from "nexus-state";
+ *
+ * const store = nexus.createNexus({
+ *   state: { count: 0 },
+ * });
+ * ```
+ */
+declare const nexus: {
+    createNexus: typeof createNexus;
+    createActs: typeof createActs;
 };
+
+export { createActs, createNexus, nexus as default };
+export type { ActsCreate, ActsCreateUnion, ActsPart, Dependencies, Getter, Middleware, Nexus, NexusOptions, Observer, SetContext, Setter, Source, UpdateContext };
