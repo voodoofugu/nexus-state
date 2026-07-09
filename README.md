@@ -113,7 +113,7 @@ function Counter() {
 
 ### API
 
-<details><summary><b>MAIN</b></summary>
+<details><summary><b>main</b></summary>
 <br>
 <ul><div>
 
@@ -468,7 +468,7 @@ const typed = createReactNexus<MyState, MyActions>({...});
 
 <h2></h2>
 
-<details><summary><b>NEXUS</b></summary>
+<details><summary><b>nexus</b></summary>
 <br>
 <ul><div>
 
