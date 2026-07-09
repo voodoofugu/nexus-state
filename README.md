@@ -8,8 +8,6 @@
 - [Installation](#installation)
 - [Quick start](#quick-start)
 - [API](#api)
-  - [main](#main)
-  - [nexus](#nexus)
 - [SSR / Next.js](#ssr--nextjs)
 - [License](#license)
 
@@ -47,12 +45,12 @@ npm install nexus-state
 React is an **optional** peer dependency — only needed if you import
 `nexus-state/react`.
 
-| Import                 | Contents                                          | Needs        |
-| ---------------------- | ------------------------------------------------- | ------------ |
-| `nexus-state`          | `createNexus`, `createActs`, `persist`            | —            |
-| `nexus-state/react`    | `createReactNexus`, `useComputed`                 | react (peer) |
-| `nexus-state/devtools` | `devtools` (Redux DevTools adapter)               | —            |
-| `nexus-state/computed` | `computed` (derived, cached values)               | —            |
+| Import                 | Contents                               | Needs        |
+| ---------------------- | -------------------------------------- | ------------ |
+| `nexus-state`          | `createNexus`, `createActs`, `persist` | —            |
+| `nexus-state/react`    | `createReactNexus`, `useComputed`      | react (peer) |
+| `nexus-state/devtools` | `devtools` (Redux DevTools adapter)    | —            |
+| `nexus-state/computed` | `computed` (derived, cached values)    | —            |
 
 ```js
 import { createNexus, createActs, persist } from "nexus-state";
@@ -115,9 +113,7 @@ function Counter() {
 
 ### API
 
-#### main:
-
-<details><summary><code>createNexus</code> · <code>createActs</code> · <code>persist</code> · <code>shallow</code> · <code>createReactNexus</code></summary>
+<details><summary>Main</summary>
 <br>
 <ul><div>
 
@@ -324,24 +320,30 @@ import { createNexus } from "nexus-state";
 import { produce } from "immer";
 
 const nexus = createNexus({
-  state: {/* any shape, however nested */},
+  state: {
+    /* any shape, however nested */
+  },
   acts: (get, set) => ({
     // one action can change anything on the draft:
     update() {
-      set(produce(get(), (s) => {
-        // s is your typed state — mutate whatever you need:
-        // s.a.b.c = value;
-        // s.list.push(item);
-        // delete s.map[id];
-      }));
+      set(
+        produce(get(), (s) => {
+          // s is your typed state — mutate whatever you need:
+          // s.a.b.c = value;
+          // s.list.push(item);
+          // delete s.map[id];
+        }),
+      );
     },
   }),
 });
 
 // Outside an action it's the same one-liner:
-nexus.set(produce(nexus.get(), (s) => {
-  // mutate the draft
-}));
+nexus.set(
+  produce(nexus.get(), (s) => {
+    // mutate the draft
+  }),
+);
 ```
 
 <br>
@@ -379,10 +381,10 @@ import nexus from "your-nexus-config";
 
 const total = computed(nexus, (s) => s.cart.reduce((n, i) => n + i.price, 0));
 
-total.get();                          // current value (cached)
+total.get(); // current value (cached)
 const off = total.subscribe((v) => console.log("total:", v));
-off();                                // stop listening
-total.dispose();                      // release the source subscription
+off(); // stop listening
+total.dispose(); // release the source subscription
 ```
 
 <br>
@@ -466,9 +468,7 @@ const typed = createReactNexus<MyState, MyActions>({...});
 
 <h2></h2>
 
-#### nexus:
-
-<details><summary><code>get</code> · <code>set</code> · <code>reset</code> · <code>subscribe</code> · <code>middleware</code> · <code>acts</code> · <code>use</code> · <code>useSelector</code> · <code>useRerender</code></summary>
+<details><summary>Nexus</summary>
 <br>
 <ul><div>
 
@@ -825,7 +825,9 @@ export function StoreProvider({
   const ref = useRef<Store>();
   if (!ref.current) ref.current = createStore(initial);
   return (
-    <StoreContext.Provider value={ref.current}>{children}</StoreContext.Provider>
+    <StoreContext.Provider value={ref.current}>
+      {children}
+    </StoreContext.Provider>
   );
 }
 
