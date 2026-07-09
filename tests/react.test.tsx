@@ -1,7 +1,6 @@
 import { describe, it, expect, afterEach, vi } from "vitest";
 import { render, screen, act, cleanup, fireEvent } from "@testing-library/react";
-import { createReactNexus, useComputed } from "../src/react";
-import { computed } from "../src/computed";
+import { createReactNexus } from "../src/react";
 import { shallow } from "../src/shallow"; // internal — not a public export
 
 afterEach(cleanup);
@@ -208,23 +207,3 @@ describe("acts in components", () => {
   });
 });
 
-describe("useComputed", () => {
-  it("renders a computed value and re-renders when it changes", () => {
-    const nx = createReactNexus({ state: { a: 1, b: 2, other: 0 } });
-    const total = computed(nx, (s) => s.a + s.b);
-    const renders = vi.fn();
-    function View() {
-      renders();
-      return <span data-testid="t">{useComputed(total)}</span>;
-    }
-    render(<View />);
-    expect(screen.getByTestId("t").textContent).toBe("3");
-    renders.mockClear();
-    // unrelated key -> computed unchanged -> no re-render
-    act(() => nx.set({ other: 9 }));
-    expect(renders).not.toHaveBeenCalled();
-    // tracked key -> computed changes -> re-render
-    act(() => nx.set({ a: 10 }));
-    expect(screen.getByTestId("t").textContent).toBe("12");
-  });
-});

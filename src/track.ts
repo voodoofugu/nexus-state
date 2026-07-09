@@ -5,8 +5,6 @@ import type { RecordAny, Dependencies } from "./types/core";
  * top-level keys it read. Only the top level is proxied — subscriptions are
  * top-level — and nested values are returned as-is via `Reflect.get`, so no deep
  * proxy is built and object identity below the top level is preserved.
- *
- * Shared by `useSelector` (React) and `computed` (framework-agnostic).
  */
 function track<S extends RecordAny, R>(
   state: S,

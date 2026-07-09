@@ -9,7 +9,6 @@ const entries = {
   index: "./src/index.ts",
   react: "./src/react.ts",
   devtools: "./src/devtools.ts",
-  computed: "./src/computed.ts",
 };
 
 const external = (id) => /^react/.test(id);

@@ -471,28 +471,6 @@ interface ReactNexus<S, A = Record<string, never>> extends Nexus<S, A> {
   useRerender(): () => void;
 }
 
-/**---
- * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
- * ### ***Computed***:
- * a cached, subscribable derived value produced by `computed`.
- * @description
- * Read the current value with `get()`, react to changes with `subscribe()`, and
- * release its subscription to the source nexus with `dispose()`. The value is
- * recomputed only when a tracked key changes and only notifies when the result
- * changes (by the chosen equality).
- * @example
- * ```ts
- * const total = computed(nexus, (s) => s.a + s.b);
- * total.get();
- * const off = total.subscribe((v) => console.log(v));
- * ```
- */
-interface Computed<R> {
-  get(): R;
-  subscribe(listener: (value: R) => void): () => void;
-  dispose(): void;
-}
-
 export type {
   RecordAny,
   Source,
@@ -504,7 +482,6 @@ export type {
   Observer,
   Dependencies,
   EqualityFn,
-  Computed,
   ActsCreate,
   ActsPart,
   ActsCreateUnion,

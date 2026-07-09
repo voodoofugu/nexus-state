@@ -40,16 +40,6 @@
         "default": "./dist/cjs/devtools.js"
       }
     },
-    "./computed": {
-      "import": {
-        "types": "./dist/esm/computed.d.ts",
-        "default": "./dist/esm/computed.js"
-      },
-      "require": {
-        "types": "./dist/cjs/computed.d.cts",
-        "default": "./dist/cjs/computed.js"
-      }
-    },
     "./package.json": "./package.json"
   },
   "typesVersions": {
@@ -59,9 +49,6 @@
       ],
       "devtools": [
         "./dist/esm/devtools.d.ts"
-      ],
-      "computed": [
-        "./dist/esm/computed.d.ts"
       ]
     }
   },

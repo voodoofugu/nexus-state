@@ -8,7 +8,7 @@
 - [Installation](#installation)
 - [Quick start](#quick-start)
 - [API](#api)
-- [SSR / Next.js](#ssr--nextjs)
+- [Recipes](#recipes)
 - [License](#license)
 
 <h2></h2>
@@ -48,15 +48,13 @@ React is an **optional** peer dependency — only needed if you import
 | Import                 | Contents                               | Needs        |
 | ---------------------- | -------------------------------------- | ------------ |
 | `nexus-state`          | `createNexus`, `createActs`, `persist` | —            |
-| `nexus-state/react`    | `createReactNexus`, `useComputed`      | react (peer) |
+| `nexus-state/react`    | `createReactNexus`                     | react (peer) |
 | `nexus-state/devtools` | `devtools` (Redux DevTools adapter)    | —            |
-| `nexus-state/computed` | `computed` (derived, cached values)    | —            |
 
 ```js
 import { createNexus, createActs, persist } from "nexus-state";
-import { createReactNexus, useComputed } from "nexus-state/react";
+import { createReactNexus } from "nexus-state/react";
 import { devtools } from "nexus-state/devtools";
-import { computed } from "nexus-state/computed";
 ```
 
 <h2></h2>
@@ -301,116 +299,6 @@ nexus.set({ profile }, { source: "server" });
 
 <h2></h2>
 
-<details><summary><b>Nested updates with Immer</b> (recipe)</summary><br><ul><div>
-<b>Description:</b><em><br>
-nexus ships no Immer integration — it doesn't need one.
-<a href="https://immerjs.github.io/immer/">Immer</a> composes with plain
-<code>set</code> in one line: <code>set(produce(get(), recipe))</code>. Mutate a
-draft, get an immutable update, no manual spreading. And because <code>set</code>
-diffs by reference and Immer's structural sharing keeps untouched branches, only
-the keys you actually change notify their subscribers.<br>
-</em><br>
-<b>Setup:</b> install Immer yourself — <code>npm i immer</code>.<br><br>
-<b>The pattern:</b> wrap any update in <code>produce(get(), …)</code> and mutate
-the draft freely — assign, push, splice, delete. The draft is your state, fully
-typed, so you decide what to change:
-
-```ts
-import { createNexus } from "nexus-state";
-import { produce } from "immer";
-
-const nexus = createNexus({
-  state: {
-    /* any shape, however nested */
-  },
-  acts: (get, set) => ({
-    // one action can change anything on the draft:
-    update() {
-      set(
-        produce(get(), (s) => {
-          // s is your typed state — mutate whatever you need:
-          // s.a.b.c = value;
-          // s.list.push(item);
-          // delete s.map[id];
-        }),
-      );
-    },
-  }),
-});
-
-// Outside an action it's the same one-liner:
-nexus.set(
-  produce(nexus.get(), (s) => {
-    // mutate the draft
-  }),
-);
-```
-
-<br>
-
-> ✦ Note: `get()` types the draft, so no generics are needed. Want a bound
-> setter? It's a one-liner you own:
-> `const draft = (r) => nexus.set(produce(nexus.get(), r));`
-
-</div></ul></details>
-
-<h2></h2>
-
-<details><summary><b><code>computed</code></b> — <code>nexus-state/computed</code></summary><br><ul><div>
-<b>Description:</b><em><br>
-a cached, subscribable derived value. Unlike <code>useSelector</code> (which
-derives per-component, React-only), a <code>computed</code> is defined <b>once</b>
-and shared — it recomputes a single time when its inputs change and every consumer
-reads the same cached value. Framework-agnostic: usable in actions, middleware, or
-React (via <code>useComputed</code>). Keys are <b>auto-tracked</b> (like
-<code>useSelector</code>), so it only recomputes when a key it reads changes, and
-only notifies when the <b>result</b> changes.<br>
-</em><br>
-<b>Parameters:</b><em><br>
-<ul>
-  <li><code>nexus</code>: the source store.</li>
-  <li><code>selector</code>: derives a value; the keys it reads are auto-tracked.</li>
-  <li><code>isEqual</code>: optional — <code>"shallow"</code> or a custom <code>(a, b) =&gt; boolean</code>. Defaults to <code>Object.is</code>.</li>
-</ul>
-</em><br>
-<b>Example:</b>
-
-```ts
-import { computed } from "nexus-state/computed";
-import nexus from "your-nexus-config";
-
-const total = computed(nexus, (s) => s.cart.reduce((n, i) => n + i.price, 0));
-
-total.get(); // current value (cached)
-const off = total.subscribe((v) => console.log("total:", v));
-off(); // stop listening
-total.dispose(); // release the source subscription
-```
-
-<br>
-
-<b>In React</b> — <code>useComputed</code> (from <code>nexus-state/react</code>)
-subscribes a component to a computed:
-
-```tsx
-import { useComputed } from "nexus-state/react";
-
-function CartTotal() {
-  return <span>{useComputed(total)}</span>; // re-renders only when total changes
-}
-```
-
-<br>
-
-> ✦ Note: read state through the <code>selector</code> argument, not
-> <code>nexus.get()</code> — untracked reads won't trigger recomputes. `computed`
-> is typically module-level (like the store); call <code>dispose()</code> if you
-> create one dynamically.
-
-</div></ul></details>
-
-<h2></h2>
-
 ###### **— REACT —**
 
 <details><summary><b><code>createReactNexus</code></b></summary><br><ul><div>
@@ -609,37 +497,6 @@ const remove = nexus.middleware((prev, next, context) => {
 // later: remove() to detach middleware
 ```
 
-<details><summary><b>Redux DevTools</b> — <code>nexus-state/devtools</code></summary><br><ul><div>
-<b>Description:</b><em><br>
-a ready-made adapter — no hand-wired middleware. Every update appears in the
-Redux DevTools extension as an action whose <b>type is its <code>source</code></b>
-(so you see <i>where</i> each change came from), with time-travel. Updates made
-inside an <code>acts</code> action are labelled by the <b>action name</b>
-automatically — no manual <code>source</code> needed. A no-op when the extension
-isn't installed, so it's safe to leave in.<br>
-</em><br>
-<b>Parameters:</b><em><br>
-<ul>
-  <li><code>nexus</code>: the store to inspect.</li>
-  <li><code>options.name</code>: instance name in the DevTools dropdown.</li>
-  <li><code>options.enabled</code>: set <code>false</code> to disable (e.g. in production).</li>
-</ul>
-</em><br>
-<b>Example:</b><br>
-
-```ts
-import { createNexus } from "nexus-state";
-import { devtools } from "nexus-state/devtools";
-
-const nexus = createNexus({ state: { count: 0 } });
-const stop = devtools(nexus, { name: "MyStore" });
-
-nexus.set({ count: 1 }, "user"); // shows up as action "user"
-// stop() disconnects
-```
-
-</div></ul></details>
-
 </div></ul></details>
 
 <h2></h2>
@@ -781,11 +638,98 @@ rerender(); // force re-render
 
 <h2></h2>
 
-### SSR / Next.js
+### Recipes
 
+Integrations and patterns. DevTools ships as a tiny adapter; Immer and SSR are
+pure recipes over `set` / React context — nexus doesn't ship code it doesn't need.
+
+<details><summary><b>Redux DevTools</b> — <code>nexus-state/devtools</code></summary><br><ul><div>
+<b>Description:</b><em><br>
+a ready-made adapter — no hand-wired middleware. Every update appears in the Redux
+DevTools extension as an action whose <b>type is its <code>source</code></b> (so
+you see <i>where</i> each change came from), with time-travel. Updates made inside
+an <code>acts</code> action are labelled by the <b>action name</b> automatically —
+no manual <code>source</code> needed. A no-op when the extension isn't installed,
+so it's safe to leave in.<br>
+</em><br>
+<b>Parameters:</b><em><br>
+<ul>
+  <li><code>nexus</code>: the store to inspect.</li>
+  <li><code>options.name</code>: instance name in the DevTools dropdown.</li>
+  <li><code>options.enabled</code>: set <code>false</code> to disable (e.g. in production).</li>
+</ul>
+</em><br>
+<b>Example:</b>
+
+```ts
+import { createNexus } from "nexus-state";
+import { devtools } from "nexus-state/devtools";
+
+const nexus = createNexus({ state: { count: 0 } });
+const stop = devtools(nexus, { name: "MyStore" });
+
+nexus.set({ count: 1 }, "user"); // shows up as action "user"
+// stop() disconnects
+```
+
+</div></ul></details>
+
+<h2></h2>
+
+<details><summary><b>Nested updates with Immer</b></summary><br><ul><div>
+<a href="https://immerjs.github.io/immer/">Immer</a> composes with plain
+<code>set</code> in one line: <code>set(produce(get(), recipe))</code>. Mutate a
+draft, get an immutable update, no manual spreading. And because <code>set</code>
+diffs by reference and Immer's structural sharing keeps untouched branches, only
+the keys you actually change notify their subscribers.<br><br>
+<b>Setup:</b> install Immer yourself — <code>npm i immer</code>. Then wrap any
+update in <code>produce(get(), …)</code> and mutate the draft freely — assign,
+push, splice, delete. The draft is your typed state, so you decide what to change:
+
+```ts
+import { createNexus } from "nexus-state";
+import { produce } from "immer";
+
+const nexus = createNexus({
+  state: {
+    /* any shape, however nested */
+  },
+  acts: (get, set) => ({
+    // one action can change anything on the draft:
+    update() {
+      set(
+        produce(get(), (s) => {
+          // s is your typed state — mutate whatever you need:
+          // s.a.b.c = value;
+          // s.list.push(item);
+          // delete s.map[id];
+        }),
+      );
+    },
+  }),
+});
+
+// Outside an action it's the same one-liner:
+nexus.set(
+  produce(nexus.get(), (s) => {
+    // mutate the draft
+  }),
+);
+```
+
+<br>
+
+> ✦ `get()` types the draft, so no generics are needed. Want a bound setter? It's
+> a one-liner you own: `const draft = (r) => nexus.set(produce(nexus.get(), r));`
+
+</div></ul></details>
+
+<h2></h2>
+
+<details><summary><b>SSR / Next.js</b></summary><br><ul><div>
 A module-level store is a singleton — on the server it's shared across every
 request, so one user's state can leak into another's render. The fix: create the
-store **per request** and pass it through React context instead of importing a
+store <b>per request</b> and pass it through React context instead of importing a
 singleton.
 
 ```ts
@@ -852,11 +796,15 @@ function Counter() {
 }
 ```
 
+<br>
+
 > ✦ With persist: `localStorage` only exists on the client, so `persist` is a
-> no-op on the server. Initialize the store with **server data** for the first
-> render (so it matches the server HTML), and call `persist` **client-side after
-> hydration** (e.g. in a `useEffect`) so stored values don't cause a hydration
+> no-op on the server. Initialize the store with <b>server data</b> for the first
+> render (so it matches the server HTML), and call `persist` <b>client-side after
+> hydration</b> (e.g. in a `useEffect`) so stored values don't cause a hydration
 > mismatch.
+
+</div></ul></details>
 
 <h2></h2>
 

@@ -437,27 +437,6 @@ interface ReactNexus<S, A = Record<string, never>> extends Nexus<S, A> {
      */
     useRerender(): () => void;
 }
-/**---
- * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
- * ### ***Computed***:
- * a cached, subscribable derived value produced by `computed`.
- * @description
- * Read the current value with `get()`, react to changes with `subscribe()`, and
- * release its subscription to the source nexus with `dispose()`. The value is
- * recomputed only when a tracked key changes and only notifies when the result
- * changes (by the chosen equality).
- * @example
- * ```ts
- * const total = computed(nexus, (s) => s.a + s.b);
- * total.get();
- * const off = total.subscribe((v) => console.log(v));
- * ```
- */
-interface Computed<R> {
-    get(): R;
-    subscribe(listener: (value: R) => void): () => void;
-    dispose(): void;
-}
 
 /**---
  * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
@@ -501,28 +480,5 @@ declare function createReactNexus<S extends RecordAny>(options: {
 }): ReactNexus<S, Record<string, never>>;
 declare function createReactNexus<S extends RecordAny = RecordAny, A extends RecordAny = Record<string, never>>(options: NexusOptions<S, A>): ReactNexus<S, A>;
 
-/**---
- * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
- * ### ***useComputed***:
- * subscribes a React component to a `computed` value.
- * @description
- * Re-renders only when the computed's cached value changes. Built on
- * `useSyncExternalStore`, so it is concurrent-safe.
- * @param computed a value from `computed(nexus, selector)`.
- * @returns the current computed value.
- * @example
- * ```tsx
- * import { computed } from "nexus-state/computed";
- * import { useComputed } from "nexus-state/react";
- *
- * const total = computed(nexus, (s) => s.a + s.b);
- *
- * function Total() {
- *   return <span>{useComputed(total)}</span>;
- * }
- * ```
- */
-declare function useComputed<R>(computed: Computed<R>): R;
-
-export { createReactNexus, useComputed };
+export { createReactNexus };
 export type { ReactNexus };

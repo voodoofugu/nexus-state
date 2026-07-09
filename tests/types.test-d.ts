@@ -1,7 +1,6 @@
 /* Compile-only sanity checks for public-API type inference. Not shipped. */
 import { createNexus, createActs, persist } from "../src";
-import { createReactNexus, useComputed } from "../src/react";
-import { computed } from "../src/computed";
+import { createReactNexus } from "../src/react";
 import type { PersistOptions, EqualityFn } from "../src";
 
 // --- 1. No generics at all: S and A are both inferred ---
@@ -59,21 +58,6 @@ void numberEq;
 // subscribe still requires explicit dependencies (low-level primitive).
 // @ts-expect-error subscribe requires dependencies
 a.subscribe((state) => void state.count);
-
-// computed: result type inferred, "shallow" / custom comparator, useComputed.
-const total = computed(a, (s) => s.count + 1); // Computed<number>
-const totalValue: number = total.get();
-void totalValue;
-const offComputed = total.subscribe((v: number) => void v);
-offComputed();
-total.dispose();
-computed(a, (s) => [s.count], "shallow");
-// @ts-expect-error comparator must match the computed result type
-computed(a, (s) => s.count, (x: string, y: string) => x === y);
-const rendered: number = useComputed(total);
-void rendered;
-// computed works with a store that has acts, too
-computed(r, (s) => s.count * 2);
 
 // --- 3. No acts at all: acts is empty, not `any` ---
 const b = createNexus({ state: { ok: true } });
