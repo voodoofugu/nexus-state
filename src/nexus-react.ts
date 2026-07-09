@@ -102,10 +102,39 @@ function createReactNexus<
     // the result is unchanged, and remember which keys the selector last read.
     const cache = useRef<{ value: R } | null>(null);
     const keysRef = useRef<Dependencies<S>>(["*"]);
+    const warnedRef = useRef(false);
 
     const getSnapshot = (): R => {
       const { value, keys } = track(nexus.get(), selectorRef.current);
       keysRef.current = keys;
+
+      // Dev-only footgun check (runs once per hook): does the selector return a
+      // *fresh* object/array of equal shallow contents on each call? Calling it
+      // twice on the same state tells a derived result (`.map`, literal — new ref
+      // every time) apart from a stored slice (`s => s.items` — same ref). Under
+      // the default `Object.is` that forces re-renders and can loop → suggest
+      // `"shallow"`. A stored ref returns the same value twice → no warning.
+      if (
+        typeof process !== "undefined" &&
+        process.env &&
+        process.env.NODE_ENV !== "production" &&
+        !warnedRef.current &&
+        isEqualRef.current === sameValue &&
+        typeof value === "object" &&
+        value !== null
+      ) {
+        warnedRef.current = true;
+        const again = track(nexus.get(), selectorRef.current).value;
+        if (!sameValue(value, again) && shallow(value, again)) {
+          console.warn(
+            "[nexus-state] useSelector returns a new " +
+              (Array.isArray(value) ? "array" : "object") +
+              " with the same contents each render, forcing extra re-renders. " +
+              'Pass "shallow" as the second argument (or a custom isEqual).'
+          );
+        }
+      }
+
       const prev = cache.current;
       if (prev !== null && isEqualRef.current(prev.value, value)) {
         return prev.value;

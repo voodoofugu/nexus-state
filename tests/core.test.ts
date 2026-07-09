@@ -142,6 +142,29 @@ describe("reset", () => {
       source: "reset",
     });
   });
+
+  it("does not share nested references with the caller's initial object", () => {
+    const initial = { user: { name: "a" }, count: 0 };
+    const nx = createNexus({ state: initial });
+    // the store owns an independent copy — mutating the caller's object is inert
+    initial.user.name = "mutated";
+    expect(nx.get("user").name).toBe("a");
+  });
+
+  it("restores pristine nested values on reset, even after in-place mutation", () => {
+    const nx = createNexus({ state: { user: { name: "a" }, count: 0 } });
+    nx.set({ count: 5 });
+    // accidental in-place mutation of nested state (anti-pattern, but shouldn't
+    // corrupt future resets)
+    (nx.get("user") as { name: string }).name = "b";
+    nx.reset();
+    expect(nx.get("user").name).toBe("a");
+    expect(nx.get("count")).toBe(0);
+    // and the restored value is a fresh copy — mutating it doesn't affect a re-reset
+    (nx.get("user") as { name: string }).name = "c";
+    nx.reset();
+    expect(nx.get("user").name).toBe("a");
+  });
 });
 
 describe("middleware", () => {

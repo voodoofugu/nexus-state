@@ -104,4 +104,39 @@ describe("persist", () => {
     nx.set({ count: 7 });
     expect(storage.data.get("app")).toBeUndefined();
   });
+
+  it("debounces writes and coalesces rapid changes into one", () => {
+    vi.useFakeTimers();
+    const nx = createNexus({ state: { count: 0 } });
+    const setSpy = vi.spyOn(storage, "setItem");
+    persist(nx, { key: "app", storage, debounce: 100 });
+    nx.set({ count: 1 });
+    nx.set({ count: 2 });
+    nx.set({ count: 3 });
+    expect(setSpy).not.toHaveBeenCalled(); // nothing written during the burst
+    vi.advanceTimersByTime(100);
+    expect(setSpy).toHaveBeenCalledTimes(1); // single write
+    expect(JSON.parse(storage.data.get("app")!).state).toEqual({ count: 3 });
+    vi.useRealTimers();
+  });
+
+  it("flushes a pending debounced write on cleanup", () => {
+    vi.useFakeTimers();
+    const nx = createNexus({ state: { count: 0 } });
+    const stop = persist(nx, { key: "app", storage, debounce: 100 });
+    nx.set({ count: 5 });
+    stop(); // flush before stopping
+    expect(JSON.parse(storage.data.get("app")!).state).toEqual({ count: 5 });
+    vi.useRealTimers();
+  });
+
+  it("flushes a pending debounced write on pagehide", () => {
+    vi.useFakeTimers();
+    const nx = createNexus({ state: { count: 0 } });
+    persist(nx, { key: "app", storage, debounce: 100 });
+    nx.set({ count: 7 });
+    window.dispatchEvent(new Event("pagehide"));
+    expect(JSON.parse(storage.data.get("app")!).state).toEqual({ count: 7 });
+    vi.useRealTimers();
+  });
 });

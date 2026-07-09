@@ -542,6 +542,17 @@ interface PersistOptions<S> {
     migrate?: (persisted: RecordAny, from: number) => Partial<S>;
     /**---
      * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
+     * ### ***debounce***:
+     * coalesce rapid updates into a single write after `ms` of quiet.
+     * @description
+     * Useful for high-frequency updates (typing, dragging) so persistence doesn't
+     * hit storage on every change. A pending write is flushed on cleanup and on the
+     * page's `pagehide` event, so the last change isn't lost. Omit for immediate
+     * writes.
+     */
+    debounce?: number;
+    /**---
+     * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
      * ### ***onError***:
      * receives storage, JSON parse or serialization errors.
      * @description

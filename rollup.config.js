@@ -26,7 +26,9 @@ const makePlugins = (clean) => [
       unsafe: true,
       unsafe_comps: true,
       unsafe_math: true,
-      drop_console: true,
+      // Drop only console.log — keep console.warn (dev-only warnings survive so
+      // the consumer's bundler can tree-shake them out of production instead).
+      drop_console: ["log"],
       pure_funcs: ["console.log"],
     },
     mangle: { toplevel: true },

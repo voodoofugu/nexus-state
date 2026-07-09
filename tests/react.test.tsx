@@ -1,4 +1,5 @@
 import { describe, it, expect, afterEach, vi } from "vitest";
+import { StrictMode } from "react";
 import { render, screen, act, cleanup, fireEvent } from "@testing-library/react";
 import { createReactNexus } from "../src/react";
 import { shallow } from "../src/shallow"; // internal — not a public export
@@ -134,6 +135,78 @@ describe("useSelector", () => {
     // Different ids -> shallow sees a change -> re-render.
     act(() => nx.set({ items: [{ id: 1 }, { id: 9 }] }));
     expect(renders).toHaveBeenCalledTimes(1);
+  });
+
+  it("dev-warns when a fresh object of equal contents is returned without shallow", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const error = vi.spyOn(console, "error").mockImplementation(() => {});
+    const nx = createReactNexus({ state: { items: [1, 2] } });
+    function View() {
+      // new array every render, shallow-equal contents, default Object.is
+      const ids = nx.useSelector((s) => s.items.map((x) => x));
+      return <span>{ids.join(",")}</span>;
+    }
+    try {
+      render(<View />); // may bail on the unstable snapshot — the warning fired first
+    } catch {
+      /* ignore React's max-update-depth */
+    }
+    expect(warn).toHaveBeenCalledWith(
+      expect.stringContaining("[nexus-state]")
+    );
+    warn.mockRestore();
+    error.mockRestore();
+  });
+
+  it("does not warn for stable selectors or when a comparator is passed", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const nx = createReactNexus({ state: { a: 1, items: [1, 2] } });
+    function View() {
+      const sum = nx.useSelector((s) => s.a + 1); // primitive
+      const ids = nx.useSelector((s) => s.items.map((x) => x), "shallow");
+      return (
+        <span>
+          {sum}-{ids.join(",")}
+        </span>
+      );
+    }
+    render(<View />);
+    act(() => nx.set({ a: 2 }));
+    expect(warn).not.toHaveBeenCalled();
+    warn.mockRestore();
+  });
+});
+
+describe("useSelector under StrictMode", () => {
+  it("renders correctly, keeps auto-tracking, and cleans up on unmount", () => {
+    const nx = createReactNexus({ state: { count: 0, other: 0 } });
+    const renders = vi.fn();
+    function View() {
+      renders();
+      const doubled = nx.useSelector((s) => s.count * 2);
+      return <span data-testid="v">{doubled}</span>;
+    }
+    const { unmount } = render(
+      <StrictMode>
+        <View />
+      </StrictMode>
+    );
+    // double-invoked render (eager getSnapshot) still yields the right value
+    expect(screen.getByTestId("v").textContent).toBe("0");
+
+    // tracked key updates through the double-mounted subscription
+    act(() => nx.set({ count: 5 }));
+    expect(screen.getByTestId("v").textContent).toBe("10");
+
+    // auto-tracking survives StrictMode: an unread key does not re-render
+    renders.mockClear();
+    act(() => nx.set({ other: 1 }));
+    expect(renders).not.toHaveBeenCalled();
+
+    // no updates after unmount — subscription cleaned up, no leak
+    unmount();
+    act(() => nx.set({ count: 9 }));
+    expect(renders).not.toHaveBeenCalled();
   });
 });
 

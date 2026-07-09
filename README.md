@@ -259,6 +259,7 @@ implements <code>getItem</code>, <code>setItem</code> and
   <li><code>options.storage</code>: storage backend (defaults to <code>localStorage</code>; no-op when unavailable).</li>
   <li><code>options.include</code>: choose which keys to persist (defaults to all).</li>
   <li><code>options.version</code> + <code>options.migrate</code>: migrate older snapshots.</li>
+  <li><code>options.debounce</code>: ms to coalesce rapid updates into one write (flushed on cleanup / <code>pagehide</code>). Omit for immediate writes.</li>
   <li><code>options.onError</code>: handle storage / parse errors instead of throwing.</li>
 </ul>
 </em><br>

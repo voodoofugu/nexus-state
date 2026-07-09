@@ -19,6 +19,23 @@ function normalizeContext(context?: SetContext): UpdateContext | undefined {
   return typeof context === "string" ? { source: context } : context;
 }
 
+/**
+ * Type-preserving deep copy for the initial snapshot, so state never shares
+ * nested references with the caller's object or with `reset`'s pristine copy.
+ * Falls back to a shallow copy on engines without `structuredClone`, or for
+ * non-cloneable values (functions, DOM nodes, …).
+ */
+function snapshot<T>(value: T): T {
+  try {
+    if (typeof structuredClone === "function") return structuredClone(value);
+  } catch {
+    /* non-cloneable — fall back to a shallow copy */
+  }
+  if (Array.isArray(value)) return value.slice() as unknown as T;
+  if (value && typeof value === "object") return { ...value };
+  return value;
+}
+
 /**---
  * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
  * ### ***createNexus***:
@@ -67,8 +84,10 @@ function createNexus<
 >(options: NexusOptions<S, A>): Nexus<S, A> {
   const { state: initialState, acts: actionsCreator } = options;
 
-  const frozenInitial = { ...initialState };
-  let state: S = { ...initialState };
+  // Independent deep copies: the pristine snapshot for `reset`, and the live
+  // state — neither shares nested references with the caller's object.
+  const frozenInitial = snapshot(initialState);
+  let state: S = snapshot(initialState);
 
   const listeners = new Map<keyof S | "*", Set<Observer<S>>>();
   const localMiddleware: Middleware<S>[] = [];
@@ -178,14 +197,17 @@ function createNexus<
   function reset(...keys: (keyof S)[]) {
     // Route resets through `set` so middleware and subscribers observe them
     // with a `"reset"` source instead of being bypassed.
+    // Clone from the pristine snapshot each time, so the restored values don't
+    // share references with `frozenInitial` (a later in-place mutation of the
+    // reset state can't corrupt future resets).
     if (keys.length === 0) {
-      set(frozenInitial as Partial<S>, "reset");
+      set(snapshot(frozenInitial) as Partial<S>, "reset");
       return;
     }
 
     const nextPartial = {} as Partial<S>;
     for (const key of keys) {
-      if (key in frozenInitial) nextPartial[key] = frozenInitial[key];
+      if (key in frozenInitial) nextPartial[key] = snapshot(frozenInitial[key]);
     }
     set(nextPartial, "reset");
   }

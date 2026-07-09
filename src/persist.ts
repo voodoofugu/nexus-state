@@ -114,6 +114,18 @@ interface PersistOptions<S> {
 
   /**---
    * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
+   * ### ***debounce***:
+   * coalesce rapid updates into a single write after `ms` of quiet.
+   * @description
+   * Useful for high-frequency updates (typing, dragging) so persistence doesn't
+   * hit storage on every change. A pending write is flushed on cleanup and on the
+   * page's `pagehide` event, so the last change isn't lost. Omit for immediate
+   * writes.
+   */
+  debounce?: number;
+
+  /**---
+   * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
    * ### ***onError***:
    * receives storage, JSON parse or serialization errors.
    * @description
@@ -169,7 +181,7 @@ function persist<S extends RecordAny, A extends RecordAny>(
   nexus: Nexus<S, A>,
   options: PersistOptions<S>
 ): () => void {
-  const { key, version = 0, include, migrate, onError } = options;
+  const { key, version = 0, include, migrate, onError, debounce } = options;
   const storage = options.storage ?? defaultStorage();
   if (!storage) return () => {};
 
@@ -178,6 +190,14 @@ function persist<S extends RecordAny, A extends RecordAny>(
     const keys = include ?? (Object.keys(state) as (keyof S)[]);
     for (const k of keys) out[k] = state[k];
     return out;
+  };
+
+  const write = (state: S) => {
+    try {
+      storage.setItem(key, JSON.stringify({ version, state: pick(state) }));
+    } catch (error) {
+      onError?.(error);
+    }
   };
 
   // --- hydrate from storage ---
@@ -199,17 +219,47 @@ function persist<S extends RecordAny, A extends RecordAny>(
   const deps: Dependencies<S> =
     include && include.length ? include : ["*"];
 
-  return nexus.subscribe((state, context) => {
+  const debounced = typeof debounce === "number" && debounce > 0;
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  let pending: S | undefined;
+
+  const flush = () => {
+    if (timer !== undefined) {
+      clearTimeout(timer);
+      timer = undefined;
+    }
+    if (pending !== undefined) {
+      const state = pending;
+      pending = undefined;
+      write(state);
+    }
+  };
+
+  // Flush a pending write before the page goes away, so debouncing never loses
+  // the last change.
+  const hasWindow = typeof window !== "undefined";
+  if (debounced && hasWindow) window.addEventListener("pagehide", flush);
+
+  const unsubscribe = nexus.subscribe((state, context) => {
     // Skip our own hydration, and any internal `@@`-prefixed source (e.g. a
     // devtools time-travel jump) — those aren't real user changes to persist.
     if (context?.meta && context.meta[HYDRATED]) return;
     if (context?.source && context.source.slice(0, 2) === "@@") return;
-    try {
-      storage.setItem(key, JSON.stringify({ version, state: pick(state) }));
-    } catch (error) {
-      onError?.(error);
+
+    if (debounced) {
+      pending = state;
+      if (timer !== undefined) clearTimeout(timer);
+      timer = setTimeout(flush, debounce);
+    } else {
+      write(state);
     }
   }, deps);
+
+  return () => {
+    unsubscribe();
+    flush(); // persist any pending write before stopping
+    if (debounced && hasWindow) window.removeEventListener("pagehide", flush);
+  };
 }
 
 export type { PersistStorage, PersistOptions };
