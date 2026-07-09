@@ -1,6 +1,7 @@
 import { useSyncExternalStore, useCallback, useReducer, useRef } from "react";
 import createNexus from "./nexus-core";
-import { sameValue } from "./shallow";
+import { sameValue, shallow } from "./shallow";
+import { track } from "./track";
 
 import type {
   RecordAny,
@@ -84,34 +85,47 @@ function createReactNexus<
 
   function useSelector<R>(
     selector: (state: S) => R,
-    dependencies: Dependencies<S> = ["*"],
-    isEqual: EqualityFn<R> = sameValue
+    isEqual?: "shallow" | EqualityFn<R>
   ): R {
     // Read the latest selector / comparator through refs so the caller never has
-    // to wrap them in `useCallback` to keep the subscription stable.
+    // to wrap them in `useCallback` to keep the subscription stable. `"shallow"`
+    // resolves to the built-in one-level comparator.
     const selectorRef = useRef(selector);
     selectorRef.current = selector;
-    const isEqualRef = useRef(isEqual);
-    isEqualRef.current = isEqual;
+    const isEqualRef = useRef<EqualityFn<R>>(sameValue);
+    isEqualRef.current =
+      isEqual === "shallow"
+        ? (shallow as EqualityFn<R>)
+        : isEqual ?? sameValue;
 
-    // Cache the derived value so `getSnapshot` stays referentially stable
-    // when the comparator says the selection is unchanged.
+    // Cache the derived value so `getSnapshot` stays referentially stable when
+    // the result is unchanged, and remember which keys the selector last read.
     const cache = useRef<{ value: R } | null>(null);
+    const keysRef = useRef<Dependencies<S>>(["*"]);
 
-    const getSnapshot = () => {
-      const next = selectorRef.current(nexus.get());
+    const getSnapshot = (): R => {
+      const { value, keys } = track(nexus.get(), selectorRef.current);
+      keysRef.current = keys;
       const prev = cache.current;
-      if (prev !== null && isEqualRef.current(prev.value, next)) {
+      if (prev !== null && isEqualRef.current(prev.value, value)) {
         return prev.value;
       }
-      cache.current = { value: next };
-      return next;
+      cache.current = { value };
+      return value;
     };
 
-    const depsKey = dependencies.join(",");
+    // Evaluate eagerly so `keysRef` reflects the keys actually read *before*
+    // `subscribe` is memoized — the first render then subscribes to the real
+    // keys. When a conditional selector reads a different set, `keysKey` changes
+    // and useSyncExternalStore re-subscribes to the new set.
+    getSnapshot();
+    // Order-independent so reading the same keys in a different order doesn't
+    // force a re-subscription.
+    const keysKey = (keysRef.current as string[]).slice().sort().join(",");
+
     const subscribe = useCallback(
-      (callback: () => void) => nexus.subscribe(callback, dependencies),
-      [depsKey]
+      (callback: () => void) => nexus.subscribe(callback, keysRef.current),
+      [keysKey]
     );
 
     return useSyncExternalStore(subscribe, getSnapshot, getSnapshot);

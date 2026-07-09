@@ -166,83 +166,6 @@ type Dependencies<S> = ["*"] | (keyof S)[];
 type EqualityFn<T> = (a: T, b: T) => boolean;
 /**---
  * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
- * ### ***ActsCreate***:
- * function that creates the action object for a nexus.
- * @description
- * The actions type `A` is inferred from the object returned by this function.
- * Use `get` to read state and `set` to update it.
- * @example
- * ```ts
- * const acts: ActsCreate<State, Actions> = (get, set) => ({
- *   increment() {
- *     set({ count: get("count") + 1 });
- *   },
- * });
- * ```
- */
-type ActsCreate<S, A> = (get: Getter<S>, set: Setter<S>) => A;
-/**---
- * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
- * ### ***ActsPart***:
- * action slice produced by `createActs`.
- * @description
- * `this` is typed as the complete acts object, so actions from one slice can
- * call actions from another slice without optional chaining.
- * @example
- * ```ts
- * const counterActs = createActs<State, Actions>(function (get, set) {
- *   return {
- *     increment() {
- *       set({ count: get("count") + 1 });
- *       this.logCount();
- *     },
- *     logCount() {
- *       console.log(get("count"));
- *     },
- *   };
- * });
- * ```
- */
-type ActsPart<S, A> = (this: A, get: Getter<S>, set: Setter<S>) => Partial<A>;
-/**---
- * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
- * ### ***ActsCreateUnion***:
- * accepted `acts` forms for `createNexus` and `createReactNexus`.
- * @description
- * Pass one action creator function for a compact store, one `createActs` slice,
- * or an array of `createActs` slices for code splitting.
- * @example
- * ```ts
- * createNexus({ state, acts: (get, set) => ({ increment() {} }) });
- * createNexus({ state, acts: counterActs });
- * createNexus({ state, acts: [counterActs, userActs] });
- * ```
- */
-type ActsCreateUnion<S, A> = ActsCreate<S, A> | ActsPart<S, A> | ActsPart<S, A>[];
-/**---
- * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
- * ### ***NexusOptions***:
- * configuration object accepted by `createNexus` and `createReactNexus`.
- * @property state initial state object used by the store and by `reset`.
- * @property acts optional action creator, action slice or array of action slices.
- * @example
- * ```ts
- * const nexus = createNexus({
- *   state: { count: 0 },
- *   acts: (get, set) => ({
- *     increment() {
- *       set({ count: get("count") + 1 });
- *     },
- *   }),
- * });
- * ```
- */
-type NexusOptions<S, A> = {
-    state: S;
-    acts?: ActsCreateUnion<S, A>;
-};
-/**---
- * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
  * ### ***Nexus***:
  * framework-agnostic nexus store instance.
  * @description
@@ -355,201 +278,57 @@ interface Nexus<S, A = Record<string, never>> {
      */
     acts: A;
 }
-
 /**---
  * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
- * ### ***createNexus***:
- * creates a framework-agnostic nexus store.
+ * ### ***Computed***:
+ * a cached, subscribable derived value produced by `computed`.
  * @description
- * `createNexus` owns state, actions, middleware and key-level subscriptions
- * without depending on React. State and actions are inferred from the config.
- * @param options initial state and optional action creator, action slice or action slices.
- * @returns a `Nexus` instance with `get`, `set`, `reset`, `subscribe`,
- * `middleware` and `acts`.
+ * Read the current value with `get()`, react to changes with `subscribe()`, and
+ * release its subscription to the source nexus with `dispose()`. The value is
+ * recomputed only when a tracked key changes and only notifies when the result
+ * changes (by the chosen equality).
  * @example
  * ```ts
- * import { createNexus } from "nexus-state";
- *
- * const nexus = createNexus({
- *   state: { count: 0 },
- *   acts: (get, set) => ({
- *     increment() {
- *       set({ count: get("count") + 1 }, "manual");
- *     },
- *   }),
- * });
- *
- * nexus.acts.increment();
- * nexus.get("count"); // number
+ * const total = computed(nexus, (s) => s.a + s.b);
+ * total.get();
+ * const off = total.subscribe((v) => console.log(v));
  * ```
  */
-declare function createNexus<S extends RecordAny, A extends RecordAny>(options: {
-    state: S;
-    acts: ActsCreate<S, A>;
-}): Nexus<S, A>;
-declare function createNexus<S extends RecordAny, A extends RecordAny>(options: {
-    state: S;
-    acts: ActsPart<S, A> | ActsPart<S, A>[];
-}): Nexus<S, A>;
-declare function createNexus<S extends RecordAny>(options: {
-    state: S;
-}): Nexus<S, Record<string, never>>;
-declare function createNexus<S extends RecordAny = RecordAny, A extends RecordAny = Record<string, never>>(options: NexusOptions<S, A>): Nexus<S, A>;
-
-/**---
- * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
- * ### ***createActs***:
- * creates a reusable action slice for `createNexus` or `createReactNexus`.
- * @description
- * Use `createActs` to split actions across files. Inside each slice, `this` is
- * typed as the complete acts object, so actions can call other actions from the
- * same or another slice.
- * @param create slice factory that receives `get` and `set`.
- * @returns an action slice accepted by `acts: slice` or `acts: [sliceA, sliceB]`.
- * @example
- * ```ts
- * import { createActs, createNexus } from "nexus-state";
- *
- * type State = { count: number };
- * type Actions = {
- *   increment(): void;
- *   logCount(): void;
- * };
- *
- * const counterActs = createActs<State, Actions>(function (get, set) {
- *   return {
- *     increment() {
- *       set({ count: get("count") + 1 });
- *       this.logCount();
- *     },
- *     logCount() {
- *       console.log(get("count"));
- *     },
- *   };
- * });
- *
- * const nexus = createNexus<State, Actions>({
- *   state: { count: 0 },
- *   acts: counterActs,
- * });
- * ```
- */
-declare function createActs<S extends RecordAny, A extends RecordAny = RecordAny>(create: (this: A, get: Getter<S>, set: Setter<S>) => Partial<A> & ThisType<A>): ActsPart<S, A>;
-
-/**---
- * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
- * ### ***PersistStorage***:
- * minimal synchronous storage contract used by `persist`.
- * @description
- * `localStorage` and `sessionStorage` satisfy this interface. Custom storage is
- * useful for tests, memory adapters, encrypted storage or platform-specific
- * persistence.
- * @example
- * ```ts
- * const cache: Record<string, string> = {};
- *
- * const memoryStorage: PersistStorage = {
- *   getItem: (key) => cache[key] ?? null,
- *   setItem: (key, value) => {
- *     cache[key] = value;
- *   },
- *   removeItem: (key) => {
- *     delete cache[key];
- *   },
- * };
- * ```
- */
-interface PersistStorage {
-    /**---
-     * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
-     * ### ***getItem***:
-     * reads a persisted string value by key.
-     * @returns persisted value, or `null` when no value exists.
-     */
-    getItem(key: string): string | null;
-    /**---
-     * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
-     * ### ***setItem***:
-     * writes a serialized string value by key.
-     */
-    setItem(key: string, value: string): void;
-    /**---
-     * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
-     * ### ***removeItem***:
-     * removes a persisted value by key.
-     */
-    removeItem(key: string): void;
+interface Computed<R> {
+    get(): R;
+    subscribe(listener: (value: R) => void): () => void;
+    dispose(): void;
 }
+
 /**---
  * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
- * ### ***PersistOptions***:
- * configuration object accepted by `persist`.
+ * ### ***computed***:
+ * a cached, subscribable value derived from a nexus.
  * @description
- * Controls where state is stored, which keys are persisted and how older
- * snapshots are migrated. The storage backend is synchronous and string-based,
- * matching `localStorage`, `sessionStorage` and small custom adapters.
+ * Unlike `useSelector` (which derives per-component, React-only), a `computed` is
+ * defined **once** and shared: it recomputes a single time when its inputs change
+ * and every consumer reads the same cached value. Framework-agnostic — usable in
+ * actions, middleware, other computeds, or React (via `useComputed`).
+ *
+ * The keys the `selector` reads are tracked automatically (shallow proxy), so it
+ * only recomputes when a key it actually uses changes. It notifies subscribers
+ * only when the **result** changes — `Object.is` by default, `"shallow"` or a
+ * custom comparator otherwise. Read state through the `selector` argument, not
+ * `nexus.get()`, or the read won't be tracked.
+ * @param nexus source nexus (from `createNexus` or `createReactNexus`).
+ * @param selector derives a value from the full state.
+ * @param isEqual optional result comparator: `"shallow"` or `(a, b) => boolean`.
+ * @returns a `Computed` with `get`, `subscribe` and `dispose`.
  * @example
  * ```ts
- * persist(nexus, {
- *   key: "counter",
- *   include: ["count"],
- *   version: 2,
- *   migrate: (state, from) => from === 1 ? { count: state.value } : state,
- * });
+ * import { computed } from "nexus-state/computed";
+ *
+ * const total = computed(nexus, (s) => s.cart.reduce((n, i) => n + i.price, 0));
+ * total.get(); // current total
+ * const off = total.subscribe((v) => console.log("total:", v));
  * ```
  */
-interface PersistOptions<S> {
-    /**---
-     * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
-     * ### ***key***:
-     * storage key used for the persisted snapshot.
-     */
-    key: string;
-    /**---
-     * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
-     * ### ***storage***:
-     * storage backend used by `persist`.
-     * @description
-     * Defaults to `localStorage` when it is available. If no storage is available,
-     * `persist` becomes a no-op and returns an empty cleanup function.
-     */
-    storage?: PersistStorage;
-    /**---
-     * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
-     * ### ***include***:
-     * state keys that should be persisted.
-     * @description
-     * Omit `include` to persist the whole state.
-     */
-    include?: (keyof S)[];
-    /**---
-     * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
-     * ### ***version***:
-     * persisted schema version.
-     * @description
-     * Bump this number when the persisted shape changes so `migrate` can transform
-     * older snapshots.
-     */
-    version?: number;
-    /**---
-     * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
-     * ### ***migrate***:
-     * transforms an older persisted snapshot into the current state shape.
-     * @param persisted raw persisted state object.
-     * @param from version stored in the persisted snapshot.
-     * @returns partial state to hydrate into the nexus.
-     */
-    migrate?: (persisted: RecordAny, from: number) => Partial<S>;
-    /**---
-     * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
-     * ### ***onError***:
-     * receives storage, JSON parse or serialization errors.
-     * @description
-     * Errors are reported here instead of being thrown from `persist`.
-     */
-    onError?: (error: unknown) => void;
-}
-declare function persist<S extends RecordAny, A extends RecordAny>(nexus: Nexus<S, A>, options: PersistOptions<S>): () => void;
+declare function computed<S extends RecordAny, R>(nexus: Nexus<S, RecordAny>, selector: (state: S) => R, isEqual?: "shallow" | EqualityFn<R>): Computed<R>;
 
-export { createActs, createNexus, persist };
-export type { ActsCreate, ActsCreateUnion, ActsPart, Dependencies, EqualityFn, Getter, Middleware, Nexus, NexusOptions, Observer, PersistOptions, PersistStorage, SetContext, Setter, Source, UpdateContext };
+export { computed, computed as default };
+export type { Computed };

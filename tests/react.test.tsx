@@ -1,7 +1,8 @@
 import { describe, it, expect, afterEach, vi } from "vitest";
 import { render, screen, act, cleanup, fireEvent } from "@testing-library/react";
-import { createReactNexus } from "../src/react";
-import { shallow } from "../src";
+import { createReactNexus, useComputed } from "../src/react";
+import { computed } from "../src/computed";
+import { shallow } from "../src/shallow"; // internal — not a public export
 
 afterEach(cleanup);
 
@@ -16,6 +17,18 @@ describe("use", () => {
     expect(screen.getByTestId("v").textContent).toBe("0");
     act(() => nx.set({ count: 3 }));
     expect(screen.getByTestId("v").textContent).toBe("3");
+  });
+
+  it("renders the whole state and re-renders on any change", () => {
+    const nx = createReactNexus({ state: { a: 1, b: 2 } });
+    function View() {
+      const state = nx.use();
+      return <span data-testid="v">{state.a + state.b}</span>;
+    }
+    render(<View />);
+    expect(screen.getByTestId("v").textContent).toBe("3");
+    act(() => nx.set({ b: 5 }));
+    expect(screen.getByTestId("v").textContent).toBe("6");
   });
 
   it("does not re-render a key component when an unrelated key changes", () => {
@@ -34,10 +47,10 @@ describe("use", () => {
 });
 
 describe("useSelector", () => {
-  it("derives a value and updates when dependencies change", () => {
+  it("derives a value and updates when a read key changes", () => {
     const nx = createReactNexus({ state: { a: 1, b: 2 } });
     function View() {
-      const total = nx.useSelector((s) => s.a + s.b, ["a", "b"]);
+      const total = nx.useSelector((s) => s.a + s.b);
       return <span data-testid="t">{total}</span>;
     }
     render(<View />);
@@ -46,18 +59,46 @@ describe("useSelector", () => {
     expect(screen.getByTestId("t").textContent).toBe("12");
   });
 
-  it("does not re-render when the derived value is unchanged", () => {
+  it("auto-tracks: an unread key does not re-render the component", () => {
     const nx = createReactNexus({ state: { a: 1, other: 0 } });
     const renders = vi.fn();
     function View() {
       renders();
-      // selector ignores `other`, but subscribes via ["*"]
-      const doubled = nx.useSelector((s) => s.a * 2, ["*"]);
+      // selector reads only `a`, so only `a` is tracked
+      const doubled = nx.useSelector((s) => s.a * 2);
       return <span>{doubled}</span>;
     }
     render(<View />);
     renders.mockClear();
     act(() => nx.set({ other: 5 }));
+    expect(renders).not.toHaveBeenCalled();
+    act(() => nx.set({ a: 2 }));
+    expect(renders).toHaveBeenCalledTimes(1);
+  });
+
+  it("re-tracks when a conditional selector reads a different key", () => {
+    const nx = createReactNexus({ state: { flag: true, a: 1, b: 100 } });
+    const renders = vi.fn();
+    function View() {
+      renders();
+      const value = nx.useSelector((s) => (s.flag ? s.a : s.b));
+      return <span data-testid="v">{value}</span>;
+    }
+    render(<View />);
+    expect(screen.getByTestId("v").textContent).toBe("1");
+    // while flag is true, `b` is not tracked -> no re-render
+    renders.mockClear();
+    act(() => nx.set({ b: 200 }));
+    expect(renders).not.toHaveBeenCalled();
+    // flip to the `b` branch, then `b` becomes tracked
+    act(() => nx.set({ flag: false }));
+    expect(screen.getByTestId("v").textContent).toBe("200");
+    renders.mockClear();
+    act(() => nx.set({ b: 300 }));
+    expect(screen.getByTestId("v").textContent).toBe("300");
+    // and `a` is no longer tracked
+    renders.mockClear();
+    act(() => nx.set({ a: 9 }));
     expect(renders).not.toHaveBeenCalled();
   });
 
@@ -66,7 +107,7 @@ describe("useSelector", () => {
     const renders = vi.fn();
     function View() {
       renders();
-      const list = nx.useSelector((s) => s.list, ["list"]);
+      const list = nx.useSelector((s) => s.list);
       return <span>{list.join(",")}</span>;
     }
     render(<View />);
@@ -78,16 +119,12 @@ describe("useSelector", () => {
     expect(renders).toHaveBeenCalledTimes(2);
   });
 
-  it("with shallow, a new array of equal contents does not re-render", () => {
+  it("with \"shallow\", a new array of equal contents does not re-render", () => {
     const nx = createReactNexus({ state: { items: [{ id: 1 }, { id: 2 }] } });
     const renders = vi.fn();
     function View() {
       renders();
-      const ids = nx.useSelector(
-        (s) => s.items.map((i) => i.id),
-        ["items"],
-        shallow
-      );
+      const ids = nx.useSelector((s) => s.items.map((i) => i.id), "shallow");
       return <span>{ids.join(",")}</span>;
     }
     render(<View />);
@@ -168,5 +205,26 @@ describe("acts in components", () => {
     expect(btn.textContent).toBe("0");
     fireEvent.click(btn);
     expect(btn.textContent).toBe("1");
+  });
+});
+
+describe("useComputed", () => {
+  it("renders a computed value and re-renders when it changes", () => {
+    const nx = createReactNexus({ state: { a: 1, b: 2, other: 0 } });
+    const total = computed(nx, (s) => s.a + s.b);
+    const renders = vi.fn();
+    function View() {
+      renders();
+      return <span data-testid="t">{useComputed(total)}</span>;
+    }
+    render(<View />);
+    expect(screen.getByTestId("t").textContent).toBe("3");
+    renders.mockClear();
+    // unrelated key -> computed unchanged -> no re-render
+    act(() => nx.set({ other: 9 }));
+    expect(renders).not.toHaveBeenCalled();
+    // tracked key -> computed changes -> re-render
+    act(() => nx.set({ a: 10 }));
+    expect(screen.getByTestId("t").textContent).toBe("12");
   });
 });

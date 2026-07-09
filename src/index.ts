@@ -1,9 +1,8 @@
 import createNexus from "./nexus-core";
 import createActs from "./createActs";
 import { persist } from "./persist";
-import { shallow } from "./shallow";
 
-export { createNexus, createActs, persist, shallow };
+export { createNexus, createActs, persist };
 export type {
   Nexus,
   Setter,

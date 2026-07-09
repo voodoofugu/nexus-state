@@ -10,6 +10,7 @@
 - [API](#api)
   - [main](#main)
   - [nexus](#nexus)
+- [SSR / Next.js](#ssr--nextjs)
 - [License](#license)
 
 <h2></h2>
@@ -46,14 +47,18 @@ npm install nexus-state
 React is an **optional** peer dependency — only needed if you import
 `nexus-state/react`.
 
-| Import              | Contents                                          | Needs React |
-| ------------------- | ------------------------------------------------- | ----------- |
-| `nexus-state`       | `createNexus`, `createActs`, `persist`, `shallow` | no          |
-| `nexus-state/react` | `createReactNexus`                                | yes         |
+| Import                 | Contents                                          | Needs        |
+| ---------------------- | ------------------------------------------------- | ------------ |
+| `nexus-state`          | `createNexus`, `createActs`, `persist`            | —            |
+| `nexus-state/react`    | `createReactNexus`, `useComputed`                 | react (peer) |
+| `nexus-state/devtools` | `devtools` (Redux DevTools adapter)               | —            |
+| `nexus-state/computed` | `computed` (derived, cached values)               | —            |
 
 ```js
-import { createNexus, createActs, persist, shallow } from "nexus-state";
-import { createReactNexus } from "nexus-state/react"; // ! with /react
+import { createNexus, createActs, persist } from "nexus-state";
+import { createReactNexus, useComputed } from "nexus-state/react";
+import { devtools } from "nexus-state/devtools";
+import { computed } from "nexus-state/computed";
 ```
 
 <h2></h2>
@@ -300,22 +305,105 @@ nexus.set({ profile }, { source: "server" });
 
 <h2></h2>
 
-<details><summary><b><code>shallow</code></b></summary><br><ul><div>
+<details><summary><b>Nested updates with Immer</b> (recipe)</summary><br><ul><div>
 <b>Description:</b><em><br>
-a plain one-level equality helper (not a hook, no React dependency). Compares
-primitives with <code>Object.is</code>, and objects/arrays by their first-level
-entries. Mainly used as the <code>isEqual</code> argument of <code>useSelector</code>,
-but usable anywhere you need a cheap shallow comparison.<br>
+nexus ships no Immer integration — it doesn't need one.
+<a href="https://immerjs.github.io/immer/">Immer</a> composes with plain
+<code>set</code> in one line: <code>set(produce(get(), recipe))</code>. Mutate a
+draft, get an immutable update, no manual spreading. And because <code>set</code>
+diffs by reference and Immer's structural sharing keeps untouched branches, only
+the keys you actually change notify their subscribers.<br>
+</em><br>
+<b>Setup:</b> install Immer yourself — <code>npm i immer</code>.<br><br>
+<b>The pattern:</b> wrap any update in <code>produce(get(), …)</code> and mutate
+the draft freely — assign, push, splice, delete. The draft is your state, fully
+typed, so you decide what to change:
+
+```ts
+import { createNexus } from "nexus-state";
+import { produce } from "immer";
+
+const nexus = createNexus({
+  state: {/* any shape, however nested */},
+  acts: (get, set) => ({
+    // one action can change anything on the draft:
+    update() {
+      set(produce(get(), (s) => {
+        // s is your typed state — mutate whatever you need:
+        // s.a.b.c = value;
+        // s.list.push(item);
+        // delete s.map[id];
+      }));
+    },
+  }),
+});
+
+// Outside an action it's the same one-liner:
+nexus.set(produce(nexus.get(), (s) => {
+  // mutate the draft
+}));
+```
+
+<br>
+
+> ✦ Note: `get()` types the draft, so no generics are needed. Want a bound
+> setter? It's a one-liner you own:
+> `const draft = (r) => nexus.set(produce(nexus.get(), r));`
+
+</div></ul></details>
+
+<h2></h2>
+
+<details><summary><b><code>computed</code></b> — <code>nexus-state/computed</code></summary><br><ul><div>
+<b>Description:</b><em><br>
+a cached, subscribable derived value. Unlike <code>useSelector</code> (which
+derives per-component, React-only), a <code>computed</code> is defined <b>once</b>
+and shared — it recomputes a single time when its inputs change and every consumer
+reads the same cached value. Framework-agnostic: usable in actions, middleware, or
+React (via <code>useComputed</code>). Keys are <b>auto-tracked</b> (like
+<code>useSelector</code>), so it only recomputes when a key it reads changes, and
+only notifies when the <b>result</b> changes.<br>
+</em><br>
+<b>Parameters:</b><em><br>
+<ul>
+  <li><code>nexus</code>: the source store.</li>
+  <li><code>selector</code>: derives a value; the keys it reads are auto-tracked.</li>
+  <li><code>isEqual</code>: optional — <code>"shallow"</code> or a custom <code>(a, b) =&gt; boolean</code>. Defaults to <code>Object.is</code>.</li>
+</ul>
 </em><br>
 <b>Example:</b>
 
 ```ts
-import { shallow } from "nexus-state";
+import { computed } from "nexus-state/computed";
+import nexus from "your-nexus-config";
 
-shallow([1, 2], [1, 2]); // true
-shallow({ a: 1 }, { a: 2 }); // false
-shallow([{ id: 1 }], [{ id: 1 }]); // false (nested refs differ)
+const total = computed(nexus, (s) => s.cart.reduce((n, i) => n + i.price, 0));
+
+total.get();                          // current value (cached)
+const off = total.subscribe((v) => console.log("total:", v));
+off();                                // stop listening
+total.dispose();                      // release the source subscription
 ```
+
+<br>
+
+<b>In React</b> — <code>useComputed</code> (from <code>nexus-state/react</code>)
+subscribes a component to a computed:
+
+```tsx
+import { useComputed } from "nexus-state/react";
+
+function CartTotal() {
+  return <span>{useComputed(total)}</span>; // re-renders only when total changes
+}
+```
+
+<br>
+
+> ✦ Note: read state through the <code>selector</code> argument, not
+> <code>nexus.get()</code> — untracked reads won't trigger recomputes. `computed`
+> is typically module-level (like the store); call <code>dispose()</code> if you
+> create one dynamically.
 
 </div></ul></details>
 
@@ -433,7 +521,7 @@ nexus.set({ user }, { source: "server", meta: { requestId: 7 } });
 
 <br>
 
-> ✦ Sources: known values (`"manual" | "storage" | "server" | "external" | "reset"`) autocomplete, but any string works.<br>
+> ✦ Sources: known values (`"manual" | "storage" | "server" | "external" | "reset"`) autocomplete, but any string works. Sources starting with <code>@@</code> are reserved for the library.<br>
 > ✦ Batching: one <code>set</code> with several keys notifies once — the primary way to batch. <code>set</code> calls made synchronously inside an action are collapsed into one too.
 
 </div></ul></details>
@@ -521,46 +609,34 @@ const remove = nexus.middleware((prev, next, context) => {
 // later: remove() to detach middleware
 ```
 
-<details><summary><b>Redux DevTools Integration</b></summary><br><ul><div>
+<details><summary><b>Redux DevTools</b> — <code>nexus-state/devtools</code></summary><br><ul><div>
 <b>Description:</b><em><br>
-you can connect your nexus to Redux DevTools for time-travel debugging and state inspection.<br>
+a ready-made adapter — no hand-wired middleware. Every update appears in the
+Redux DevTools extension as an action whose <b>type is its <code>source</code></b>
+(so you see <i>where</i> each change came from), with time-travel. Updates made
+inside an <code>acts</code> action are labelled by the <b>action name</b>
+automatically — no manual <code>source</code> needed. A no-op when the extension
+isn't installed, so it's safe to leave in.<br>
+</em><br>
+<b>Parameters:</b><em><br>
+<ul>
+  <li><code>nexus</code>: the store to inspect.</li>
+  <li><code>options.name</code>: instance name in the DevTools dropdown.</li>
+  <li><code>options.enabled</code>: set <code>false</code> to disable (e.g. in production).</li>
+</ul>
 </em><br>
 <b>Example:</b><br>
 
-```tsx
-import nexus from "your-nexus-config";
+```ts
+import { createNexus } from "nexus-state";
+import { devtools } from "nexus-state/devtools";
 
-const devtools = window.__REDUX_DEVTOOLS_EXTENSION__?.connect({
-  name: "MyStore",
-});
+const nexus = createNexus({ state: { count: 0 } });
+const stop = devtools(nexus, { name: "MyStore" });
 
-devtools?.init(nexus.get());
-
-nexus.middleware((_, next, context) => {
-  devtools?.send?.({ type: context?.source ?? "UPDATE" }, next);
-});
+nexus.set({ count: 1 }, "user"); // shows up as action "user"
+// stop() disconnects
 ```
-
-<details><summary><b>TypeScript Snippet:</b></summary>
-
-```tsx
-interface ReduxDevToolsConnection {
-  send: (action: unknown, state: unknown) => void;
-  init: (state: unknown) => void;
-}
-
-interface ReduxDevToolsExtension {
-  connect(options: { name: string }): ReduxDevToolsConnection;
-}
-
-declare global {
-  interface Window {
-    __REDUX_DEVTOOLS_EXTENSION__?: ReduxDevToolsExtension;
-  }
-}
-```
-
-</details>
 
 </div></ul></details>
 
@@ -581,6 +657,14 @@ import nexus from "your-nexus-config";
 nexus.acts.increment();
 nexus.acts.getState("count1");
 ```
+
+<br>
+
+> ✦ Provenance: updates a <code>set</code> makes inside an action inherit the
+> <b>action name</b> as their <code>source</code> (unless the <code>set</code>
+> passes its own context), so subscribers, <code>persist</code> and devtools can
+> tell which action changed the state. Nested <code>this.other()</code> calls keep
+> the outer action's name.
 
 <b>Important:</b><em><br>
 regular functions support calling other actions via <code>this</code>, arrow functions are more compact but don't:
@@ -633,40 +717,43 @@ const specificValue = nexus.use("key");
 
 <details><summary><b><code>useSelector</code></b></summary><br><ul><div>
 <b>Description:</b><em><br>
-<code>react</code> hook that derives a value from state. It re-renders only when
-the selector's <b>result</b> changes (<code>Object.is</code> by default).<br>
+<code>react</code> hook that derives a value from state. The keys the selector
+reads are <b>tracked automatically</b> — the component subscribes to exactly
+those keys, with no dependency array to keep in sync. It re-renders only when the
+selector's <b>result</b> changes (<code>Object.is</code> by default).<br>
 </em><br>
 <b>Parameters:</b><em><br>
 <ul>
-  <li><code>selector</code>: derives a value from the state.</li>
-  <li><code>dependencies</code>: keys that trigger a re-check (required). Pass specific keys, or <code>["*"]</code> to watch every key.</li>
-  <li><code>isEqual</code>: optional result comparator. Defaults to <code>Object.is</code>; pass <code>shallow</code> for one-level object/array equality, or your own.</li>
+  <li><code>selector</code>: derives a value from the state. The keys it reads are auto-tracked.</li>
+  <li><code>isEqual</code>: optional result comparator — <code>"shallow"</code> for built-in one-level equality, or your own <code>(a, b) =&gt; boolean</code>. Defaults to <code>Object.is</code>.</li>
 </ul>
 </em><br>
 <b>Example:</b>
 
 ```tsx
-import { shallow } from "nexus-state";
 import nexus from "your-nexus-config";
 
-// Primitive result — Object.is is enough:
-const total = nexus.useSelector((s) => s.count1 + s.count2, ["count1", "count2"]);
+// Subscribes to count1 and count2 only — inferred from the reads, no deps array:
+const total = nexus.useSelector((s) => s.count1 + s.count2);
 
-// New array/object each run (.map/.filter/literal) — pass shallow so an
+// New array/object each run (.map/.filter/literal) — pass "shallow" so an
 // equal result doesn't re-render:
-const ids = nexus.useSelector((s) => s.items.map((i) => i.id), ["items"], shallow);
+const ids = nexus.useSelector((s) => s.items.map((i) => i.id), "shallow");
 
 // Escape hatch — custom comparator (e.g. arrays of objects):
 const rows = nexus.useSelector(
   (s) => s.users.map((u) => ({ id: u.id, name: u.name })),
-  ["users"],
   (a, b) => a.length === b.length && a.every((x, i) => x.id === b[i].id),
 );
 ```
 
 <br>
 
-> ✦ Note: comparison is on the selector's <b>result</b>, not the watched keys — a watched key re-runs the selector, but an equal result won't re-render. <code>shallow</code> is a plain helper (not a hook), and the selector/comparator are read from refs, so no <code>useCallback</code> is needed.
+> ✦ Note: read state through the <code>selector</code> argument, not
+> <code>nexus.get()</code> — reads that bypass the argument aren't tracked.<br>
+> Comparison is on the selector's <b>result</b>: a tracked key changing re-runs
+> the selector, but an equal result won't re-render. Selector/comparator are read
+> from refs, so no <code>useCallback</code> is needed.
 
 </div></ul></details>
 
@@ -691,6 +778,83 @@ rerender(); // force re-render
 </div></ul>
 
 </details>
+
+<h2></h2>
+
+### SSR / Next.js
+
+A module-level store is a singleton — on the server it's shared across every
+request, so one user's state can leak into another's render. The fix: create the
+store **per request** and pass it through React context instead of importing a
+singleton.
+
+```ts
+// store.ts — a factory, not a singleton
+import { createReactNexus } from "nexus-state/react";
+
+export function createStore(initial?: Partial<{ count: number }>) {
+  return createReactNexus({
+    state: { count: 0, ...initial },
+    acts: (get, set) => ({
+      increment() {
+        set((s) => ({ count: s.count + 1 }));
+      },
+    }),
+  });
+}
+
+export type Store = ReturnType<typeof createStore>;
+```
+
+```tsx
+// store-provider.tsx — standard React context (you own this ~10 lines)
+"use client";
+import { createContext, useContext, useRef, type ReactNode } from "react";
+import { createStore, type Store } from "./store";
+
+const StoreContext = createContext<Store | null>(null);
+
+export function StoreProvider({
+  initial,
+  children,
+}: {
+  initial?: Partial<{ count: number }>;
+  children: ReactNode;
+}) {
+  // create once per mount/request — never re-create on render
+  const ref = useRef<Store>();
+  if (!ref.current) ref.current = createStore(initial);
+  return (
+    <StoreContext.Provider value={ref.current}>{children}</StoreContext.Provider>
+  );
+}
+
+export function useStore() {
+  const store = useContext(StoreContext);
+  if (!store) throw new Error("useStore must be used within <StoreProvider>");
+  return store;
+}
+```
+
+```tsx
+// pass server data as `initial` (matches the server-rendered HTML):
+<StoreProvider initial={{ count: serverCount }}>
+  <App />
+</StoreProvider>;
+
+// in a component — read via context, then use the store's hooks:
+function Counter() {
+  const store = useStore();
+  const count = store.use("count");
+  return <button onClick={store.acts.increment}>{count}</button>;
+}
+```
+
+> ✦ With persist: `localStorage` only exists on the client, so `persist` is a
+> no-op on the server. Initialize the store with **server data** for the first
+> render (so it matches the server HTML), and call `persist` **client-side after
+> hydration** (e.g. in a `useEffect`) so stored values don't cause a hydration
+> mismatch.
 
 <h2></h2>
 

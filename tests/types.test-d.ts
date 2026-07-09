@@ -1,6 +1,7 @@
 /* Compile-only sanity checks for public-API type inference. Not shipped. */
-import { createNexus, createActs, persist, shallow } from "../src";
-import { createReactNexus } from "../src/react";
+import { createNexus, createActs, persist } from "../src";
+import { createReactNexus, useComputed } from "../src/react";
+import { computed } from "../src/computed";
 import type { PersistOptions, EqualityFn } from "../src";
 
 // --- 1. No generics at all: S and A are both inferred ---
@@ -37,31 +38,42 @@ r.acts.inc();
 // @ts-expect-error still type-safe without explicit A
 r.acts.missing();
 
-// useSelector: result type inferred, optional isEqual typed against it.
-const doubled: number = r.useSelector((s) => s.count * 2, ["count"]);
+// useSelector: keys auto-tracked, result type inferred, optional isEqual (2nd arg).
+const doubled: number = r.useSelector((s) => s.count * 2);
 void doubled;
-const ids: number[] = r.useSelector(
-  (s) => [s.count],
-  ["count"],
-  shallow
-);
+// "shallow" string shorthand:
+const ids: number[] = r.useSelector((s) => [s.count], "shallow");
 void ids;
+// custom comparator, typed against the result:
 r.useSelector(
   (s) => [s.count],
-  ["count"],
-  // isEqual is (a: number[], b: number[]) => boolean here
   (prev, next) => prev.length === next.length && prev[0] === next[0]
 );
 // @ts-expect-error comparator must match the selector result type
-r.useSelector((s) => s.count, ["count"], (a: string, b: string) => a === b);
+r.useSelector((s) => s.count, (a: string, b: string) => a === b);
+// @ts-expect-error only "shallow" is a valid string strategy
+r.useSelector((s) => s.count, "deep");
 const numberEq: EqualityFn<number> = (a, b) => a === b;
 void numberEq;
 
-// dependencies are required — omitting them is a type error.
-// @ts-expect-error useSelector requires dependencies
-r.useSelector((s) => s.count);
+// subscribe still requires explicit dependencies (low-level primitive).
 // @ts-expect-error subscribe requires dependencies
 a.subscribe((state) => void state.count);
+
+// computed: result type inferred, "shallow" / custom comparator, useComputed.
+const total = computed(a, (s) => s.count + 1); // Computed<number>
+const totalValue: number = total.get();
+void totalValue;
+const offComputed = total.subscribe((v: number) => void v);
+offComputed();
+total.dispose();
+computed(a, (s) => [s.count], "shallow");
+// @ts-expect-error comparator must match the computed result type
+computed(a, (s) => s.count, (x: string, y: string) => x === y);
+const rendered: number = useComputed(total);
+void rendered;
+// computed works with a store that has acts, too
+computed(r, (s) => s.count * 2);
 
 // --- 3. No acts at all: acts is empty, not `any` ---
 const b = createNexus({ state: { ok: true } });

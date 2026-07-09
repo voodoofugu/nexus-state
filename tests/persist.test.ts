@@ -46,8 +46,25 @@ describe("persist", () => {
     const nx = createNexus({ state: { count: 0 } });
     const setSpy = vi.spyOn(storage, "setItem");
     persist(nx, { key: "app", storage });
-    // hydration used source "storage", so the writer skipped it
+    // the guard keys off a private meta marker, so hydration is skipped
     expect(setSpy).not.toHaveBeenCalled();
+  });
+
+  it("still persists a user update whose source is 'storage'", () => {
+    // The echo guard keys off a private meta marker, not the "storage" source,
+    // so a user source (e.g. an action named "storage") is never mistaken for
+    // hydration and is persisted normally.
+    const nx = createNexus({ state: { count: 0 } });
+    persist(nx, { key: "app", storage });
+    nx.set({ count: 5 }, "storage");
+    expect(JSON.parse(storage.data.get("app")!).state).toEqual({ count: 5 });
+  });
+
+  it("does not persist internal @@-prefixed sources (e.g. devtools jumps)", () => {
+    const nx = createNexus({ state: { count: 0 } });
+    persist(nx, { key: "app", storage });
+    nx.set({ count: 7 }, "@@devtools");
+    expect(storage.data.get("app")).toBeUndefined();
   });
 
   it("persists only included keys", () => {

@@ -62,6 +62,21 @@ describe("subscribe", () => {
     expect(spy).not.toHaveBeenCalled();
   });
 
+  it("notifies only keys whose reference changed (underpins the Immer recipe)", () => {
+    // A structural update keeps unchanged branches by reference — exactly what
+    // Immer's `produce` produces. `set` diffs by reference, so only `a` notifies.
+    const nx = createNexus({ state: { a: { x: 1 }, b: { y: 2 } } });
+    const onA = vi.fn();
+    const onB = vi.fn();
+    nx.subscribe(onA, ["a"]);
+    nx.subscribe(onB, ["b"]);
+    const beforeB = nx.get("b");
+    nx.set((s) => ({ a: { ...s.a, x: 9 } }));
+    expect(nx.get("b")).toBe(beforeB); // b untouched by reference
+    expect(onA).toHaveBeenCalledTimes(1);
+    expect(onB).not.toHaveBeenCalled();
+  });
+
   it("watches every key with ['*']", () => {
     const nx = createNexus({ state: { a: 0, b: 0 } });
     const spy = vi.fn();
@@ -236,5 +251,68 @@ describe("acts", () => {
     nx.acts.twice();
     expect(nx.get("count")).toBe(2);
     expect(spy).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe("action provenance (auto-tagged source)", () => {
+  it("tags an action's update with the action name", () => {
+    const nx = createNexus({
+      state: { count: 0 },
+      acts: (_g, set) => ({
+        increment() {
+          set((s) => ({ count: s.count + 1 }));
+        },
+      }),
+    });
+    const spy = vi.fn();
+    nx.subscribe(spy, ["count"]);
+    nx.acts.increment();
+    expect(spy).toHaveBeenCalledWith(expect.anything(), {
+      source: "increment",
+    });
+  });
+
+  it("uses the entry-point action name for cross-action calls", () => {
+    const nx = createNexus({
+      state: { count: 0 },
+      acts: (_g, set) => ({
+        bump() {
+          set((s) => ({ count: s.count + 1 }));
+        },
+        bumpTwice() {
+          this.bump();
+          this.bump();
+        },
+      }),
+    });
+    const spy = vi.fn();
+    nx.subscribe(spy, ["count"]);
+    nx.acts.bumpTwice();
+    // one batched notification, tagged by the outer action, not `bump`
+    expect(spy).toHaveBeenCalledTimes(1);
+    expect(spy).toHaveBeenCalledWith(expect.anything(), { source: "bumpTwice" });
+  });
+
+  it("lets an explicit set context override the action name", () => {
+    const nx = createNexus({
+      state: { count: 0 },
+      acts: (_g, set) => ({
+        load() {
+          set((s) => ({ count: s.count + 1 }), "server");
+        },
+      }),
+    });
+    const spy = vi.fn();
+    nx.subscribe(spy, ["count"]);
+    nx.acts.load();
+    expect(spy).toHaveBeenCalledWith(expect.anything(), { source: "server" });
+  });
+
+  it("does not tag direct set calls made outside an action", () => {
+    const nx = createNexus({ state: { count: 0 } });
+    const spy = vi.fn();
+    nx.subscribe(spy, ["count"]);
+    nx.set({ count: 1 });
+    expect(spy).toHaveBeenCalledWith(expect.anything(), undefined);
   });
 });

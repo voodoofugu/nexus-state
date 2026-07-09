@@ -390,33 +390,38 @@ interface ReactNexus<S, A = Record<string, never>> extends Nexus<S, A> {
     /**---
      * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
      * ### ***useSelector***:
-     * React hook that subscribes to selected keys and returns derived state.
+     * React hook that derives a value from state with automatic key tracking.
      * @description
-     * The **result** of the selector is compared to decide whether to re-render —
+     * The keys the `selector` reads are tracked automatically (via a shallow proxy
+     * over the state), so the component subscribes to exactly those keys — no
+     * dependency array, and no way for deps to drift out of sync with the selector.
+     *
+     * The selector's **result** is compared to decide whether to re-render —
      * `Object.is` by default. Primitive results work out of the box; when the
      * selector returns a new object or array each run (e.g. `.map`, `.filter`, an
-     * object literal), pass the `shallow` helper or a custom `isEqual` so an equal
-     * result does not re-render.
+     * object literal), pass `"shallow"` for one-level equality, or a custom
+     * comparator function, so an equal result does not re-render.
+     *
+     * Read state through the `selector` argument, not `nexus.get()` — reads that
+     * bypass the argument are not tracked.
      * @param selector derives a value from the full state.
-     * @param dependencies keys that trigger a selector re-check (required, so the subscription is always explicit). Pass `["*"]` to watch every key.
-     * @param isEqual optional result comparator. Defaults to `Object.is`; pass
-     * `shallow` for one-level object/array equality.
+     * @param isEqual optional result comparator: `"shallow"` for built-in
+     * one-level object/array equality, or your own `(a, b) => boolean`. Defaults to
+     * `Object.is`.
      * @example
      * ```tsx
+     * // Subscribes to `firstName` and `lastName` only — inferred from the reads.
      * const fullName = nexus.useSelector(
      *   (state) => `${state.firstName} ${state.lastName}`,
-     *   ["firstName", "lastName"],
      * );
      *
-     * // import { shallow } from "nexus-state";
      * const ids = nexus.useSelector(
      *   (state) => state.items.map((item) => item.id),
-     *   ["items"],
-     *   shallow,
+     *   "shallow",
      * );
      * ```
      */
-    useSelector<R>(selector: (state: S) => R, dependencies: Dependencies<S>, isEqual?: EqualityFn<R>): R;
+    useSelector<R>(selector: (state: S) => R, isEqual?: "shallow" | EqualityFn<R>): R;
     /**---
      * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
      * ### ***useRerender***:
@@ -431,6 +436,27 @@ interface ReactNexus<S, A = Record<string, never>> extends Nexus<S, A> {
      * ```
      */
     useRerender(): () => void;
+}
+/**---
+ * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
+ * ### ***Computed***:
+ * a cached, subscribable derived value produced by `computed`.
+ * @description
+ * Read the current value with `get()`, react to changes with `subscribe()`, and
+ * release its subscription to the source nexus with `dispose()`. The value is
+ * recomputed only when a tracked key changes and only notifies when the result
+ * changes (by the chosen equality).
+ * @example
+ * ```ts
+ * const total = computed(nexus, (s) => s.a + s.b);
+ * total.get();
+ * const off = total.subscribe((v) => console.log(v));
+ * ```
+ */
+interface Computed<R> {
+    get(): R;
+    subscribe(listener: (value: R) => void): () => void;
+    dispose(): void;
 }
 
 /**---
@@ -475,5 +501,28 @@ declare function createReactNexus<S extends RecordAny>(options: {
 }): ReactNexus<S, Record<string, never>>;
 declare function createReactNexus<S extends RecordAny = RecordAny, A extends RecordAny = Record<string, never>>(options: NexusOptions<S, A>): ReactNexus<S, A>;
 
-export { createReactNexus };
+/**---
+ * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
+ * ### ***useComputed***:
+ * subscribes a React component to a `computed` value.
+ * @description
+ * Re-renders only when the computed's cached value changes. Built on
+ * `useSyncExternalStore`, so it is concurrent-safe.
+ * @param computed a value from `computed(nexus, selector)`.
+ * @returns the current computed value.
+ * @example
+ * ```tsx
+ * import { computed } from "nexus-state/computed";
+ * import { useComputed } from "nexus-state/react";
+ *
+ * const total = computed(nexus, (s) => s.a + s.b);
+ *
+ * function Total() {
+ *   return <span>{useComputed(total)}</span>;
+ * }
+ * ```
+ */
+declare function useComputed<R>(computed: Computed<R>): R;
+
+export { createReactNexus, useComputed };
 export type { ReactNexus };

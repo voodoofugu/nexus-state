@@ -77,6 +77,9 @@ function createNexus<
   let batchDepth = 0;
   const pendingKeys = new Set<keyof S>();
   let pendingContext: UpdateContext | undefined;
+  // Name of the entry-point action currently running — used to auto-tag the
+  // `source` of updates made inside an action when no explicit context is given.
+  let currentActionName: string | undefined;
 
   const notify = (keys: (keyof S)[] | "*", context?: UpdateContext) => {
     // Collect callbacks first so an observer subscribed under several keys
@@ -145,19 +148,30 @@ function createNexus<
 
     const keys: (keyof S)[] = [];
     pendingKeys.forEach((key) => keys.push(key));
-    const context = pendingContext;
+    // An explicit `set` context wins; otherwise fall back to the action name, so
+    // an action's updates are labelled by the action in subscribers / devtools.
+    const context =
+      pendingContext ??
+      (currentActionName ? { source: currentActionName } : undefined);
     pendingKeys.clear();
     pendingContext = undefined;
     notify(keys, context);
   }
 
-  function runInBatch<T>(fn: () => T): T {
+  // Runs an action inside a batch and records its name so nested `set` calls can
+  // inherit it as their `source`. Only the outermost (entry-point) action names
+  // the batch; nested `this.other()` calls don't override it.
+  function runInAction<T>(name: string, fn: () => T): T {
+    if (batchDepth === 0) currentActionName = name;
     batchDepth++;
     try {
       return fn();
     } finally {
       batchDepth--;
-      flushBatch();
+      if (batchDepth === 0) {
+        flushBatch();
+        currentActionName = undefined;
+      }
     }
   }
 
@@ -226,13 +240,14 @@ function createNexus<
 
   // Bind every action to the final acts object so cross-action `this` calls
   // work even when actions are destructured. Each action is internally batched,
-  // so the synchronous `set` calls it makes notify subscribers once. Calls made
-  // after an `await` run as separate updates (the batch already flushed).
+  // so the synchronous `set` calls it makes notify subscribers once (and inherit
+  // the action name as their `source`). Calls made after an `await` run as
+  // separate updates (the batch already flushed).
   for (const key of Object.keys(acts)) {
     const val = (acts as RecordAny)[key];
     if (typeof val === "function") {
       (acts as RecordAny)[key] = (...args: unknown[]) =>
-        runInBatch(() => val.apply(acts, args));
+        runInAction(key, () => val.apply(acts, args));
     }
   }
 

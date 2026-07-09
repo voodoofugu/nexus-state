@@ -549,53 +549,7 @@ interface PersistOptions<S> {
      */
     onError?: (error: unknown) => void;
 }
-/**---
- * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
- * ### ***persist***:
- * syncs a nexus with persistent storage.
- * @description
- * Hydration is tagged with `source: "storage"`, and the write-back subscriber
- * skips updates carrying that source, so loading from disk never echoes back to
- * disk. Returns a cleanup function that stops persisting future updates.
- * @param nexus nexus instance created by `createNexus` or `createReactNexus`.
- * @param options persistence configuration.
- * @returns cleanup function that unsubscribes the persistence listener.
- * @example
- * ```ts
- * import { createNexus, persist } from "nexus-state";
- *
- * const nexus = createNexus({ state: { count: 0 } });
- *
- * const stopPersisting = persist(nexus, {
- *   key: "counter",
- *   include: ["count"],
- * });
- *
- * stopPersisting();
- * ```
- */
 declare function persist<S extends RecordAny, A extends RecordAny>(nexus: Nexus<S, A>, options: PersistOptions<S>): () => void;
 
-/**---
- * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
- * ### ***shallow***:
- * one-level equality helper.
- * @description
- * A plain function (not a hook, no React dependency). Returns `true` when two
- * values are equal at the first level: `Object.is` for primitives, and same keys
- * with `Object.is` values for objects and arrays. Pass it as the third argument
- * to `useSelector` when the selector returns a freshly built object or array so
- * an equal result does not re-render — or use it anywhere you need a cheap
- * one-level comparison.
- * @example
- * ```ts
- * import { shallow } from "nexus-state";
- *
- * shallow([1, 2], [1, 2]); // true
- * shallow({ a: 1 }, { a: 2 }); // false
- * ```
- */
-declare function shallow<T>(a: T, b: T): boolean;
-
-export { createActs, createNexus, persist, shallow };
+export { createActs, createNexus, persist };
 export type { ActsCreate, ActsCreateUnion, ActsPart, Dependencies, EqualityFn, Getter, Middleware, Nexus, NexusOptions, Observer, PersistOptions, PersistStorage, SetContext, Setter, Source, UpdateContext };

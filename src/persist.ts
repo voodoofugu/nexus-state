@@ -136,9 +136,11 @@ function defaultStorage(): PersistStorage | null {
  * ### ***persist***:
  * syncs a nexus with persistent storage.
  * @description
- * Hydration is tagged with `source: "storage"`, and the write-back subscriber
- * skips updates carrying that source, so loading from disk never echoes back to
- * disk. Returns a cleanup function that stops persisting future updates.
+ * Hydration is labelled `source: "storage"` (visible to subscribers / devtools)
+ * and carries a private `meta` marker; the write-back guard keys off that marker,
+ * so loading from disk never echoes back — and no user `source` (even an action
+ * named `"storage"`) can be mistaken for hydration. Returns a cleanup function
+ * that stops persisting future updates.
  * @param nexus nexus instance created by `createNexus` or `createReactNexus`.
  * @param options persistence configuration.
  * @returns cleanup function that unsubscribes the persistence listener.
@@ -156,6 +158,13 @@ function defaultStorage(): PersistStorage | null {
  * stopPersisting();
  * ```
  */
+/**
+ * Private `meta` marker set on hydration. The write-back guard keys off this, not
+ * off `source`, so no user `source` — including an action named `"storage"` —
+ * can ever be mistaken for hydration.
+ */
+const HYDRATED = "@@nexus/hydrated";
+
 function persist<S extends RecordAny, A extends RecordAny>(
   nexus: Nexus<S, A>,
   options: PersistOptions<S>
@@ -180,7 +189,7 @@ function persist<S extends RecordAny, A extends RecordAny>(
         migrate && parsed.version !== version
           ? migrate(parsed.state, parsed.version)
           : (parsed.state as Partial<S>);
-      nexus.set(data, { source: "storage", meta: { hydrated: true } });
+      nexus.set(data, { source: "storage", meta: { [HYDRATED]: true } });
     }
   } catch (error) {
     onError?.(error);
@@ -191,7 +200,10 @@ function persist<S extends RecordAny, A extends RecordAny>(
     include && include.length ? include : ["*"];
 
   return nexus.subscribe((state, context) => {
-    if (context?.source === "storage") return;
+    // Skip our own hydration, and any internal `@@`-prefixed source (e.g. a
+    // devtools time-travel jump) — those aren't real user changes to persist.
+    if (context?.meta && context.meta[HYDRATED]) return;
+    if (context?.source && context.source.slice(0, 2) === "@@") return;
     try {
       storage.setItem(key, JSON.stringify({ version, state: pick(state) }));
     } catch (error) {

@@ -151,98 +151,6 @@ type Observer<S> = (state: S, context?: UpdateContext) => void;
 type Dependencies<S> = ["*"] | (keyof S)[];
 /**---
  * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
- * ### ***EqualityFn***:
- * compares the previous and next result of a `useSelector` selector.
- * @description
- * Returns `true` to keep the previous value (skip the re-render). Defaults to
- * `Object.is` semantics. Pass the exported `shallow` helper for one-level
- * object/array equality, or a custom function for anything else.
- * @example
- * ```ts
- * const isEqual: EqualityFn<number[]> = (a, b) =>
- *   a.length === b.length && a.every((v, i) => v === b[i]);
- * ```
- */
-type EqualityFn<T> = (a: T, b: T) => boolean;
-/**---
- * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
- * ### ***ActsCreate***:
- * function that creates the action object for a nexus.
- * @description
- * The actions type `A` is inferred from the object returned by this function.
- * Use `get` to read state and `set` to update it.
- * @example
- * ```ts
- * const acts: ActsCreate<State, Actions> = (get, set) => ({
- *   increment() {
- *     set({ count: get("count") + 1 });
- *   },
- * });
- * ```
- */
-type ActsCreate<S, A> = (get: Getter<S>, set: Setter<S>) => A;
-/**---
- * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
- * ### ***ActsPart***:
- * action slice produced by `createActs`.
- * @description
- * `this` is typed as the complete acts object, so actions from one slice can
- * call actions from another slice without optional chaining.
- * @example
- * ```ts
- * const counterActs = createActs<State, Actions>(function (get, set) {
- *   return {
- *     increment() {
- *       set({ count: get("count") + 1 });
- *       this.logCount();
- *     },
- *     logCount() {
- *       console.log(get("count"));
- *     },
- *   };
- * });
- * ```
- */
-type ActsPart<S, A> = (this: A, get: Getter<S>, set: Setter<S>) => Partial<A>;
-/**---
- * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
- * ### ***ActsCreateUnion***:
- * accepted `acts` forms for `createNexus` and `createReactNexus`.
- * @description
- * Pass one action creator function for a compact store, one `createActs` slice,
- * or an array of `createActs` slices for code splitting.
- * @example
- * ```ts
- * createNexus({ state, acts: (get, set) => ({ increment() {} }) });
- * createNexus({ state, acts: counterActs });
- * createNexus({ state, acts: [counterActs, userActs] });
- * ```
- */
-type ActsCreateUnion<S, A> = ActsCreate<S, A> | ActsPart<S, A> | ActsPart<S, A>[];
-/**---
- * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
- * ### ***NexusOptions***:
- * configuration object accepted by `createNexus` and `createReactNexus`.
- * @property state initial state object used by the store and by `reset`.
- * @property acts optional action creator, action slice or array of action slices.
- * @example
- * ```ts
- * const nexus = createNexus({
- *   state: { count: 0 },
- *   acts: (get, set) => ({
- *     increment() {
- *       set({ count: get("count") + 1 });
- *     },
- *   }),
- * });
- * ```
- */
-type NexusOptions<S, A> = {
-    state: S;
-    acts?: ActsCreateUnion<S, A>;
-};
-/**---
- * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
  * ### ***Nexus***:
  * framework-agnostic nexus store instance.
  * @description
@@ -355,174 +263,45 @@ interface Nexus<S, A = Record<string, never>> {
      */
     acts: A;
 }
-/**---
- * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
- * ### ***ReactNexus***:
- * nexus store with React hooks added by `createReactNexus`.
- * @description
- * Includes the full framework-agnostic `Nexus` API plus `use`, `useSelector`
- * and `useRerender` hooks.
- * @example
- * ```tsx
- * const count = nexus.use("count");
- * const doubled = nexus.useSelector((state) => state.count * 2, ["count"]);
- * ```
- */
-interface ReactNexus<S, A = Record<string, never>> extends Nexus<S, A> {
-    /**---
-     * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
-     * ### ***use***:
-     * React hook that subscribes a component to the whole state or one key.
-     * @description
-     * Uses `useSyncExternalStore` under the hood. Passing a key creates a
-     * key-level subscription so unrelated state updates do not re-render the
-     * component.
-     * @example
-     * ```tsx
-     * const state = nexus.use();
-     * const count = nexus.use("count");
-     * ```
+
+interface DevtoolsOptions {
+    /** Instance name shown in the Redux DevTools dropdown. */
+    name?: string;
+    /**
+     * Set `false` to disable (e.g. in production). Defaults to `true`; the adapter
+     * is still a no-op when the extension is not installed.
      */
-    use: {
-        (): S;
-        <K extends keyof S>(key: K): S[K];
-    };
-    /**---
-     * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
-     * ### ***useSelector***:
-     * React hook that derives a value from state with automatic key tracking.
-     * @description
-     * The keys the `selector` reads are tracked automatically (via a shallow proxy
-     * over the state), so the component subscribes to exactly those keys — no
-     * dependency array, and no way for deps to drift out of sync with the selector.
-     *
-     * The selector's **result** is compared to decide whether to re-render —
-     * `Object.is` by default. Primitive results work out of the box; when the
-     * selector returns a new object or array each run (e.g. `.map`, `.filter`, an
-     * object literal), pass `"shallow"` for one-level equality, or a custom
-     * comparator function, so an equal result does not re-render.
-     *
-     * Read state through the `selector` argument, not `nexus.get()` — reads that
-     * bypass the argument are not tracked.
-     * @param selector derives a value from the full state.
-     * @param isEqual optional result comparator: `"shallow"` for built-in
-     * one-level object/array equality, or your own `(a, b) => boolean`. Defaults to
-     * `Object.is`.
-     * @example
-     * ```tsx
-     * // Subscribes to `firstName` and `lastName` only — inferred from the reads.
-     * const fullName = nexus.useSelector(
-     *   (state) => `${state.firstName} ${state.lastName}`,
-     * );
-     *
-     * const ids = nexus.useSelector(
-     *   (state) => state.items.map((item) => item.id),
-     *   "shallow",
-     * );
-     * ```
-     */
-    useSelector<R>(selector: (state: S) => R, isEqual?: "shallow" | EqualityFn<R>): R;
-    /**---
-     * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
-     * ### ***useRerender***:
-     * React hook that returns an imperative local re-render function.
-     * @description
-     * Use it for rare cases where a component needs to redraw because of refs or
-     * other non-reactive values. Prefer state subscriptions for normal data flow.
-     * @example
-     * ```tsx
-     * const rerender = nexus.useRerender();
-     * rerender();
-     * ```
-     */
-    useRerender(): () => void;
+    enabled?: boolean;
 }
 /**---
  * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
- * ### ***Computed***:
- * a cached, subscribable derived value produced by `computed`.
+ * ### ***devtools***:
+ * connects a nexus to the Redux DevTools browser extension.
  * @description
- * Read the current value with `get()`, react to changes with `subscribe()`, and
- * release its subscription to the source nexus with `dispose()`. The value is
- * recomputed only when a tracked key changes and only notifies when the result
- * changes (by the chosen equality).
+ * Every update is sent to Redux DevTools as an action whose **type is the update
+ * `source`** (`"server"`, `"storage"`, `"reset"`, or your own) — so the timeline
+ * shows *where each change came from*, not just that it happened. Time-travel
+ * (jump / reset / rollback) writes the selected state back with a private source
+ * that the sender skips, so there is no echo loop.
+ *
+ * A no-op when the extension is not installed or `enabled` is `false`, so it is
+ * safe to leave in place. Returns a cleanup function that disconnects.
+ * @param nexus nexus instance created by `createNexus` or `createReactNexus`.
+ * @param options devtools configuration.
+ * @returns cleanup function that stops sending and disconnects.
  * @example
  * ```ts
- * const total = computed(nexus, (s) => s.a + s.b);
- * total.get();
- * const off = total.subscribe((v) => console.log(v));
+ * import { createNexus } from "nexus-state";
+ * import { devtools } from "nexus-state/devtools";
+ *
+ * const nexus = createNexus({ state: { count: 0 } });
+ * const stop = devtools(nexus, { name: "Counter" });
+ *
+ * nexus.set({ count: 1 }, "user"); // appears in DevTools as action "user"
+ * stop();
  * ```
  */
-interface Computed<R> {
-    get(): R;
-    subscribe(listener: (value: R) => void): () => void;
-    dispose(): void;
-}
+declare function devtools<S extends RecordAny, A extends RecordAny>(nexus: Nexus<S, A>, options?: DevtoolsOptions): () => void;
 
-/**---
- * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
- * ### ***createReactNexus***:
- * creates a nexus store with React hooks.
- * @description
- * `createReactNexus` returns the full framework-agnostic nexus API plus
- * `use`, `useSelector` and `useRerender`. React is an optional peer dependency
- * and is only needed when importing `nexus-state/react`.
- * @param options initial state and optional action creator, action slice or action slices.
- * @returns a `ReactNexus` instance.
- * @example
- * ```tsx
- * import { createReactNexus } from "nexus-state/react";
- *
- * const nexus = createReactNexus({
- *   state: { count: 0 },
- *   acts: (get, set) => ({
- *     increment() {
- *       set({ count: get("count") + 1 });
- *     },
- *   }),
- * });
- *
- * function Counter() {
- *   const count = nexus.use("count");
- *   return <button onClick={nexus.acts.increment}>{count}</button>;
- * }
- * ```
- */
-declare function createReactNexus<S extends RecordAny, A extends RecordAny>(options: {
-    state: S;
-    acts: ActsCreate<S, A>;
-}): ReactNexus<S, A>;
-declare function createReactNexus<S extends RecordAny, A extends RecordAny>(options: {
-    state: S;
-    acts: ActsPart<S, A> | ActsPart<S, A>[];
-}): ReactNexus<S, A>;
-declare function createReactNexus<S extends RecordAny>(options: {
-    state: S;
-}): ReactNexus<S, Record<string, never>>;
-declare function createReactNexus<S extends RecordAny = RecordAny, A extends RecordAny = Record<string, never>>(options: NexusOptions<S, A>): ReactNexus<S, A>;
-
-/**---
- * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
- * ### ***useComputed***:
- * subscribes a React component to a `computed` value.
- * @description
- * Re-renders only when the computed's cached value changes. Built on
- * `useSyncExternalStore`, so it is concurrent-safe.
- * @param computed a value from `computed(nexus, selector)`.
- * @returns the current computed value.
- * @example
- * ```tsx
- * import { computed } from "nexus-state/computed";
- * import { useComputed } from "nexus-state/react";
- *
- * const total = computed(nexus, (s) => s.a + s.b);
- *
- * function Total() {
- *   return <span>{useComputed(total)}</span>;
- * }
- * ```
- */
-declare function useComputed<R>(computed: Computed<R>): R;
-
-export { createReactNexus, useComputed };
-export type { ReactNexus };
+export { devtools as default, devtools };
+export type { DevtoolsOptions };

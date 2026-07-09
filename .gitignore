@@ -2,4 +2,7 @@
 node_modules
 Zone.Identifier
 .DS_Store
-PROJECT.md
+
+# Local docs — keep only the public README in git
+*.md
+!README.md
