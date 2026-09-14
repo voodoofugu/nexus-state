@@ -146,10 +146,16 @@ describe("useSelector", () => {
       const ids = nx.useSelector((s) => s.items.map((x) => x));
       return <span>{ids.join(",")}</span>;
     }
+    // React's dev build rethrows the max-update-depth error through a DOM event,
+    // and jsdom reports that event straight to stderr, past the console mocks.
+    const swallow = (e: ErrorEvent) => e.preventDefault();
+    window.addEventListener("error", swallow);
     try {
       render(<View />); // may bail on the unstable snapshot — the warning fired first
     } catch {
       /* ignore React's max-update-depth */
+    } finally {
+      window.removeEventListener("error", swallow);
     }
     expect(warn).toHaveBeenCalledWith(
       expect.stringContaining("[nexus-state]")
