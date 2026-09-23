@@ -1,0 +1,45 @@
+/*
+ * Вид служебных прокруток. Бегунок тихий: он оснастка, а не пример.
+ * Растворы по краям берут цвет страницы.
+ */
+.scroll-thumb,
+.scroll-thumb-frame,
+.scroll-thumb-shape {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.scroll-thumb {
+  transition: color 0.18s ease;
+}
+
+.chrome-scroll .ms-bar {
+  border-radius: 999px;
+}
+
+.chrome-scroll .ms-thumb .scroll-thumb {
+  width: 8px;
+  height: 100%;
+  border-radius: 20px;
+  corner-shape: bevel;
+}
+
+.chrome-scroll .ms-thumb.ms-grabbing .scroll-thumb {
+  width: 10px;
+  margin: 0 -1px;
+}
+
+.chrome-scroll .scroll-thumb {
+  color: var(--ink-faint-soft);
+}
+
+.chrome-scroll .ms-bar:hover .scroll-thumb,
+.chrome-scroll .ms-thumb.ms-grabbing .scroll-thumb {
+  color: var(--ink-faint);
+}
+
+.chrome-scroll .ms-edge:not(.ms-disabled) .ms-edge-inner {
+  background: linear-gradient(var(--fade, var(--bg)) 0%, transparent 100%);
+  width: 20px;
+}

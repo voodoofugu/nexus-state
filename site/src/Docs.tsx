@@ -10,8 +10,10 @@ import docs from "virtual:ns-docs";
 import readme from "virtual:ns-readme";
 import type { ReadmeNode } from "virtual:ns-readme";
 
+import ChromeScroll from "./ChromeScroll";
 import TopBar from "./TopBar";
 import type { Theme } from "./TopBar";
+import type { MorphScrollHandle } from "morphing-scroll";
 
 /*
  * Документация — это README, показанный удобнее: текст разделов приходит из
@@ -251,11 +253,11 @@ function Docs() {
   const route = useRoute();
   const [theme, setTheme] = useTheme();
   const [query, setQuery] = React.useState("");
-  const page = React.useRef<HTMLElement>(null);
+  const page = React.useRef<MorphScrollHandle>(null);
 
   // новый раздел читают с начала
   React.useEffect(() => {
-    page.current?.scrollTo({ top: 0 });
+    page.current?.scrollTo(0, { duration: 0 });
   }, [route]);
 
   const node = byHref.get(route);
@@ -282,33 +284,47 @@ function Docs() {
           />
 
           <div className="docs-nav-scroll">
-            {found ? (
-              <ul className="docs-found">
-                {found.map((entry) => (
-                  <li key={hrefOf(entry)}>
-                    <a href={hrefOf(entry)} onClick={() => setQuery("")}>
-                      {entry.name}
-                      <small>{entry.section}</small>
-                    </a>
-                  </li>
-                ))}
-                {found.length === 0 && (
-                  <li className="docs-none">nothing found</li>
-                )}
-              </ul>
-            ) : (
-              <nav aria-label="contents" className="docs-tree">
-                <a aria-current={route === "#/" ? "page" : undefined} href="#/">
-                  overview
-                </a>
-                <Tree current={route} nodes={readme.api} />
-              </nav>
-            )}
+            <ChromeScroll
+              controls={{ keys: true, bar: { trackGap: -4 } }}
+              wrapper={{ margin: [0, 14, 0, 0] }}
+            >
+              {found ? (
+                <ul className="docs-found">
+                  {found.map((entry) => (
+                    <li key={hrefOf(entry)}>
+                      <a href={hrefOf(entry)} onClick={() => setQuery("")}>
+                        {entry.name}
+                        <small>{entry.section}</small>
+                      </a>
+                    </li>
+                  ))}
+                  {found.length === 0 && (
+                    <li className="docs-none">nothing found</li>
+                  )}
+                </ul>
+              ) : (
+                <nav aria-label="contents" className="docs-tree">
+                  <a
+                    aria-current={route === "#/" ? "page" : undefined}
+                    href="#/"
+                  >
+                    overview
+                  </a>
+                  <Tree current={route} nodes={readme.api} />
+                </nav>
+              )}
+            </ChromeScroll>
           </div>
         </aside>
 
-        <main className="docs-main" ref={page}>
-          {node ? <Page node={node} /> : <Overview />}
+        <main className="docs-main">
+          <ChromeScroll
+            controls={{ keys: true }}
+            ref={page}
+            wrapper={{ margin: [24, 18, 96, 0] }}
+          >
+            {node ? <Page node={node} /> : <Overview />}
+          </ChromeScroll>
         </main>
       </div>
     </div>

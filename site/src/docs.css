@@ -8,8 +8,8 @@
 
 /* #region shell */
 /*
- * Страница держит высоту окна: прокручивается не она, а две области —
- * дерево слева и текст справа.
+ * Страница держит высоту окна: прокручиваются не она, а два `MorphScroll` —
+ * дерево слева и текст справа. Прокрутка своя, не браузерная.
  */
 .docs {
   display: grid;
@@ -38,16 +38,6 @@
 .docs-nav-scroll,
 .docs-main {
   min-height: 0;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-}
-
-.docs-nav-scroll {
-  padding-right: 14px;
-}
-
-.docs-main {
-  padding: 24px 18px 96px 0;
 }
 
 .docs-search {
