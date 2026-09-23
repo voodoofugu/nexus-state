@@ -143,6 +143,13 @@ function defaultStorage(): PersistStorage | null {
   return null;
 }
 
+/**
+ * Private `meta` marker set on hydration. The write-back guard keys off this, not
+ * off `source`, so no user `source` — including an action named `"storage"` —
+ * can ever be mistaken for hydration.
+ */
+const HYDRATED = "@@nexus/hydrated";
+
 /**---
  * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
  * ### ***persist***:
@@ -170,16 +177,9 @@ function defaultStorage(): PersistStorage | null {
  * stopPersisting();
  * ```
  */
-/**
- * Private `meta` marker set on hydration. The write-back guard keys off this, not
- * off `source`, so no user `source` — including an action named `"storage"` —
- * can ever be mistaken for hydration.
- */
-const HYDRATED = "@@nexus/hydrated";
-
 function persist<S extends RecordAny, A extends RecordAny>(
   nexus: Nexus<S, A>,
-  options: PersistOptions<S>
+  options: PersistOptions<S>,
 ): () => void {
   const { key, version = 0, include, migrate, onError, debounce } = options;
   const storage = options.storage ?? defaultStorage();
@@ -216,8 +216,7 @@ function persist<S extends RecordAny, A extends RecordAny>(
   }
 
   // --- write back on change (ignoring our own hydration) ---
-  const deps: Dependencies<S> =
-    include && include.length ? include : ["*"];
+  const deps: Dependencies<S> = include && include.length ? include : ["*"];
 
   const debounced = typeof debounce === "number" && debounce > 0;
   let timer: ReturnType<typeof setTimeout> | undefined;

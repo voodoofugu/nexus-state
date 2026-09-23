@@ -22,6 +22,19 @@ interface DevtoolsExtension {
   disconnect?(): void;
 }
 
+/**---
+ * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
+ * ### ***DevtoolsOptions***:
+ * configuration object accepted by `devtools`.
+ * @description
+ * Names the instance in the Redux DevTools dropdown and lets you switch the
+ * adapter off. Both fields are optional — with the extension missing, the
+ * adapter is a no-op regardless.
+ * @example
+ * ```ts
+ * devtools(nexus, { name: "cart", enabled: import.meta.env.DEV });
+ * ```
+ */
 interface DevtoolsOptions {
   /** Instance name shown in the Redux DevTools dropdown. */
   name?: string;
