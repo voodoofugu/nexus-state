@@ -2,22 +2,22 @@
 
 <h2></h2>
 
-### [Documentation](https://voodoofugu.github.io/nexus-state/)
-
-This README is the source of truth; the site is the same text, easier to
-browse — searchable, with an API tree and live navigation.
-
-<h2></h2>
-
 ### Table of contents
 
-- [Documentation](https://voodoofugu.github.io/nexus-state/)
+- [Documentation](#documentation)
 - [About](#about)
 - [Installation](#installation)
 - [Quick start](#quick-start)
 - [API](#api)
 - [Recipes](#recipes)
 - [License](#license)
+
+<h2></h2>
+
+### Documentation
+
+This README is the source of truth; the [site](https://voodoofugu.github.io/nexus-state/) is the same text, easier to
+browse — searchable, with an API tree and live navigation.
 
 <h2></h2>
 
