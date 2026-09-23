@@ -69,7 +69,14 @@
     "package-prepare": "npm run typecheck && npm run test && npm run build && node scripts/prepare-publish.mjs",
     "publish:dry": "npm run package-prepare && npm publish ./publish --dry-run",
     "publish": "npm run package-prepare && npm publish ./publish --access public",
-    "npm-login": "npm login"
+    "npm-login": "npm login",
+    "site": "vite --config vite.config.ts",
+    "site:check": "tsc -p site/tsconfig.json --noEmit",
+    "site:build": "vite build --config vite.config.ts --base=/nexus-state/",
+    "site:preview": "vite preview --config vite.config.ts --base=/nexus-state/",
+    "site:deploy": "gh workflow run pages.yml --ref main && sleep 5 && npm run site:deploy:watch",
+    "site:deploy:watch": "gh run watch $(gh run list --workflow=pages.yml --limit 1 --json databaseId --jq '.[0].databaseId')",
+    "site:open": "open https://voodoofugu.github.io/nexus-state/"
   },
   "keywords": [
     "react",
@@ -101,12 +108,16 @@
     "@testing-library/dom": "^10.4.1",
     "@testing-library/react": "^16.3.2",
     "@types/node": "^24.0.7",
+    "@types/prismjs": "^1.26.6",
     "@types/react": "^18.3.7",
     "@types/react-dom": "^18.3.7",
+    "@vitejs/plugin-react": "^6.1.1",
     "eslint": "^9.17.0",
     "eslint-plugin-react": "^7.37.2",
     "globals": "^15.13.0",
     "jsdom": "^29.1.1",
+    "marked": "^18.0.14",
+    "prismjs": "^1.30.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "rollup": "^4.21.3",
@@ -115,6 +126,7 @@
     "tslib": "^2.7.0",
     "typescript": "^5.6.2",
     "typescript-eslint": "^8.18.0",
+    "vite": "^8.3.0",
     "vitest": "^4.1.11"
   }
 }

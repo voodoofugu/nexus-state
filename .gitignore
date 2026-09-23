@@ -1,7 +1,9 @@
 /dist
+/site/dist
 node_modules
 Zone.Identifier
 .DS_Store
+.claude/
 
 # Local docs — keep only the public README in git
 *.md
