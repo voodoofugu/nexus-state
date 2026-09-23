@@ -54,10 +54,6 @@ const HEADING = /^### (.+?)\s*$/gm;
  */
 const SKIP = new Set(["Table of contents", "Documentation"]);
 
-/** заголовок бывает ссылкой вида `[Documentation](url)` — нужен её текст */
-const titleOf = (heading: string) =>
-  heading.match(/^\[([^\]]+)\]\(.*\)$/)?.[1] ?? heading;
-
 /** разделы, что идут отдельным блоком после API */
 const EXTRA = new Set(["Recipes", "License"]);
 
@@ -115,7 +111,7 @@ export function parseReadme(text: string): Readme {
       .replace(/<h2><\/h2>/g, "")
       .trim();
 
-    const title = titleOf(heading[1]);
+    const title = heading[1];
     if (title === "API") apiText = body;
     else if (SKIP.has(title)) return;
     else if (EXTRA.has(title)) extras.push({ title, body });

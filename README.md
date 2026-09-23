@@ -16,7 +16,8 @@
 
 ### Documentation
 
-This README is the source of truth; the [site](https://voodoofugu.github.io/nexus-state/) is the same text, easier to
+This README is the source of truth; the
+[site](https://voodoofugu.github.io/nexus-state/) is the same text, easier to
 browse — searchable, with an API tree and live navigation.
 
 <h2></h2>
