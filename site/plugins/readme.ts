@@ -48,8 +48,16 @@ export type Readme = {
 const GROUP = /###### \*\*— (.+?) —\*\*/g;
 const HEADING = /^### (.+?)\s*$/gm;
 
-/** разделы, которые на сайте не нужны: оглавление строит навигация */
-const SKIP = new Set(["Table of contents"]);
+/**
+ * Разделы, которые на сайте не нужны: оглавление строит навигация, а ссылка
+ * на саму документацию вела бы на эту же страницу.
+ */
+const SKIP = new Set(["Table of contents", "Documentation"]);
+
+/** заголовок бывает ссылкой вида `[Documentation](url)` — нужен её текст */
+const titleOf = (heading: string) =>
+  heading.match(/^\[([^\]]+)\]\(.*\)$/)?.[1] ?? heading;
+
 /** разделы, что идут отдельным блоком после API */
 const EXTRA = new Set(["Recipes", "License"]);
 
@@ -100,12 +108,14 @@ export function parseReadme(text: string): Readme {
   headings.forEach((heading, index) => {
     const start = heading.index! + heading[0].length;
     const end = headings[index + 1]?.index ?? text.length;
+    // `<h2></h2>` — разделители, которыми README держит вид на GitHub;
+    // на сайте они стали бы пустыми заголовками
     const body = text
       .slice(start, end)
-      .replace(/<h2><\/h2>\s*$/, "")
+      .replace(/<h2><\/h2>/g, "")
       .trim();
 
-    const title = heading[1];
+    const title = titleOf(heading[1]);
     if (title === "API") apiText = body;
     else if (SKIP.has(title)) return;
     else if (EXTRA.has(title)) extras.push({ title, body });
