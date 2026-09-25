@@ -43,6 +43,9 @@ first-class TypeScript inference.
 - **Inference-first types.** State and actions are inferred from your config —
   you rarely write a generic by hand.
 
+The API is settled as of 4.0.0: the surface is what it is meant to be, and no
+further additions are planned. Anything breaking would arrive as a new major.
+
 <h2></h2>
 
 ### Installation
