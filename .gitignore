@@ -5,6 +5,7 @@ Zone.Identifier
 .DS_Store
 .claude/
 
-# Local docs — keep only the public README in git
+# Local docs — keep only the public ones in git
 *.md
 !README.md
+!CHANGELOG.md
