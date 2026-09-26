@@ -168,6 +168,61 @@ describe("reset", () => {
 });
 
 describe("middleware", () => {
+  it("sees the action name, like subscribers do", () => {
+    const nx = createNexus({
+      state: { count: 0 },
+      acts: (get, set) => ({
+        increment() {
+          set({ count: get("count") + 1 });
+        },
+      }),
+    });
+
+    const fromMiddleware: (string | undefined)[] = [];
+    const fromSubscriber: (string | undefined)[] = [];
+
+    nx.middleware((_p, _n, ctx) => {
+      fromMiddleware.push(ctx?.source);
+    });
+    nx.subscribe((_s, ctx) => {
+      fromSubscriber.push(ctx?.source);
+    }, ["count"]);
+
+    nx.acts.increment();
+
+    expect(fromMiddleware).toEqual(["increment"]);
+    expect(fromSubscriber).toEqual(["increment"]);
+  });
+
+  it("does not let an action name overwrite an explicit source", () => {
+    const nx = createNexus({
+      state: { a: 0, b: 0 },
+      acts: (get, set) => ({
+        both() {
+          set({ a: 1 }); // no context — takes the action name
+          set({ b: 1 }, "server"); // explicit — must win for subscribers
+        },
+      }),
+    });
+
+    const fromMiddleware: (string | undefined)[] = [];
+    const fromSubscriber: (string | undefined)[] = [];
+
+    nx.middleware((_p, _n, ctx) => {
+      fromMiddleware.push(ctx?.source);
+    });
+    nx.subscribe((_s, ctx) => {
+      fromSubscriber.push(ctx?.source);
+    }, ["*"]);
+
+    nx.acts.both();
+
+    // each `set` is labelled as it happens
+    expect(fromMiddleware).toEqual(["both", "server"]);
+    // the batch notifies once, and the explicit source wins
+    expect(fromSubscriber).toEqual(["server"]);
+  });
+
   it("can replace the next state", () => {
     const nx = createNexus({ state: { count: 0 } });
     nx.middleware((_p, next) => ({ ...next, count: next.count * 2 }));

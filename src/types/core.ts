@@ -169,8 +169,8 @@ type Dependencies<S> = ["*"] | (keyof S)[];
  * compares the previous and next result of a `useSelector` selector.
  * @description
  * Returns `true` to keep the previous value (skip the re-render). Defaults to
- * `Object.is` semantics. Pass the exported `shallow` helper for one-level
- * object/array equality, or a custom function for anything else.
+ * `Object.is` semantics. Pass `"shallow"` instead of a function for built-in
+ * one-level object/array equality, or your own function for anything else.
  * @example
  * ```ts
  * const isEqual: EqualityFn<number[]> = (a, b) =>

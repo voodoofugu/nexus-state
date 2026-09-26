@@ -128,7 +128,15 @@ function createNexus<
   // acts wrapper below) for the synchronous `set` calls made inside them.
   const set: Setter<S> = (update, context) => {
     const prevState = state;
-    const normalizedContext = normalizeContext(context);
+    const explicitContext = normalizeContext(context);
+    // What observers actually see: an explicit context wins, otherwise the name
+    // of the action currently running. Middleware is handed the same value, so
+    // a middleware and a subscriber never disagree about where an update came
+    // from. Only `pendingContext` below keeps the explicit one, so an action's
+    // name can't overwrite a source the caller set on purpose.
+    const effectiveContext =
+      explicitContext ??
+      (currentActionName ? { source: currentActionName } : undefined);
 
     const nextPartial =
       typeof update === "function" ? update(prevState) : update;
@@ -137,7 +145,7 @@ function createNexus<
 
     // --- run through middleware (may replace the next state) ---
     for (const middleware of localMiddleware) {
-      const result = middleware(prevState, nextState, normalizedContext);
+      const result = middleware(prevState, nextState, effectiveContext);
       if (result !== undefined) nextState = result as S;
     }
 
@@ -155,11 +163,11 @@ function createNexus<
 
     if (batchDepth > 0) {
       changedKeys.forEach((key) => pendingKeys.add(key));
-      if (normalizedContext) pendingContext = normalizedContext;
+      if (explicitContext) pendingContext = explicitContext;
       return;
     }
 
-    notify(changedKeys, normalizedContext);
+    notify(changedKeys, effectiveContext);
   };
 
   function flushBatch() {

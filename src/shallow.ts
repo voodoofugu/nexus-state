@@ -13,21 +13,15 @@ function sameValue<T>(a: T, b: T): boolean {
   return a !== a && b !== b;
 }
 
-/**---
- * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
- * ### ***shallow***:
- * one-level equality helper.
- * @description
- * A plain function (not a hook, no React dependency). Returns `true` when two
- * values are equal at the first level: `Object.is` for primitives, and same keys
- * with `Object.is` values for objects and arrays. Pass it as the third argument
- * to `useSelector` when the selector returns a freshly built object or array so
- * an equal result does not re-render — or use it anywhere you need a cheap
- * one-level comparison.
- * @example
- * ```ts
- * import { shallow } from "nexus-state";
+/**
+ * One-level equality: `Object.is` for primitives, and same keys with `Object.is`
+ * values for objects and arrays.
  *
+ * Internal — not a public export. Callers reach it by passing the string
+ * `"shallow"` as the second argument of `useSelector`, which resolves to this
+ * function.
+ *
+ * ```ts
  * shallow([1, 2], [1, 2]); // true
  * shallow({ a: 1 }, { a: 2 }); // false
  * ```

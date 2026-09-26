@@ -8,13 +8,25 @@ breaking would arrive as a new major.
 
 ## 4.0.1 (unreleased)
 
-Documentation only — no behaviour changes, no API changes.
+A documentation pass plus one behaviour fix. No API changes.
 
 ### Fixed
+
+- **Middleware did not see the action name.** Updates made inside an action are
+  auto-tagged with the action as their `source`, but that name was resolved only
+  when the batch flushed — after middleware had already run, so a middleware saw
+  `undefined` where a subscriber saw the action. Both now receive the same
+  context. An explicit `source` still wins, and subscribers are unaffected.
 
 - **`persist` carried no hover documentation.** Its JSDoc block was separated
   from the function by a private constant, so TypeScript attached the
   description to that constant instead. The emitted `.d.ts` now carries it.
+
+- **`EqualityFn` promised an export that does not exist.** Its documentation
+  told callers to "pass the exported `shallow` helper", but `shallow` stopped
+  being a public export in 4.0.0 — the string `"shallow"` replaced it. The text
+  now points at the string, and `shallow` is marked internal in the source,
+  with its stale "third argument" corrected to the second.
 
 ### Added
 
