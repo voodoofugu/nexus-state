@@ -23,7 +23,7 @@ interface DevtoolsExtension {
 }
 
 /**---
- * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
+ * ## ![logo](../assets/nexus-state-logoText.svg)
  * ### ***DevtoolsOptions***:
  * configuration object accepted by `devtools`.
  * @description
@@ -61,7 +61,7 @@ function getExtension(): DevtoolsExtension | undefined {
 }
 
 /**---
- * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
+ * ## ![logo](../assets/nexus-state-logoText.svg)
  * ### ***devtools***:
  * connects a nexus to the Redux DevTools browser extension.
  * @description

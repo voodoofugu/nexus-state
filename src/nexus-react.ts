@@ -14,7 +14,7 @@ import type {
 } from "./types/core";
 
 /**---
- * ## ![logo](https://github.com/voodoofugu/nexus-state/raw/main/src/assets/nexus-state-logo.png)
+ * ## ![logo](../assets/nexus-state-logoText.svg)
  * ### ***createReactNexus***:
  * creates a nexus store with React hooks.
  * @description

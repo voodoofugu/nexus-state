@@ -1,6 +1,6 @@
 {
   "name": "nexus-state",
-  "version": "4.0.0",
+  "version": "4.0.1",
   "description": "Lightweight, traceable global state manager for JavaScript and React.",
   "author": "Georg Schilin",
   "license": "MIT",
@@ -65,7 +65,7 @@
     "typecheck": "tsc -p tsconfig.check.json",
     "test": "vitest run",
     "test:watch": "vitest",
-    "build": "rollup -c && node scripts/write-markers.mjs",
+    "build": "rollup -c && node scripts/write-markers.mjs && node scripts/copy-assets.mjs",
     "package-prepare": "npm run typecheck && npm run test && npm run build && node scripts/prepare-publish.mjs",
     "publish:dry": "npm run package-prepare && npm publish ./publish --dry-run",
     "publish": "npm run package-prepare && npm publish ./publish --access public",

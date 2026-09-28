@@ -6,7 +6,7 @@ This project follows [Semantic Versioning](https://semver.org/).
 The API is settled as of 4.0.0. No further additions are planned; anything
 breaking would arrive as a new major.
 
-## 4.0.1 (unreleased)
+## 4.0.1 — 2026-09-28
 
 A documentation pass plus one behaviour fix. No API changes.
 
@@ -32,6 +32,15 @@ A documentation pass plus one behaviour fix. No API changes.
 
 - Interface-level documentation for **`DevtoolsOptions`**, which is exported
   publicly but previously documented only its members.
+
+### Changed
+
+- **The logo shown in hover documentation now ships with the package.** It was
+  fetched from GitHub on every hover, which needed a network round trip, showed
+  nothing offline, and would have broken silently had the repository layout
+  changed. A single SVG is copied into `dist/assets` at build time and referenced
+  by a relative path. Declarations shrank more than the file adds, so the
+  unpacked package is slightly smaller than 4.0.0.
 
 ## 4.0.0 — 2026-07-10
 
