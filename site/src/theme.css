@@ -25,9 +25,9 @@
   --ink-faint-soft: light-dark(#b6c7c3, #505b57);
   --line: light-dark(#d8e0dc, #2a3533);
   --line-soft: light-dark(#dadedc, #222c2a);
-  --accent: light-dark(#2563eb, #5b9bf8);
-  --accent-soft: light-dark(#e6edfd, #16233d);
-  --accent-ink: light-dark(#1d4ed8, #a9c8ff);
+  --accent: light-dark(#7c3aed, #a78bfa);
+  --accent-soft: light-dark(#f1eafe, #251a3f);
+  --accent-ink: light-dark(#6d28d9, #cbb6ff);
   --code-bg: light-dark(#17201f, #0b1211);
   --code-ink: light-dark(#eef7f4, #dff0ec);
   --grid: light-dark(rgba(24, 32, 31, 0.05), rgba(255, 255, 255, 0.05));
