@@ -37,7 +37,7 @@ function snapshot<T>(value: T): T {
 }
 
 /**---
- * ## ![logo](../assets/nexus-state-logoText.svg)
+ * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logoText.svg)
  * ### ***createNexus***:
  * creates a framework-agnostic nexus store.
  * @description

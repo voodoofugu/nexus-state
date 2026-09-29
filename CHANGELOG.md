@@ -35,12 +35,12 @@ A documentation pass plus one behaviour fix. No API changes.
 
 ### Changed
 
-- **The logo shown in hover documentation now ships with the package.** It was
-  fetched from GitHub on every hover, which needed a network round trip, showed
-  nothing offline, and would have broken silently had the repository layout
-  changed. A single SVG is copied into `dist/assets` at build time and referenced
-  by a relative path. Declarations shrank more than the file adds, so the
-  unpacked package is slightly smaller than 4.0.0.
+- **The logo in hover documentation is now an SVG with the wordmark.** The
+  previous bitmap washed out on light editor themes; the replacement clears the
+  contrast threshold on both light and dark, and stays sharp on any display.
+  Shipping it inside the package was tried and reverted: editors resolve a
+  relative image against the file the hover is shown in, not the declaration it
+  came from, so it only rendered while browsing the library's own sources.
 
 ## 4.0.0 — 2026-07-10
 
