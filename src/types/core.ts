@@ -1,5 +1,5 @@
 /**---
- * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logoText.svg)
+ * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logo.png)
  * ### ***RecordAny***:
  * internal object shape used by generic nexus state and acts constraints.
  * @description
@@ -18,7 +18,7 @@ type RecordAny = Record<string, any>;
 type KnownSource = "manual" | "storage" | "server" | "external" | "reset";
 
 /**---
- * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logoText.svg)
+ * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logo.png)
  * ### ***Source***:
  * update source label carried by `set`, `middleware` and subscribers.
  * @description
@@ -33,7 +33,7 @@ type KnownSource = "manual" | "storage" | "server" | "external" | "reset";
 type Source = KnownSource | (string & {});
 
 /**---
- * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logoText.svg)
+ * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logo.png)
  * ### ***UpdateContext***:
  * trace metadata describing where a state update came from.
  * @description
@@ -51,7 +51,7 @@ type Source = KnownSource | (string & {});
 type UpdateContext = { source: Source; meta?: RecordAny };
 
 /**---
- * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logoText.svg)
+ * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logo.png)
  * ### ***SetContext***:
  * context accepted by `set`.
  * @description
@@ -66,7 +66,7 @@ type UpdateContext = { source: Source; meta?: RecordAny };
 type SetContext = Source | UpdateContext;
 
 /**---
- * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logoText.svg)
+ * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logo.png)
  * ### ***Setter***:
  * updates the state with a partial object or functional updater.
  * @param update partial object or function with access to the full current state.
@@ -93,7 +93,7 @@ type Setter<S> = (
 ) => void;
 
 /**---
- * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logoText.svg)
+ * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logo.png)
  * ### ***Getter***:
  * reads the whole state or one typed state key.
  * @description
@@ -111,7 +111,7 @@ type Getter<S> = {
 };
 
 /**---
- * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logoText.svg)
+ * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logo.png)
  * ### ***Middleware***:
  * intercepts every state update before subscribers are notified.
  * @param prevState state before the update.
@@ -133,7 +133,7 @@ type Middleware<S> = (
 ) => S | void;
 
 /**---
- * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logoText.svg)
+ * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logo.png)
  * ### ***Observer***:
  * subscriber callback called after a relevant state update.
  * @param state latest complete state.
@@ -148,7 +148,7 @@ type Middleware<S> = (
 type Observer<S> = (state: S, context?: UpdateContext) => void;
 
 /**---
- * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logoText.svg)
+ * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logo.png)
  * ### ***Dependencies***:
  * keys that control when a subscriber or selector should update.
  * @description
@@ -164,7 +164,7 @@ type Observer<S> = (state: S, context?: UpdateContext) => void;
 type Dependencies<S> = ["*"] | (keyof S)[];
 
 /**---
- * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logoText.svg)
+ * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logo.png)
  * ### ***EqualityFn***:
  * compares the previous and next result of a `useSelector` selector.
  * @description
@@ -180,7 +180,7 @@ type Dependencies<S> = ["*"] | (keyof S)[];
 type EqualityFn<T> = (a: T, b: T) => boolean;
 
 /**---
- * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logoText.svg)
+ * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logo.png)
  * ### ***ActsCreate***:
  * function that creates the action object for a nexus.
  * @description
@@ -198,7 +198,7 @@ type EqualityFn<T> = (a: T, b: T) => boolean;
 type ActsCreate<S, A> = (get: Getter<S>, set: Setter<S>) => A;
 
 /**---
- * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logoText.svg)
+ * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logo.png)
  * ### ***ActsPart***:
  * action slice produced by `createActs`.
  * @description
@@ -222,7 +222,7 @@ type ActsCreate<S, A> = (get: Getter<S>, set: Setter<S>) => A;
 type ActsPart<S, A> = (this: A, get: Getter<S>, set: Setter<S>) => Partial<A>;
 
 /**---
- * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logoText.svg)
+ * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logo.png)
  * ### ***ActsCreateUnion***:
  * accepted `acts` forms for `createNexus` and `createReactNexus`.
  * @description
@@ -241,7 +241,7 @@ type ActsCreateUnion<S, A> =
   | ActsPart<S, A>[];
 
 /**---
- * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logoText.svg)
+ * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logo.png)
  * ### ***NexusOptions***:
  * configuration object accepted by `createNexus` and `createReactNexus`.
  * @property state initial state object used by the store and by `reset`.
@@ -264,7 +264,7 @@ type NexusOptions<S, A> = {
 };
 
 /**---
- * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logoText.svg)
+ * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logo.png)
  * ### ***Nexus***:
  * framework-agnostic nexus store instance.
  * @description
@@ -282,7 +282,7 @@ type NexusOptions<S, A> = {
  */
 interface Nexus<S, A = Record<string, never>> {
   /**---
-   * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logoText.svg)
+   * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logo.png)
    * ### ***get***:
    * reads the whole state or one typed state key.
    * @example
@@ -294,7 +294,7 @@ interface Nexus<S, A = Record<string, never>> {
   get: Getter<S>;
 
   /**---
-   * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logoText.svg)
+   * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logo.png)
    * ### ***set***:
    * updates the state with a partial object or functional updater.
    * @description
@@ -314,7 +314,7 @@ interface Nexus<S, A = Record<string, never>> {
   set: Setter<S>;
 
   /**---
-   * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logoText.svg)
+   * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logo.png)
    * ### ***reset***:
    * restores all state or selected keys to their initial values.
    * @description
@@ -330,7 +330,7 @@ interface Nexus<S, A = Record<string, never>> {
   reset(...keys: (keyof S)[]): void;
 
   /**---
-   * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logoText.svg)
+   * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logo.png)
    * ### ***subscribe***:
    * listens to all updates or only selected state keys.
    * @param observer callback called with latest state and optional update context.
@@ -348,7 +348,7 @@ interface Nexus<S, A = Record<string, never>> {
   subscribe(observer: Observer<S>, dependencies: Dependencies<S>): () => void;
 
   /**---
-   * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logoText.svg)
+   * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logo.png)
    * ### ***middleware***:
    * adds an update interceptor for this nexus.
    * @description
@@ -367,7 +367,7 @@ interface Nexus<S, A = Record<string, never>> {
   middleware(fn: Middleware<S>): () => void;
 
   /**---
-   * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logoText.svg)
+   * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logo.png)
    * ### ***acts***:
    * action object created from the `acts` option.
    * @description
@@ -384,7 +384,7 @@ interface Nexus<S, A = Record<string, never>> {
 }
 
 /**---
- * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logoText.svg)
+ * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logo.png)
  * ### ***ReactNexus***:
  * nexus store with React hooks added by `createReactNexus`.
  * @description
@@ -398,7 +398,7 @@ interface Nexus<S, A = Record<string, never>> {
  */
 interface ReactNexus<S, A = Record<string, never>> extends Nexus<S, A> {
   /**---
-   * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logoText.svg)
+   * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logo.png)
    * ### ***use***:
    * React hook that subscribes a component to the whole state or one key.
    * @description
@@ -417,7 +417,7 @@ interface ReactNexus<S, A = Record<string, never>> extends Nexus<S, A> {
   };
 
   /**---
-   * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logoText.svg)
+   * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logo.png)
    * ### ***useSelector***:
    * React hook that derives a value from state with automatic key tracking.
    * @description
@@ -456,7 +456,7 @@ interface ReactNexus<S, A = Record<string, never>> extends Nexus<S, A> {
   ): R;
 
   /**---
-   * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logoText.svg)
+   * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logo.png)
    * ### ***useRerender***:
    * React hook that returns an imperative local re-render function.
    * @description

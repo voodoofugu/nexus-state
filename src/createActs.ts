@@ -1,7 +1,7 @@
 import type { Setter, Getter, RecordAny, ActsPart } from "./types/core";
 
 /**---
- * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logoText.svg)
+ * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logo.png)
  * ### ***createActs***:
  * creates a reusable action slice for `createNexus` or `createReactNexus`.
  * @description

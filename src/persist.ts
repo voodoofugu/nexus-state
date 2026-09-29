@@ -1,7 +1,7 @@
 import type { Nexus, RecordAny, Dependencies } from "./types/core";
 
 /**---
- * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logoText.svg)
+ * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logo.png)
  * ### ***PersistStorage***:
  * minimal synchronous storage contract used by `persist`.
  * @description
@@ -25,7 +25,7 @@ import type { Nexus, RecordAny, Dependencies } from "./types/core";
  */
 interface PersistStorage {
   /**---
-   * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logoText.svg)
+   * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logo.png)
    * ### ***getItem***:
    * reads a persisted string value by key.
    * @returns persisted value, or `null` when no value exists.
@@ -33,14 +33,14 @@ interface PersistStorage {
   getItem(key: string): string | null;
 
   /**---
-   * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logoText.svg)
+   * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logo.png)
    * ### ***setItem***:
    * writes a serialized string value by key.
    */
   setItem(key: string, value: string): void;
 
   /**---
-   * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logoText.svg)
+   * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logo.png)
    * ### ***removeItem***:
    * removes a persisted value by key.
    */
@@ -48,7 +48,7 @@ interface PersistStorage {
 }
 
 /**---
- * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logoText.svg)
+ * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logo.png)
  * ### ***PersistOptions***:
  * configuration object accepted by `persist`.
  * @description
@@ -67,14 +67,14 @@ interface PersistStorage {
  */
 interface PersistOptions<S> {
   /**---
-   * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logoText.svg)
+   * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logo.png)
    * ### ***key***:
    * storage key used for the persisted snapshot.
    */
   key: string;
 
   /**---
-   * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logoText.svg)
+   * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logo.png)
    * ### ***storage***:
    * storage backend used by `persist`.
    * @description
@@ -84,7 +84,7 @@ interface PersistOptions<S> {
   storage?: PersistStorage;
 
   /**---
-   * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logoText.svg)
+   * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logo.png)
    * ### ***include***:
    * state keys that should be persisted.
    * @description
@@ -93,7 +93,7 @@ interface PersistOptions<S> {
   include?: (keyof S)[];
 
   /**---
-   * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logoText.svg)
+   * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logo.png)
    * ### ***version***:
    * persisted schema version.
    * @description
@@ -103,7 +103,7 @@ interface PersistOptions<S> {
   version?: number;
 
   /**---
-   * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logoText.svg)
+   * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logo.png)
    * ### ***migrate***:
    * transforms an older persisted snapshot into the current state shape.
    * @param persisted raw persisted state object.
@@ -113,7 +113,7 @@ interface PersistOptions<S> {
   migrate?: (persisted: RecordAny, from: number) => Partial<S>;
 
   /**---
-   * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logoText.svg)
+   * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logo.png)
    * ### ***debounce***:
    * coalesce rapid updates into a single write after `ms` of quiet.
    * @description
@@ -125,7 +125,7 @@ interface PersistOptions<S> {
   debounce?: number;
 
   /**---
-   * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logoText.svg)
+   * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logo.png)
    * ### ***onError***:
    * receives storage, JSON parse or serialization errors.
    * @description
@@ -151,7 +151,7 @@ function defaultStorage(): PersistStorage | null {
 const HYDRATED = "@@nexus/hydrated";
 
 /**---
- * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logoText.svg)
+ * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logo.png)
  * ### ***persist***:
  * syncs a nexus with persistent storage.
  * @description

@@ -18,9 +18,10 @@ A single fix to the previous release. No API changes.
   an editor resolves the image against the file the hover is displayed in — the
   consumer's own file — not against the declaration the text came from, so the
   path never matched and the logo showed as broken. The image is served from a
-  URL again, now the SVG wordmark, addressed directly on
-  `raw.githubusercontent.com` to skip the redirect the `github.com/raw` form
-  goes through.
+  URL again, addressed directly on `raw.githubusercontent.com` to skip the
+  redirect the `github.com/raw` form goes through. It stays a bitmap: editors
+  render a remote PNG in a hover but not a remote SVG, which was tested before
+  settling on it.
 
   Embedding the image as a data URI would sidestep both the network and the
   path, but the banner repeats 160 times across the bundled declarations, which
