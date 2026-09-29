@@ -1,5 +1,5 @@
 /**---
- * ## ![logo](../assets/nexus-state-logoText.svg)
+ * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logoText.svg)
  * ### ***RecordAny***:
  * internal object shape used by generic nexus state and acts constraints.
  * @description
@@ -16,7 +16,7 @@
 type RecordAny = Record<string, any>;
 type KnownSource = "manual" | "storage" | "server" | "external" | "reset";
 /**---
- * ## ![logo](../assets/nexus-state-logoText.svg)
+ * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logoText.svg)
  * ### ***Source***:
  * update source label carried by `set`, `middleware` and subscribers.
  * @description
@@ -30,7 +30,7 @@ type KnownSource = "manual" | "storage" | "server" | "external" | "reset";
  */
 type Source = KnownSource | (string & {});
 /**---
- * ## ![logo](../assets/nexus-state-logoText.svg)
+ * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logoText.svg)
  * ### ***UpdateContext***:
  * trace metadata describing where a state update came from.
  * @description
@@ -50,7 +50,7 @@ type UpdateContext = {
     meta?: RecordAny;
 };
 /**---
- * ## ![logo](../assets/nexus-state-logoText.svg)
+ * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logoText.svg)
  * ### ***SetContext***:
  * context accepted by `set`.
  * @description
@@ -64,7 +64,7 @@ type UpdateContext = {
  */
 type SetContext = Source | UpdateContext;
 /**---
- * ## ![logo](../assets/nexus-state-logoText.svg)
+ * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logoText.svg)
  * ### ***Setter***:
  * updates the state with a partial object or functional updater.
  * @param update partial object or function with access to the full current state.
@@ -87,7 +87,7 @@ type SetContext = Source | UpdateContext;
  */
 type Setter<S> = (update: Partial<S> | ((state: S) => Partial<S>), context?: SetContext) => void;
 /**---
- * ## ![logo](../assets/nexus-state-logoText.svg)
+ * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logoText.svg)
  * ### ***Getter***:
  * reads the whole state or one typed state key.
  * @description
@@ -104,7 +104,7 @@ type Getter<S> = {
     <K extends keyof S>(key: K): S[K];
 };
 /**---
- * ## ![logo](../assets/nexus-state-logoText.svg)
+ * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logoText.svg)
  * ### ***Middleware***:
  * intercepts every state update before subscribers are notified.
  * @param prevState state before the update.
@@ -121,7 +121,7 @@ type Getter<S> = {
  */
 type Middleware<S> = (prevState: S, nextState: S, context?: UpdateContext) => S | void;
 /**---
- * ## ![logo](../assets/nexus-state-logoText.svg)
+ * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logoText.svg)
  * ### ***Observer***:
  * subscriber callback called after a relevant state update.
  * @param state latest complete state.
@@ -135,7 +135,7 @@ type Middleware<S> = (prevState: S, nextState: S, context?: UpdateContext) => S 
  */
 type Observer<S> = (state: S, context?: UpdateContext) => void;
 /**---
- * ## ![logo](../assets/nexus-state-logoText.svg)
+ * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logoText.svg)
  * ### ***Dependencies***:
  * keys that control when a subscriber or selector should update.
  * @description
@@ -150,7 +150,7 @@ type Observer<S> = (state: S, context?: UpdateContext) => void;
  */
 type Dependencies<S> = ["*"] | (keyof S)[];
 /**---
- * ## ![logo](../assets/nexus-state-logoText.svg)
+ * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logoText.svg)
  * ### ***EqualityFn***:
  * compares the previous and next result of a `useSelector` selector.
  * @description
@@ -165,7 +165,7 @@ type Dependencies<S> = ["*"] | (keyof S)[];
  */
 type EqualityFn<T> = (a: T, b: T) => boolean;
 /**---
- * ## ![logo](../assets/nexus-state-logoText.svg)
+ * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logoText.svg)
  * ### ***ActsCreate***:
  * function that creates the action object for a nexus.
  * @description
@@ -182,7 +182,7 @@ type EqualityFn<T> = (a: T, b: T) => boolean;
  */
 type ActsCreate<S, A> = (get: Getter<S>, set: Setter<S>) => A;
 /**---
- * ## ![logo](../assets/nexus-state-logoText.svg)
+ * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logoText.svg)
  * ### ***ActsPart***:
  * action slice produced by `createActs`.
  * @description
@@ -205,7 +205,7 @@ type ActsCreate<S, A> = (get: Getter<S>, set: Setter<S>) => A;
  */
 type ActsPart<S, A> = (this: A, get: Getter<S>, set: Setter<S>) => Partial<A>;
 /**---
- * ## ![logo](../assets/nexus-state-logoText.svg)
+ * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logoText.svg)
  * ### ***ActsCreateUnion***:
  * accepted `acts` forms for `createNexus` and `createReactNexus`.
  * @description
@@ -220,7 +220,7 @@ type ActsPart<S, A> = (this: A, get: Getter<S>, set: Setter<S>) => Partial<A>;
  */
 type ActsCreateUnion<S, A> = ActsCreate<S, A> | ActsPart<S, A> | ActsPart<S, A>[];
 /**---
- * ## ![logo](../assets/nexus-state-logoText.svg)
+ * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logoText.svg)
  * ### ***NexusOptions***:
  * configuration object accepted by `createNexus` and `createReactNexus`.
  * @property state initial state object used by the store and by `reset`.
@@ -242,7 +242,7 @@ type NexusOptions<S, A> = {
     acts?: ActsCreateUnion<S, A>;
 };
 /**---
- * ## ![logo](../assets/nexus-state-logoText.svg)
+ * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logoText.svg)
  * ### ***Nexus***:
  * framework-agnostic nexus store instance.
  * @description
@@ -260,7 +260,7 @@ type NexusOptions<S, A> = {
  */
 interface Nexus<S, A = Record<string, never>> {
     /**---
-     * ## ![logo](../assets/nexus-state-logoText.svg)
+     * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logoText.svg)
      * ### ***get***:
      * reads the whole state or one typed state key.
      * @example
@@ -271,7 +271,7 @@ interface Nexus<S, A = Record<string, never>> {
      */
     get: Getter<S>;
     /**---
-     * ## ![logo](../assets/nexus-state-logoText.svg)
+     * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logoText.svg)
      * ### ***set***:
      * updates the state with a partial object or functional updater.
      * @description
@@ -290,7 +290,7 @@ interface Nexus<S, A = Record<string, never>> {
      */
     set: Setter<S>;
     /**---
-     * ## ![logo](../assets/nexus-state-logoText.svg)
+     * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logoText.svg)
      * ### ***reset***:
      * restores all state or selected keys to their initial values.
      * @description
@@ -305,7 +305,7 @@ interface Nexus<S, A = Record<string, never>> {
      */
     reset(...keys: (keyof S)[]): void;
     /**---
-     * ## ![logo](../assets/nexus-state-logoText.svg)
+     * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logoText.svg)
      * ### ***subscribe***:
      * listens to all updates or only selected state keys.
      * @param observer callback called with latest state and optional update context.
@@ -322,7 +322,7 @@ interface Nexus<S, A = Record<string, never>> {
      */
     subscribe(observer: Observer<S>, dependencies: Dependencies<S>): () => void;
     /**---
-     * ## ![logo](../assets/nexus-state-logoText.svg)
+     * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logoText.svg)
      * ### ***middleware***:
      * adds an update interceptor for this nexus.
      * @description
@@ -340,7 +340,7 @@ interface Nexus<S, A = Record<string, never>> {
      */
     middleware(fn: Middleware<S>): () => void;
     /**---
-     * ## ![logo](../assets/nexus-state-logoText.svg)
+     * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logoText.svg)
      * ### ***acts***:
      * action object created from the `acts` option.
      * @description
@@ -357,7 +357,7 @@ interface Nexus<S, A = Record<string, never>> {
 }
 
 /**---
- * ## ![logo](../assets/nexus-state-logoText.svg)
+ * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logoText.svg)
  * ### ***createNexus***:
  * creates a framework-agnostic nexus store.
  * @description
@@ -397,7 +397,7 @@ declare function createNexus<S extends RecordAny>(options: {
 declare function createNexus<S extends RecordAny = RecordAny, A extends RecordAny = Record<string, never>>(options: NexusOptions<S, A>): Nexus<S, A>;
 
 /**---
- * ## ![logo](../assets/nexus-state-logoText.svg)
+ * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logoText.svg)
  * ### ***createActs***:
  * creates a reusable action slice for `createNexus` or `createReactNexus`.
  * @description
@@ -437,7 +437,7 @@ declare function createNexus<S extends RecordAny = RecordAny, A extends RecordAn
 declare function createActs<S extends RecordAny, A extends RecordAny = RecordAny>(create: (this: A, get: Getter<S>, set: Setter<S>) => Partial<A> & ThisType<A>): ActsPart<S, A>;
 
 /**---
- * ## ![logo](../assets/nexus-state-logoText.svg)
+ * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logoText.svg)
  * ### ***PersistStorage***:
  * minimal synchronous storage contract used by `persist`.
  * @description
@@ -461,27 +461,27 @@ declare function createActs<S extends RecordAny, A extends RecordAny = RecordAny
  */
 interface PersistStorage {
     /**---
-     * ## ![logo](../assets/nexus-state-logoText.svg)
+     * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logoText.svg)
      * ### ***getItem***:
      * reads a persisted string value by key.
      * @returns persisted value, or `null` when no value exists.
      */
     getItem(key: string): string | null;
     /**---
-     * ## ![logo](../assets/nexus-state-logoText.svg)
+     * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logoText.svg)
      * ### ***setItem***:
      * writes a serialized string value by key.
      */
     setItem(key: string, value: string): void;
     /**---
-     * ## ![logo](../assets/nexus-state-logoText.svg)
+     * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logoText.svg)
      * ### ***removeItem***:
      * removes a persisted value by key.
      */
     removeItem(key: string): void;
 }
 /**---
- * ## ![logo](../assets/nexus-state-logoText.svg)
+ * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logoText.svg)
  * ### ***PersistOptions***:
  * configuration object accepted by `persist`.
  * @description
@@ -500,13 +500,13 @@ interface PersistStorage {
  */
 interface PersistOptions<S> {
     /**---
-     * ## ![logo](../assets/nexus-state-logoText.svg)
+     * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logoText.svg)
      * ### ***key***:
      * storage key used for the persisted snapshot.
      */
     key: string;
     /**---
-     * ## ![logo](../assets/nexus-state-logoText.svg)
+     * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logoText.svg)
      * ### ***storage***:
      * storage backend used by `persist`.
      * @description
@@ -515,7 +515,7 @@ interface PersistOptions<S> {
      */
     storage?: PersistStorage;
     /**---
-     * ## ![logo](../assets/nexus-state-logoText.svg)
+     * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logoText.svg)
      * ### ***include***:
      * state keys that should be persisted.
      * @description
@@ -523,7 +523,7 @@ interface PersistOptions<S> {
      */
     include?: (keyof S)[];
     /**---
-     * ## ![logo](../assets/nexus-state-logoText.svg)
+     * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logoText.svg)
      * ### ***version***:
      * persisted schema version.
      * @description
@@ -532,7 +532,7 @@ interface PersistOptions<S> {
      */
     version?: number;
     /**---
-     * ## ![logo](../assets/nexus-state-logoText.svg)
+     * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logoText.svg)
      * ### ***migrate***:
      * transforms an older persisted snapshot into the current state shape.
      * @param persisted raw persisted state object.
@@ -541,7 +541,7 @@ interface PersistOptions<S> {
      */
     migrate?: (persisted: RecordAny, from: number) => Partial<S>;
     /**---
-     * ## ![logo](../assets/nexus-state-logoText.svg)
+     * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logoText.svg)
      * ### ***debounce***:
      * coalesce rapid updates into a single write after `ms` of quiet.
      * @description
@@ -552,7 +552,7 @@ interface PersistOptions<S> {
      */
     debounce?: number;
     /**---
-     * ## ![logo](../assets/nexus-state-logoText.svg)
+     * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logoText.svg)
      * ### ***onError***:
      * receives storage, JSON parse or serialization errors.
      * @description
@@ -561,7 +561,7 @@ interface PersistOptions<S> {
     onError?: (error: unknown) => void;
 }
 /**---
- * ## ![logo](../assets/nexus-state-logoText.svg)
+ * ## ![logo](https://raw.githubusercontent.com/voodoofugu/nexus-state/main/src/assets/nexus-state-logoText.svg)
  * ### ***persist***:
  * syncs a nexus with persistent storage.
  * @description
