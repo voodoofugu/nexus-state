@@ -6,6 +6,26 @@ This project follows [Semantic Versioning](https://semver.org/).
 The API is settled as of 4.0.0. No further additions are planned; anything
 breaking would arrive as a new major.
 
+## 4.0.2 — 2026-09-29
+
+A single fix to the previous release. No API changes.
+
+### Fixed
+
+- **The hover logo did not render outside the library's own sources.** 4.0.1
+  shipped the image inside the package and pointed at it with a relative path,
+  which looked correct while browsing the library in `node_modules`. It is not:
+  an editor resolves the image against the file the hover is displayed in — the
+  consumer's own file — not against the declaration the text came from, so the
+  path never matched and the logo showed as broken. The image is served from a
+  URL again, now the SVG wordmark, addressed directly on
+  `raw.githubusercontent.com` to skip the redirect the `github.com/raw` form
+  goes through.
+
+  Embedding the image as a data URI would sidestep both the network and the
+  path, but the banner repeats 160 times across the bundled declarations, which
+  adds roughly 1.2 MB unpacked — so it was measured and rejected.
+
 ## 4.0.1 — 2026-09-28
 
 A documentation pass plus one behaviour fix. No API changes.
@@ -37,10 +57,9 @@ A documentation pass plus one behaviour fix. No API changes.
 
 - **The logo in hover documentation is now an SVG with the wordmark.** The
   previous bitmap washed out on light editor themes; the replacement clears the
-  contrast threshold on both light and dark, and stays sharp on any display.
-  Shipping it inside the package was tried and reverted: editors resolve a
-  relative image against the file the hover is shown in, not the declaration it
-  came from, so it only rendered while browsing the library's own sources.
+  contrast threshold on both light and dark, and stays sharp on any display. It
+  ships inside the package and is referenced by a relative path, so no request
+  leaves the machine. (This part did not work — see 4.0.2.)
 
 ## 4.0.0 — 2026-07-10
 

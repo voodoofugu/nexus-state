@@ -1,6 +1,6 @@
 {
   "name": "nexus-state",
-  "version": "4.0.1",
+  "version": "4.0.2",
   "description": "Lightweight, traceable global state manager for JavaScript and React.",
   "author": "Georg Schilin",
   "license": "MIT",
