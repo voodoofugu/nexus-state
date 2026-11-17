@@ -247,7 +247,7 @@ function Tree({
         return (
           <li key={href}>
             <div
-              className={`docs-tree-row${hasChildren ? " has-children" : ""}${isCurrent ? " is-current" : ""}`}
+              className={`docs-tree-row${hasChildren ? " has-children" : ""}${inside ? " is-ancestor" : ""}${isCurrent ? " is-current" : ""}`}
             >
               <span className="docs-tree-link">
                 <a
