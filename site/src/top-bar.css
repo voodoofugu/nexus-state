@@ -5,9 +5,19 @@
 .top-bar {
   position: relative;
   z-index: 20;
-  border-bottom: 1px solid var(--line-soft);
-  background: color-mix(in srgb, var(--bg) 90%, transparent);
-  backdrop-filter: blur(18px);
+  border-bottom: 1px solid color-mix(in srgb, var(--line-soft) 55%, transparent);
+  background: color-mix(in srgb, var(--bg) 72%, transparent);
+  backdrop-filter: blur(16px) saturate(1.06);
+  transition:
+    background-color 180ms ease,
+    border-color 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.docs[data-scrolled] > .top-bar {
+  border-bottom-color: var(--line-soft);
+  background: color-mix(in srgb, var(--bg) 86%, transparent);
+  box-shadow: 0 8px 22px color-mix(in srgb, var(--ink) 12%, transparent);
 }
 
 .top-bar-inner {

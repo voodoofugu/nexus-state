@@ -13,7 +13,7 @@ import type { ReadmeNode } from "virtual:ns-readme";
 import ChromeScroll from "./ChromeScroll";
 import TopBar from "./TopBar";
 import type { Theme } from "./TopBar";
-import type { MorphScrollHandle } from "morphing-scroll";
+import type { MorphScrollHandle, MorphScrollProps } from "morphing-scroll";
 
 /*
  * Документация — это README, показанный удобнее: текст разделов приходит из
@@ -322,6 +322,17 @@ function Docs() {
     () => new Map(),
   );
   const page = React.useRef<MorphScrollHandle>(null);
+  const navigation = React.useRef<HTMLElement>(null);
+  const shell = React.useRef<HTMLDivElement>(null);
+  const keepNavigationStill = React.useCallback<
+    NonNullable<MorphScrollProps["onScrollPosition"]>
+  >((_left, top) => {
+    navigation.current?.style.setProperty(
+      "--docs-scroll-offset",
+      `${top}px`,
+    );
+    shell.current?.toggleAttribute("data-scrolled", top > 8);
+  }, []);
 
   // новый раздел читают с начала
   React.useEffect(() => {
@@ -345,18 +356,19 @@ function Docs() {
   };
 
   return (
-    <div className="docs">
+    <div className="docs" ref={shell}>
       <TopBar onTheme={setTheme} theme={theme} />
 
       <div className="docs-shell">
         <main className="docs-main">
           <ChromeScroll
             controls={{ keys: true }}
+            onScrollPosition={keepNavigationStill}
             ref={page}
           >
             <div className="docs-content">
               <div className="docs-body">
-                <aside className="docs-nav">
+                <aside className="docs-nav" ref={navigation}>
           <input
             aria-label="search api"
             className="docs-search"
