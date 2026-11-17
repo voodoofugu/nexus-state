@@ -38,3 +38,7 @@
 .chrome-scroll .ms-thumb.ms-grabbing .scroll-thumb {
   color: var(--ink-faint);
 }
+
+.docs-main > div > .chrome-scroll > .ms-content > .ms-bar {
+  z-index: 30;
+}
