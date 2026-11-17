@@ -83,17 +83,19 @@ function TopBar({
 }) {
   return (
     <header className="top-bar">
-      <a className="top-brand" href="#/">
-        {/* знак красим сами: форму берём маской, цвет — из темы */}
-        <span
-          className="top-mark"
-          style={{ "--mark": `url("${logo}")` } as React.CSSProperties}
-        />
-        <span>nexus-state</span>
-        <span className="top-version">v{packageInfo.version}</span>
-      </a>
+      <div className="top-bar-inner">
+        <a className="top-brand" href="#/">
+          {/* знак красим сами: форму берём маской, цвет — из темы */}
+          <span
+            className="top-mark"
+            style={{ "--mark": `url("${logo}")` } as React.CSSProperties}
+          />
+          <span>nexus-state</span>
+          <span className="top-version">v{packageInfo.version}</span>
+        </a>
 
-      <ThemeControl onTheme={onTheme} theme={theme} />
+        <ThemeControl onTheme={onTheme} theme={theme} />
+      </div>
     </header>
   );
 }

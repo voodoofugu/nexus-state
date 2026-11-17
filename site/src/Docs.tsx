@@ -298,16 +298,18 @@ function Tree({
 function Footer() {
   return (
     <footer className="site-footer">
-      <div>
-        <span>© {new Date().getFullYear()} voodoofugu</span>
+      <div className="site-footer-inner">
+        <div>
+          <span>© {new Date().getFullYear()} voodoofugu</span>
+        </div>
+        <nav aria-label="Project links">
+          <a href="https://www.npmjs.com/package/nexus-state">npm</a>
+          <a href="https://github.com/voodoofugu/nexus-state">github</a>
+          <a href="https://dev.to/voodoofugu/how-i-wrote-my-own-state-manager-434h">article · en</a>
+          <a href="https://habr.com/ru/articles/1087264/">article · ru</a>
+          <a href="https://resume.voodoofugu.com/?lang=ru">author</a>
+        </nav>
       </div>
-      <nav aria-label="Project links">
-        <a href="https://www.npmjs.com/package/nexus-state">npm</a>
-        <a href="https://github.com/voodoofugu/nexus-state">github</a>
-        <a href="https://dev.to/voodoofugu/how-i-wrote-my-own-state-manager-434h">article · en</a>
-        <a href="https://habr.com/ru/articles/1087264/">article · ru</a>
-        <a href="https://resume.voodoofugu.com/?lang=ru">author</a>
-      </nav>
     </footer>
   );
 }
@@ -351,7 +353,6 @@ function Docs() {
           <ChromeScroll
             controls={{ keys: true }}
             ref={page}
-            wrapper={{ margin: [24, 18, 24, 0] }}
           >
             <div className="docs-content">
               <div className="docs-body">
