@@ -295,9 +295,13 @@ function Tree({
   );
 }
 
-function Footer() {
+function Footer({
+  elementRef,
+}: {
+  elementRef: React.Ref<HTMLElement>;
+}) {
   return (
-    <footer className="site-footer">
+    <footer className="site-footer" ref={elementRef}>
       <div className="site-footer-inner">
         <div>
           <span>© {new Date().getFullYear()} voodoofugu</span>
@@ -323,6 +327,7 @@ function Docs() {
   );
   const page = React.useRef<MorphScrollHandle>(null);
   const navigation = React.useRef<HTMLElement>(null);
+  const footer = React.useRef<HTMLElement>(null);
   const shell = React.useRef<HTMLDivElement>(null);
   const keepNavigationStill = React.useCallback<
     NonNullable<MorphScrollProps["onScrollPosition"]>
@@ -331,6 +336,21 @@ function Docs() {
       "--docs-scroll-offset",
       `${top}px`,
     );
+    if (navigation.current && footer.current && shell.current) {
+      const headerHeight =
+        Number.parseFloat(
+          getComputedStyle(shell.current).getPropertyValue("--top-bar-height"),
+        ) || 59;
+      const navigationTop = headerHeight + 24;
+      const availableHeight = Math.max(
+        0,
+        footer.current.getBoundingClientRect().top - navigationTop,
+      );
+      navigation.current.style.setProperty(
+        "--docs-nav-available",
+        `${availableHeight}px`,
+      );
+    }
     shell.current?.toggleAttribute("data-scrolled", top > 8);
   }, []);
 
@@ -424,7 +444,7 @@ function Docs() {
                 {node ? <Page node={node} /> : <Overview />}
               </div>
               </div>
-              <Footer />
+              <Footer elementRef={footer} />
             </div>
           </ChromeScroll>
         </main>
