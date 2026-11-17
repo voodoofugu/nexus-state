@@ -15,23 +15,23 @@
 :root {
   color-scheme: light dark;
 
-  --bg: light-dark(#f4f5f1, #101615);
-  --panel: light-dark(#fbfcf9, #151d1b);
-  --card: light-dark(#ffffff, #1a2321);
-  --card-soft: light-dark(#f7faf8, #1e2826);
-  --ink: light-dark(#18201f, #e6efec);
-  --ink-soft: light-dark(#55635f, #9fada9);
-  --ink-faint: light-dark(#8d9a96, #71807b);
-  --ink-faint-soft: light-dark(#b6c7c3, #505b57);
-  --line: light-dark(#d8e0dc, #2a3533);
-  --line-soft: light-dark(#dadedc, #222c2a);
+  --bg: light-dark(#f7f4fb, #14101a);
+  --panel: light-dark(#fcfafe, #1a1522);
+  --card: light-dark(#ffffff, #211a2b);
+  --card-soft: light-dark(#faf7fd, #271f32);
+  --ink: light-dark(#211a29, #f0eaf6);
+  --ink-soft: light-dark(#685c70, #b1a4ba);
+  --ink-faint: light-dark(#9b8fa3, #82758b);
+  --ink-faint-soft: light-dark(#c6bacd, #605468);
+  --line: light-dark(#e4dce9, #3a2e42);
+  --line-soft: light-dark(#e8e1ec, #302637);
   --accent: light-dark(#7c3aed, #a78bfa);
   --accent-soft: light-dark(#f1eafe, #251a3f);
   --accent-ink: light-dark(#6d28d9, #cbb6ff);
-  --code-bg: light-dark(#17201f, #0b1211);
-  --code-ink: light-dark(#eef7f4, #dff0ec);
-  --grid: light-dark(rgba(24, 32, 31, 0.05), rgba(255, 255, 255, 0.05));
-  --shadow: light-dark(rgba(18, 32, 28, 0.13), rgba(0, 0, 0, 0.45));
+  --code-bg: light-dark(#211a29, #0e0a12);
+  --code-ink: light-dark(#f6effa, #eadff1);
+  --grid: light-dark(rgba(33, 26, 41, 0.05), rgba(255, 255, 255, 0.05));
+  --shadow: light-dark(rgba(38, 24, 48, 0.13), rgba(0, 0, 0, 0.45));
 }
 
 :root[data-theme="light"] {
