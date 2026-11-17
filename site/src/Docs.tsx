@@ -14,7 +14,6 @@ import ChromeScroll from "./ChromeScroll";
 import TopBar from "./TopBar";
 import type { Theme } from "./TopBar";
 import type { MorphScrollHandle } from "morphing-scroll";
-import packageInfo from "../../package.json";
 
 /*
  * Документация — это README, показанный удобнее: текст разделов приходит из
@@ -247,10 +246,10 @@ function Tree({
 
         return (
           <li key={href}>
-            <div className="docs-tree-row">
-              <span
-                className={`docs-tree-link${isCurrent ? " is-current" : ""}`}
-              >
+            <div
+              className={`docs-tree-row${hasChildren ? " has-children" : ""}${isCurrent ? " is-current" : ""}`}
+            >
+              <span className="docs-tree-link">
                 <a
                   aria-current={isCurrent ? "page" : inside || undefined}
                   href={href}
@@ -265,9 +264,7 @@ function Tree({
                   className="docs-tree-toggle"
                   onClick={() => onToggle(href, open)}
                   type="button"
-                >
-                  <span aria-hidden="true">›</span>
-                </button>
+                />
               )}
             </div>
             {hasChildren && (
@@ -302,8 +299,6 @@ function Footer() {
   return (
     <footer className="site-footer">
       <div>
-        <strong>nexus-state</strong>
-        <span>v{packageInfo.version}</span>
         <span>© {new Date().getFullYear()} voodoofugu</span>
       </div>
       <nav aria-label="Project links">
@@ -352,7 +347,15 @@ function Docs() {
       <TopBar onTheme={setTheme} theme={theme} />
 
       <div className="docs-shell">
-        <aside className="docs-nav">
+        <main className="docs-main">
+          <ChromeScroll
+            controls={{ keys: true }}
+            ref={page}
+            wrapper={{ margin: [24, 18, 24, 0] }}
+          >
+            <div className="docs-content">
+              <div className="docs-body">
+                <aside className="docs-nav">
           <input
             aria-label="search api"
             className="docs-search"
@@ -383,16 +386,16 @@ function Docs() {
                 </ul>
               ) : (
                 <nav aria-label="contents" className="docs-tree">
-                  <span
-                    className={`docs-tree-link${route === "#/" ? " is-current" : ""}`}
-                  >
-                    <a
-                      aria-current={route === "#/" ? "page" : undefined}
-                      href="#/"
-                    >
-                      overview
-                    </a>
-                  </span>
+                  <div className={`docs-tree-row${route === "#/" ? " is-current" : ""}`}>
+                    <span className="docs-tree-link">
+                      <a
+                        aria-current={route === "#/" ? "page" : undefined}
+                        href="#/"
+                      >
+                        overview
+                      </a>
+                    </span>
+                  </div>
                   <Tree
                     current={route}
                     expanded={expanded}
@@ -403,16 +406,11 @@ function Docs() {
               )}
             </ChromeScroll>
           </div>
-        </aside>
-
-        <main className="docs-main">
-          <ChromeScroll
-            controls={{ keys: true }}
-            ref={page}
-            wrapper={{ margin: [24, 18, 24, 0] }}
-          >
-            <div className="docs-content">
-              {node ? <Page node={node} /> : <Overview />}
+                </aside>
+              <div className="docs-page-slot">
+                {node ? <Page node={node} /> : <Overview />}
+              </div>
+              </div>
               <Footer />
             </div>
           </ChromeScroll>
