@@ -230,15 +230,20 @@ function Tree({ nodes, current }: { nodes: ReadmeNode[]; current: string }) {
         const href = hrefOf(node);
         const inside = current.startsWith(`${href}/`);
         const open = node.kind === "section" || current === href || inside;
+        const isCurrent = current === href;
 
         return (
           <li key={href}>
-            <a
-              aria-current={current === href ? "page" : inside || undefined}
-              href={href}
+            <span
+              className={`docs-tree-link${isCurrent ? " is-current" : ""}`}
             >
-              {node.name}
-            </a>
+              <a
+                aria-current={isCurrent ? "page" : inside || undefined}
+                href={href}
+              >
+                {node.name}
+              </a>
+            </span>
             {open && node.children.length > 0 && (
               <Tree current={current} nodes={node.children} />
             )}
@@ -304,12 +309,16 @@ function Docs() {
                 </ul>
               ) : (
                 <nav aria-label="contents" className="docs-tree">
-                  <a
-                    aria-current={route === "#/" ? "page" : undefined}
-                    href="#/"
+                  <span
+                    className={`docs-tree-link${route === "#/" ? " is-current" : ""}`}
                   >
-                    overview
-                  </a>
+                    <a
+                      aria-current={route === "#/" ? "page" : undefined}
+                      href="#/"
+                    >
+                      overview
+                    </a>
+                  </span>
                   <Tree current={route} nodes={readme.api} />
                 </nav>
               )}
