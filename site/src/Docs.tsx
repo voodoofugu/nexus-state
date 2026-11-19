@@ -311,6 +311,7 @@ function Footer({
           <a href="https://github.com/voodoofugu/nexus-state">github</a>
           <a href="https://dev.to/voodoofugu/how-i-wrote-my-own-state-manager-434h">article · en</a>
           <a href="https://habr.com/ru/articles/1087264/">article · ru</a>
+          <a href="https://voodoofugu.github.io/">libraries</a>
           <a href="https://resume.voodoofugu.com/?lang=ru">author</a>
         </nav>
       </div>
